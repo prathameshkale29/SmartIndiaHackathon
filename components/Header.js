@@ -6,7 +6,7 @@ function Header({ user, onLogout, onNotificationClick, onSettingsClick, onToggle
       <header className="bg-[var(--bg-white)] border-b border-[var(--border-color)] px-6 py-4" data-name="header" data-file="components/Header.js">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={onToggleSidebar} className="mr-2 p-1 hover:bg-gray-100 rounded-lg transition-colors">
+            <button onClick={onToggleSidebar} className="mr-2 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
               <div className="icon-menu text-xl text-[var(--text-secondary)]"></div>
             </button>
             <button onClick={onNotificationClick} className="relative">
@@ -23,7 +23,7 @@ function Header({ user, onLogout, onNotificationClick, onSettingsClick, onToggle
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">{user?.name}</p>
               <p className="text-xs text-[var(--text-secondary)] capitalize">{user?.role}</p>
             </div>
             <div className="w-10 h-10 bg-[var(--secondary-color)] rounded-full flex items-center justify-center">
@@ -31,7 +31,7 @@ function Header({ user, onLogout, onNotificationClick, onSettingsClick, onToggle
             </div>
             <button
               onClick={onLogout}
-              className="ml-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all flex items-center gap-2"
+              className="ml-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all flex items-center gap-2"
               title={t('logout')}
             >
               <div className="icon-log-out text-lg"></div>
