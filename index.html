@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agri-Sync - Smart Value Chain Platform</title>
+    <meta name="description"
+        content="AI-powered agriculture platform for oilseed value chain connecting farmers, FPOs, processors, and policymakers">
+    <meta name="keywords" content="oilseed, agriculture, AI, farmers, value chain, self-reliance">
+    <meta property="og:title" content="Agri-Sync - Smart Value Chain Platform">
+    <meta property="og:description" content="AI-powered agriculture platform for oilseed value chain">
+    <meta name="twitter:title" content="Agri-Sync - Smart Value Chain Platform">
+    <meta name="twitter:description" content="AI-powered agriculture platform for oilseed value chain">
+
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#16a34a">
+
+    <style type="text/tailwindcss">
+        @layer theme {
+        :root {
+            --primary-color: #10b981;
+            --secondary-color: #d1fae5;
+            --accent-color: #f59e0b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-lighter: #f1f5f9;
+            --border-color: #e2e8f0;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --gradient-primary: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            --gradient-secondary: linear-gradient(135deg, #84cc16 0%, #22c55e 100%);
+            --gradient-success: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            --gradient-warning: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #10b981;
+            --secondary-color: #064e3b;
+            --accent-color: #fbbf24;
+            --success-color: #10b981;
+            --warning-color: #fbbf24;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --bg-light: #1e293b;
+            --bg-lighter: #334155;
+            --border-color: #475569;
+            --bg-white: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --gradient-primary: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            --gradient-secondary: linear-gradient(135deg, #84cc16 0%, #22c55e 100%);
+            --gradient-success: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            --gradient-warning: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+    }
+
+    @layer base {
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+        }
+    }
+
+    @layer components {
+        .card {
+            @apply bg-[var(--bg-white)] rounded-xl shadow-[var(--shadow-sm)] border border-[var(--border-color)] p-4 md:p-6 transition-all duration-300 hover:shadow-[var(--shadow-md)];
+        }
+        .btn-primary {
+            @apply bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 md:px-6 py-2.5 rounded-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300 active:scale-95 text-sm md:text-base;
+        }
+        .sidebar-link {
+            @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer;
+        }
+        .sidebar-link:hover {
+            @apply bg-[var(--bg-lighter)] transform translate-x-1;
+        }
+        .sidebar-link.active {
+            @apply bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900 dark:to-teal-900 dark:bg-opacity-20 text-[var(--primary-color)] font-semibold border-l-4 border-[var(--primary-color)] shadow-md;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .animate-shimmer {
+            animation: shimmer 2s infinite linear;
+            background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+            background-size: 1000px 100%;
+        }
+        
+        /* Responsive Fixes */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        
+        #root {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        /* Prevent horizontal scroll on all containers */
+        .flex, .grid {
+            max-width: 100%;
+        }
+        
+        /* Mobile-specific fixes */
+        @media (max-width: 768px) {
+            .card {
+                padding: 1rem;
+            }
+            
+            main {
+                padding: 1rem !important;
+            }
+            
+            /* Hide scrollbar for cleaner mobile experience */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        }
+    }
+    
+    </style>
+</head>
+
+<body class="bg-[var(--bg-light)]">
+    <div id="root"></div>
+    <script type="text/javascript" src="utils/aiHelper.js"></script>
+    <script type="text/babel" src="components/Login.js"></script>
+    <script type="text/babel" src="components/Sidebar.js"></script>
+    <script type="text/babel" src="components/Header.js"></script>
+    <script type="text/babel" src="components/StatCard.js"></script>
+    <script type="text/babel" src="components/PriceChart.js"></script>
+    <script type="text/babel" src="components/DemandSupplyChart.js"></script>
+    <script type="text/babel" src="components/FarmersList.js"></script>
+    <script type="text/babel" src="components/MarketTable.js"></script>
+    <script type="text/babel" src="components/WarehouseMap.js"></script>
+    <script type="text/babel" src="components/AIAdvisor.js"></script>
+    <script type="text/babel" src="components/ComplianceStatus.js"></script>
+    <script type="text/babel" src="components/ContractsList.js"></script>
+    <script type="text/babel" src="components/PerformanceScore.js"></script>
+    <script type="text/babel" src="components/WeatherWidget.js"></script>
+    <script type="text/babel" src="components/SchemesList.js"></script>
+    <script type="text/babel" src="components/FinancialCalculator.js"></script>
+    <script type="text/babel" src="components/NotificationCenter.js"></script>
+    <script type="text/babel" src="components/Settings.js"></script>
+    <script type="text/babel" src="components/PredictiveAnalytics.js"></script>
+    <script type="text/babel" src="components/VoiceAssistant.js"></script>
+    <script type="text/babel" src="components/LiveAuction.js"></script>
+    <script type="text/babel" src="components/SatelliteWidget.js"></script>
+    <script type="text/babel" src="utils/mockData.js"></script>
+
+    <script type="text/babel" src="utils/auth.js"></script>
+    <script type="text/babel" src="utils/theme.js"></script>
+    <script type="text/babel" src="utils/i18n.js"></script>
+    <script type="text/babel" src="app.js"></script>
+</body>
+
+</html>

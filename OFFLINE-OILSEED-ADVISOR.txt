@@ -1,0 +1,29 @@
+Offline Oilseed AI Advisor
+==========================
+
+This project now includes an OFFLINE oilseed advisor:
+
+- Backend route: backend/routes/oilseedAdvisor.js
+  - No external API keys required.
+  - Uses backend/data/oilseed_knowledge.json as a small local knowledge base.
+  - Does simple keyword matching to return relevant answers about oilseed crops.
+
+- Frontend: components/AIAdvisor.js
+  - Sends the user's question to /api/oilseed-advisor and shows the reply in chat UI.
+
+How to run:
+
+1) Start backend:
+   cd backend
+   npm install
+   npm run dev
+
+2) Start frontend (same as your usual method).
+
+3) Open the AI Advisor tab in the dashboard and ask questions like:
+   - "Best sowing window for soybean in Vidarbha?"
+   - "Fertilizer recommendation for mustard on black soil."
+   - "Major pests of groundnut and basic management."
+   - "How can FPOs reduce post-harvest losses in oilseeds?"
+
+The advisor runs completely offline using the local knowledge base.

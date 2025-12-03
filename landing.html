@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agri-Sync - Empowering Farmers with AI</title>
+    <meta name="description" content="AI-powered agriculture platform transforming India's oilseed value chain">
+    <meta name="keywords" content="agriculture, AI, farmers, oilseeds, digital agriculture">
+    <meta property="og:title" content="Agri-Sync - Smart Agriculture Platform">
+    <meta property="og:description" content="Empowering farmers with AI and technology">
+    <meta name="twitter:title" content="Agri-Sync - Smart Agriculture Platform">
+    <meta name="twitter:description" content="Empowering farmers with AI and technology">
+    
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+    @layer theme {
+        :root {
+            --primary-color: #16a34a;
+            --secondary-color: #86efac;
+            --accent-color: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+            --bg-white: #ffffff;
+        }
+    }
+    
+    @layer utilities {
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out forwards;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel" src="components/LandingHero.js"></script>
+    <script type="text/babel" src="components/FeatureShowcase.js"></script>
+    <script type="text/babel" src="components/ImpactMetrics.js"></script>
+    <script type="text/babel" src="components/TeamSection.js"></script>
+    <script type="text/babel" src="landing-app.js"></script>
+</body>
+</html>

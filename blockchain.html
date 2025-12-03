@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Traceability - Agri-Sync</title>
+    <meta name="description" content="Blockchain-based traceability for oilseed produce">
+    <meta name="keywords" content="blockchain, traceability, supply chain, farm to fork">
+    <meta property="og:title" content="Blockchain Traceability - Agri-Sync">
+    <meta property="og:description" content="Track your produce from farm to fork">
+    <meta name="twitter:title" content="Blockchain Traceability - Agri-Sync">
+    <meta name="twitter:description" content="Track your produce from farm to fork">
+
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+    @layer theme {
+        :root {
+            --primary-color: #047857;
+            --secondary-color: #d1fae5;
+            --accent-color: #f59e0b;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --bg-white: #ffffff;
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #10b981;
+            --secondary-color: #064e3b;
+            --accent-color: #fbbf24;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --bg-light: #1e293b;
+            --border-color: #475569;
+            --bg-white: #0f172a;
+        }
+    }
+    </style>
+</head>
+<body class="bg-[var(--bg-light)]">
+    <div id="root"></div>
+    <script type="text/babel" src="components/BlockchainTracker.js"></script>
+    <script type="text/babel" src="components/QRScanner.js"></script>
+    <script type="text/babel" src="utils/blockchain.js"></script>
+    <script type="text/babel" src="utils/auth.js"></script>
+    <script type="text/babel" src="utils/theme.js"></script>
+    <script type="text/babel" src="utils/i18n.js"></script>
+    <script type="text/babel" src="blockchain-app.js"></script>
+</body>
+</html>

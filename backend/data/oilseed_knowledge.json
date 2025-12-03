@@ -1,0 +1,84 @@
+[
+  {
+    "id": "soybean_sowing_window_vidarbha",
+    "tags": [
+      "soybean",
+      "sowing",
+      "vidarbha",
+      "wardha",
+      "nagpur",
+      "kharif",
+      "rainfed"
+    ],
+    "question": "Best sowing window for soybean in Vidarbha (Wardha, Nagpur)?",
+    "answer": "For soybean in Vidarbha (Wardha, Nagpur), the ideal sowing window is usually from mid June to mid July, after receipt of at least 75\u2013100 mm of rainfall and with good soil moisture. Delayed sowing beyond the last week of July often reduces yield. Use early-maturing varieties if sowing is delayed."
+  },
+  {
+    "id": "soybean_seed_rate_spacing",
+    "tags": [
+      "soybean",
+      "seed rate",
+      "spacing",
+      "plant population"
+    ],
+    "question": "Recommended seed rate and spacing for soybean?",
+    "answer": "Soybean general recommendation: 30\u201335 kg/ha seed rate for bold seeded varieties, sown at 45 cm row spacing and 5\u20137 cm plant spacing (about 30\u201335 plants per metre row length). Maintain sowing depth of 3\u20134 cm only and use treated seed."
+  },
+  {
+    "id": "mustard_fertilizer_black_soil",
+    "tags": [
+      "mustard",
+      "fertilizer",
+      "black soil",
+      "nutrient",
+      "npk"
+    ],
+    "question": "Fertilizer recommendation for mustard on black soils?",
+    "answer": "For mustard on medium black soils, a common blanket recommendation is around 60 kg N, 40 kg P2O5 and 20 kg K2O per hectare. Apply half N + full P and K as basal at sowing and remaining N at first irrigation. Also apply 20 kg S/ha (through gypsum) and micronutrients like zinc if deficiency is known."
+  },
+  {
+    "id": "groundnut_major_pests",
+    "tags": [
+      "groundnut",
+      "pest",
+      "leaf miner",
+      "thrips",
+      "jassid"
+    ],
+    "question": "Major pests of groundnut and their basic management?",
+    "answer": "Important groundnut pests include leaf miner, thrips, jassids and spodoptera. For IPM: use timely sowing, balanced fertilizer, removal of volunteer plants, install pheromone traps/light traps, and monitor 10\u201315 plants per field corner. If ETL is crossed, use recommended insecticides from local agri department, always avoiding spraying before rain or in high winds."
+  },
+  {
+    "id": "post_harvest_losses_oilseeds",
+    "tags": [
+      "post harvest",
+      "storage",
+      "losses",
+      "fpo",
+      "warehouse"
+    ],
+    "question": "How can FPOs reduce post-harvest losses in oilseeds?",
+    "answer": "To reduce post-harvest losses in oilseeds, FPOs should: (1) dry produce to safe moisture (8\u20139% for soybean, 7\u20138% for groundnut kernels), (2) use cleaned, graded bags, (3) store on wooden pallets away from walls, (4) ensure proper aeration and fumigation against storage pests, (5) digitize stock entries and stack-wise identification, and (6) avoid frequent handling which causes mechanical damage and oil loss."
+  },
+  {
+    "id": "nmeo_op_overview",
+    "tags": [
+      "nmeo-op",
+      "scheme",
+      "oil palm",
+      "mission",
+      "government"
+    ],
+    "question": "What is NMEO-OP and how does it help farmers?",
+    "answer": "The National Mission on Edible Oils \u2013 Oil Palm (NMEO-OP) is a Government of India scheme to expand oil palm cultivation and reduce edible oil imports. It provides support for planting material, maintenance, intercropping, and price assurance to farmers. In your platform, it can be linked to advisories, credit schemes and performance-based incentives for oil palm growers."
+  },
+  {
+    "id": "generic_offline_limit",
+    "tags": [
+      "generic",
+      "fallback"
+    ],
+    "question": "Generic fallback answer when knowledge is limited.",
+    "answer": "I am an offline oilseed advisor running on a local knowledge base. I can give general guidance on oilseed crops like soybean, mustard, groundnut, sunflower, sesame and oil palm. For very location-specific doses or latest scheme details, please cross-check with your local agriculture department or KVK."
+  }
+]

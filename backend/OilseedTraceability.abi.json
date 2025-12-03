@@ -1,0 +1,148 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_batchId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_crop",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_originFarm",
+        "type": "string"
+      }
+    ],
+    "name": "registerBatch",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_batchId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_actorType",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_actorId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_location",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_action",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_extraData",
+        "type": "string"
+      }
+    ],
+    "name": "addEvent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_batchId",
+        "type": "string"
+      }
+    ],
+    "name": "getBatch",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_batchId",
+        "type": "string"
+      }
+    ],
+    "name": "getEvents",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "actorType",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "actorId",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "extraData",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct OilseedTraceability.TraceEvent[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

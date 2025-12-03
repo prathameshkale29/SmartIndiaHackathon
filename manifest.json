@@ -1,0 +1,21 @@
+{
+  "name": "Agri-Sync",
+  "short_name": "Agri-Sync",
+  "description": "Smart Agriculture Value Chain Platform",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
