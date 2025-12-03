@@ -9,19 +9,54 @@ function Login({ onLogin }) {
     const [error, setError] = React.useState('');
     const [loading, setLoading] = React.useState(false);
 
-    const handleGoogleAuth = () => {
+    // Initialize Google Sign-In
+    React.useEffect(() => {
+      /* global google */
+      if (window.google) {
+        google.accounts.id.initialize({
+          client_id: "668817215778-c9f5vqdkfjjbpqnjp7i7g3jrj4599efo.apps.googleusercontent.com",
+          callback: handleGoogleResponse
+        });
+        google.accounts.id.renderButton(
+          document.getElementById("googleSignInDiv"),
+          { theme: "outline", size: "large", width: "100%" }
+        );
+      }
+    }, [isRegistering]);
+
+    const handleGoogleResponse = (response) => {
       try {
-        // Redirect to backend Google OAuth route (configure this in your backend)
-        window.location.href = '/auth/google';
+        // Decode JWT token
+        const base64Url = response.credential.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const payload = JSON.parse(jsonPayload);
+
+        // Login with Google profile
+        const result = googleLogin({
+          email: payload.email,
+          name: payload.name,
+          picture: payload.picture
+        });
+
+        if (result.success) {
+          onLogin(result.user);
+        } else {
+          setError(result.message);
+        }
       } catch (err) {
-        console.error('Google auth redirect failed:', err);
+        console.error('Google login error:', err);
+        setError('Google sign-in failed');
       }
     };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
       setError('');
-      
+
       if (!username || !password) {
         setError('Please enter username and password');
         return;
@@ -43,7 +78,7 @@ function Login({ onLogin }) {
       }
 
       setLoading(true);
-      
+
       setTimeout(() => {
         if (isRegistering) {
           const result = register(username, password, fullName, role);
@@ -151,16 +186,17 @@ function Login({ onLogin }) {
                 {isRegistering ? t('register') : t('login')}
               </button>
 
-              <div className="mt-3">
-                <button
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="w-full border border-gray-300 py-3 text-base font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition"
-                >
-                  <span className="icon-google"></span>
-                  <span>{isRegistering ? 'Sign up with Google' : 'Sign in with Google'}</span>
-                </button>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-[var(--bg-white)] text-gray-500">Or continue with</span>
+                </div>
               </div>
+
+              <div id="googleSignInDiv" className="w-full flex justify-center"></div>
+
             </form>
 
             <div className="mt-6 text-center">

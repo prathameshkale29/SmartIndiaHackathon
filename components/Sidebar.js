@@ -1,5 +1,7 @@
 function Sidebar({ activePage, setActivePage, user, isOpen }) {
   try {
+    // Removed incorrect useContext call. t() is global.
+
     const allMenuItems = [
       { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'user'] },
       { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'user'] },
@@ -9,9 +11,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'user'] },
       { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'user'] },
       { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'user'] },
-      { id: 'credit', label: t('credit'), icon: 'credit-card', roles: ['admin'] },
       { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'user'] },
-      { id: 'policy', label: t('policy'), icon: 'file-text', roles: ['admin'] },
       { id: 'traceability', label: t('traceability'), icon: 'link', roles: ['admin', 'user'] },
       { id: 'agristack', label: t('agristack'), icon: 'database', roles: ['admin', 'user'] },
       { id: 'logistics', label: t('logistics'), icon: 'truck', roles: ['admin', 'user'] }

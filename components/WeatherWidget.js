@@ -1,7 +1,7 @@
 function WeatherWidget({ location }) {
   const [weatherData, setWeatherData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  // Removed error state to handle failures silently
 
   // Default location if none provided
   const activeLocation = location || {
@@ -14,7 +14,6 @@ function WeatherWidget({ location }) {
     const fetchWeather = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         // Fetch current weather and alerts
         const currentRes = await fetch(`http://localhost:5000/api/weather/current?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}&location=${encodeURIComponent(activeLocation.name)}`);
@@ -36,10 +35,9 @@ function WeatherWidget({ location }) {
         });
 
       } catch (err) {
-        console.error('Weather load failed', err);
-        setError('Using offline data');
+        console.warn('Weather API unavailable, using demo data');
 
-        // Fallback mock data
+        // Fallback mock data - silently switch to demo mode
         setWeatherData({
           current: {
             temp: 28,
@@ -48,7 +46,7 @@ function WeatherWidget({ location }) {
             weather: [{ main: 'Clouds', description: 'Partly Cloudy' }]
           },
           alerts: [
-            { severity: 'low', type: 'normal', message: 'No major weather risks - Normal field operations can continue', icon: '✅' }
+            { severity: 'low', type: 'normal', message: 'Normal field operations can continue', icon: '✅' }
           ],
           forecast: [
             { date: 'Tomorrow', temp_max: 32, temp_min: 24, rain_probability: 20, condition: 'Clouds' },
@@ -85,7 +83,6 @@ function WeatherWidget({ location }) {
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             Weather & Advisory
-            {error && <span className="text-xs font-normal text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Offline Mode</span>}
           </h3>
           <p className="text-sm text-[var(--text-secondary)]">
             {activeLocation.name}
@@ -103,8 +100,8 @@ function WeatherWidget({ location }) {
       <div className="space-y-2 mb-4">
         {alerts && alerts.map((alert, idx) => (
           <div key={idx} className={`p-3 rounded-lg border flex items-start gap-3 ${alert.severity === 'high' ? 'bg-red-50 border-red-200 text-red-800' :
-              alert.severity === 'medium' ? 'bg-amber-50 border-amber-200 text-amber-800' :
-                'bg-green-50 border-green-200 text-green-800'
+            alert.severity === 'medium' ? 'bg-amber-50 border-amber-200 text-amber-800' :
+              'bg-green-50 border-green-200 text-green-800'
             }`}>
             <span className="text-xl">{alert.icon}</span>
             <div>

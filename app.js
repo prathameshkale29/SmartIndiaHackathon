@@ -37,7 +37,7 @@ function App() {
     const [isLoading, setIsLoading] = React.useState(true);
     const [showNotifications, setShowNotifications] = React.useState(false);
     const [showSettings, setShowSettings] = React.useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
     React.useEffect(() => {
       initTheme();
@@ -139,6 +139,7 @@ function App() {
 function HomePage({ setActivePage }) {
   const [user, setUser] = React.useState(getCurrentUser());
   const isAdmin = user?.role === 'admin';
+  // Removed incorrect useContext call
 
   const adminStats = mockData.dashboardStats;
   const userStats = [

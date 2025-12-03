@@ -21,26 +21,26 @@ function saveUsers(users) {
 
 function register(username, password, fullName, role) {
   const users = getStoredUsers();
-  
+
   if (users[username]) {
     return { success: false, message: 'Username already exists' };
   }
-  
+
   users[username] = {
     username: username,
     password: password,
     name: fullName,
     role: role
   };
-  
+
   saveUsers(users);
-  
+
   const userData = {
     username: username,
     name: fullName,
     role: role
   };
-  
+
   localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
   return { success: true, user: userData };
 }
@@ -48,7 +48,7 @@ function register(username, password, fullName, role) {
 function login(username, password, role) {
   const users = getStoredUsers();
   const user = users[username];
-  
+
   if (user && user.password === password && user.role === role) {
     const userData = {
       username: user.username,
@@ -58,7 +58,7 @@ function login(username, password, role) {
     localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
     return { success: true, user: userData };
   }
-  
+
   return { success: false, message: 'Invalid username, password, or account type' };
 }
 
@@ -78,4 +78,34 @@ function getCurrentUser() {
 
 function isAdmin(user) {
   return user?.role === 'admin';
+}
+
+function googleLogin(profile) {
+  const users = getStoredUsers();
+  // Use email as username for Google login
+  const username = profile.email;
+
+  if (!users[username]) {
+    // Register new user automatically
+    users[username] = {
+      username: username,
+      password: '', // No password for Google auth
+      name: profile.name,
+      role: 'user', // Default role
+      picture: profile.picture,
+      authProvider: 'google'
+    };
+    saveUsers(users);
+  }
+
+  const user = users[username];
+  const userData = {
+    username: user.username,
+    name: user.name,
+    role: user.role,
+    picture: user.picture
+  };
+
+  localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+  return { success: true, user: userData };
 }
