@@ -433,15 +433,26 @@ const translations = {
 };
 
 function getLanguage() {
+  // Check for google translate cookie
+  const match = document.cookie.match(new RegExp('(^| )googtrans=([^;]+)'));
+  if (match) {
+      const lang = match[2].split('/')[2];
+      if (lang) return lang;
+  }
   return localStorage.getItem(LANGUAGE_KEY) || 'en';
 }
 
 function setLanguage(lang) {
   localStorage.setItem(LANGUAGE_KEY, lang);
+  // Set Google Translate cookie
+  // Format: /source/target
+  // We need to set it for both root path and current path to be safe, and potentially domain
+  document.cookie = "googtrans=/en/" + lang + "; path=/";
   window.location.reload();
 }
 
 function t(key) {
-  const lang = getLanguage();
-  return translations[lang]?.[key] || translations.en[key] || key;
+  // Always return English so Google Translate has a consistent source to translate from
+  // We still use the dictionary for English text
+  return translations['en']?.[key] || key;
 }

@@ -9,4 +9,7 @@ router.get('/', userController.getUsers);
 // POST /api/users/register
 router.post('/register', userController.registerUser);
 
+// POST /api/users/login
+router.post('/login', userController.loginUser);
+
 module.exports = router;

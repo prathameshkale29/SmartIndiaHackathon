@@ -19,47 +19,58 @@ function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-function register(username, password, fullName, role) {
-  const users = getStoredUsers();
+async function register(username, password, fullName, role) {
+  try {
+    const res = await fetch('/api/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: fullName, email: username, password, role })
+    });
 
-  if (users[username]) {
-    return { success: false, message: 'Username already exists' };
-  }
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, message: data.error || 'Registration failed' };
+    }
 
-  users[username] = {
-    username: username,
-    password: password,
-    name: fullName,
-    role: role
-  };
-
-  saveUsers(users);
-
-  const userData = {
-    username: username,
-    name: fullName,
-    role: role
-  };
-
-  localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
-  return { success: true, user: userData };
-}
-
-function login(username, password, role) {
-  const users = getStoredUsers();
-  const user = users[username];
-
-  if (user && user.password === password && user.role === role) {
     const userData = {
-      username: user.username,
-      name: user.name,
-      role: user.role
+      username: data.user.email,
+      name: data.user.name,
+      role: role
     };
+
     localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
     return { success: true, user: userData };
+  } catch (error) {
+    console.error('Registration error:', error);
+    return { success: false, message: 'Network error' };
   }
+}
 
-  return { success: false, message: 'Invalid username, password, or account type' };
+async function login(username, password, role) {
+  try {
+    const res = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: username, password })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, message: data.error || 'Login failed' };
+    }
+
+    const userData = {
+      username: data.user.email,
+      name: data.user.name,
+      role: role
+    };
+
+    localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    return { success: true, user: userData };
+  } catch (error) {
+    console.error('Login error:', error);
+    return { success: false, message: 'Network error' };
+  }
 }
 
 function logout() {

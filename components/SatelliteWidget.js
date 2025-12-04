@@ -16,7 +16,7 @@ function SatelliteWidget({ location, crop }) {
                 setLoading(true);
                 setError(null);
 
-                const url = `http://localhost:5000/api/satellite/crop-health?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}&crop=${crop || 'mustard'}&location=${encodeURIComponent(activeLocation.name)}`;
+                const url = `/api/satellite/crop-health?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}&crop=${crop || 'mustard'}&location=${encodeURIComponent(activeLocation.name)}`;
 
                 const response = await fetch(url);
 

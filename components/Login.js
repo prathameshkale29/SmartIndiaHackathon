@@ -102,7 +102,19 @@ function Login({ onLogin }) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4" data-name="login" data-file="components/Login.js">
         <div className="w-full max-w-md">
-          <div className="bg-[var(--bg-white)] rounded-2xl shadow-xl p-8 animate-fade-in">
+          <div className="bg-[var(--bg-white)] rounded-2xl shadow-xl p-8 animate-fade-in relative">
+            <div className="absolute top-4 right-4">
+              <select
+                value={getLanguage()}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="text-sm border border-[var(--border-color)] rounded-lg px-2 py-1 bg-[var(--bg-white)] text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)]"
+              >
+                <option value="en">English</option>
+                <option value="hi">हिन्दी</option>
+                <option value="mr">मराठी</option>
+              </select>
+            </div>
+
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <div className="icon-leaf text-4xl text-white"></div>

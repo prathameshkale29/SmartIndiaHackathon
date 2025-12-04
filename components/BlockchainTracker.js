@@ -79,23 +79,42 @@ function BlockchainTracker({ user }) {
       }
 
       const batchId = 'BTC' + String(Date.now()).substr(-6);
-      const batch = {
-        id: batchId,
-        crop: newBatch.crop,
-        quantity: parseFloat(newBatch.quantity),
-        farmer: user?.name || 'Current User',
-        location: newBatch.location,
-        timestamp: new Date().toISOString(),
-        status: 'In Progress',
-        blockchainHash: '0x' + Math.random().toString(36).substr(2, 60),
-        stages: [
-          { stage: 'Farm Harvest', date: new Date().toISOString(), verified: true, verifier: 'Self', notes: 'Batch created' }
-        ],
-        certificates: []
-      };
-      setBatches([...batches, batch]);
-      setShowAddModal(false);
-      setNewBatch({ crop: 'Mustard Seeds', quantity: '', location: '' });
+
+      try {
+        const res = await fetch('/api/trace/register-batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            batchId,
+            crop: newBatch.crop,
+            originFarm: user?.name || 'Current User'
+          })
+        });
+
+        const data = await res.json();
+        if (data.status !== 'ok') throw new Error(data.error);
+
+        const batch = {
+          id: batchId,
+          crop: newBatch.crop,
+          quantity: parseFloat(newBatch.quantity),
+          farmer: user?.name || 'Current User',
+          location: newBatch.location,
+          timestamp: new Date().toISOString(),
+          status: 'In Progress',
+          blockchainHash: data.txHash,
+          stages: [
+            { stage: 'Farm Harvest', date: new Date().toISOString(), verified: true, verifier: 'Self', notes: 'Batch created' }
+          ],
+          certificates: []
+        };
+        setBatches([...batches, batch]);
+        setShowAddModal(false);
+        setNewBatch({ crop: 'Mustard Seeds', quantity: '', location: '' });
+      } catch (err) {
+        console.error('Failed to create batch:', err);
+        alert('Failed to create batch: ' + err.message);
+      }
     };
 
     const formatDate = (dateStr) => {
@@ -123,8 +142,8 @@ function BlockchainTracker({ user }) {
                   <p className="text-base font-medium text-[var(--text-primary)] mt-1">{batch.crop}</p>
                 </div>
                 <span className={`px-3 py-1.5 text-sm font-bold rounded-lg ${batch.status === 'Completed' ? 'bg-green-500 text-white' :
-                    batch.status === 'In Transit' ? 'bg-blue-500 text-white' :
-                      'bg-amber-500 text-white'
+                  batch.status === 'In Transit' ? 'bg-blue-500 text-white' :
+                    'bg-amber-500 text-white'
                   }`}>{batch.status}</span>
               </div>
               <div className="space-y-2 text-sm mb-4">
@@ -191,7 +210,7 @@ function BlockchainTracker({ user }) {
                       <div className="flex items-start justify-between mb-3">
                         <h4 className="font-bold text-xl text-[var(--text-primary)]">{stage.stage}</h4>
                         <span className={`px-3 py-1.5 text-sm font-bold rounded-lg ${stage.verified ? 'bg-green-500 text-white' :
-                            'bg-gray-400 text-white'
+                          'bg-gray-400 text-white'
                           }`}>
                           {stage.verified ? '✓ Verified' : 'Pending'}
                         </span>

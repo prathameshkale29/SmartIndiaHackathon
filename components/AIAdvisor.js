@@ -253,14 +253,18 @@ function AIAdvisor() {
       setInput('');
       setLoading(true);
       try {
-        // Use client-side helper instead of backend API
-        const responseText = await window.getAIAdvice(userMessage);
-        setMessages(prev => [...prev, { role: 'ai', text: responseText }]);
+        const res = await fetch('/api/oilseed-advisor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMessage })
+        });
+        const data = await res.json();
+        setMessages(prev => [...prev, { role: 'ai', text: data.reply || 'Sorry, I could not understand that.' }]);
       } catch (err) {
-        console.error('Offline AI advisor error', err);
+        console.error('AI advisor error', err);
         setMessages(prev => [
           ...prev,
-          { role: 'ai', text: 'Sorry, there was an error in the offline advisor. Please try again.' }
+          { role: 'ai', text: 'Sorry, there was an error connecting to the advisor. Please try again.' }
         ]);
       }
       setLoading(false);

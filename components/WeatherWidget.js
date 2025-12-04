@@ -16,14 +16,14 @@ function WeatherWidget({ location }) {
         setLoading(true);
 
         // Fetch current weather and alerts
-        const currentRes = await fetch(`http://localhost:5000/api/weather/current?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}&location=${encodeURIComponent(activeLocation.name)}`);
+        const currentRes = await fetch(`/api/weather/current?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}&location=${encodeURIComponent(activeLocation.name)}`);
 
         if (!currentRes.ok) throw new Error('Weather API failed');
 
         const currentData = await currentRes.json();
 
         // Fetch forecast
-        const forecastRes = await fetch(`http://localhost:5000/api/weather/forecast?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}`);
+        const forecastRes = await fetch(`/api/weather/forecast?lat=${activeLocation.latitude}&lon=${activeLocation.longitude}`);
         const forecastData = forecastRes.ok ? await forecastRes.json() : { data: { forecast: [] } };
 
         if (currentData.status === 'error') throw new Error(currentData.error);
