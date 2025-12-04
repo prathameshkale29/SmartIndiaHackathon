@@ -24,8 +24,8 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       <div className={`bg-[var(--bg-white)] border-r border-[var(--border-color)] flex flex-col transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${isOpen ? 'w-64' : 'w-0'}`} data-name="sidebar" data-file="components/Sidebar.js">
         <div className="p-6 border-b border-[var(--border-color)] bg-gradient-to-br from-[var(--bg-white)] to-[var(--bg-light)]">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
-              <div className="icon-leaf text-2xl text-white"></div>
+            <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg bg-white">
+              <img src="agrisync-logo.jpg" alt="AgriSync Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">{t('appName')}</h1>

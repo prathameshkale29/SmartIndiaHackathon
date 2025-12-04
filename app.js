@@ -141,11 +141,32 @@ function App() {
 function HomePage({ setActivePage }) {
   const [user, setUser] = React.useState(getCurrentUser());
   const isAdmin = user?.role === 'admin';
+  const [showAddCropModal, setShowAddCropModal] = React.useState(false);
+  const [userCrops, setUserCrops] = React.useState(mockData.userCrops || []);
+  const toast = useToast();
+
+  const handleAddCrop = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const newCrop = {
+      name: formData.get('cropName'),
+      area: formData.get('landArea'),
+      sowingDate: formData.get('sowingDate'),
+      status: 'Healthy',
+      days: 0
+    };
+    setUserCrops([newCrop, ...userCrops]);
+    setShowAddCropModal(false);
+    toast.success('New crop added successfully!');
+  };
+
+  const totalCrops = userCrops.length;
+  const totalLandArea = userCrops.reduce((acc, crop) => acc + Number(crop.area), 0);
 
   const adminStats = mockData.dashboardStats;
   const userStats = [
-    { title: t('myCrops'), value: '3', change: 0, icon: 'sprout', color: 'from-emerald-500 to-teal-500' },
-    { title: t('landArea'), value: '8.5 ' + t('acres'), change: 5, icon: 'map', color: 'from-lime-500 to-green-500' },
+    { title: t('myCrops'), value: totalCrops.toString(), change: 0, icon: 'sprout', color: 'from-emerald-500 to-teal-500' },
+    { title: t('landArea'), value: totalLandArea + ' ' + t('acres'), change: 5, icon: 'map', color: 'from-lime-500 to-green-500' },
     { title: t('avgPrice'), value: '₹5,600', change: 3.2, icon: 'indian-rupee', color: 'from-amber-500 to-yellow-500' },
     { title: t('pendingOrders'), value: '2', change: -20, icon: 'package', color: 'from-teal-500 to-cyan-500' }
   ];
@@ -156,8 +177,8 @@ function HomePage({ setActivePage }) {
       <div className="mb-12 pb-8 border-b border-[var(--border-color)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-600 to-green-700 rounded-2xl flex items-center justify-center shadow-xl">
-              <div className="icon-leaf text-4xl text-white"></div>
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xl bg-white">
+              <img src="agrisync-logo.jpg" alt="AgriSync Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-1">
@@ -167,7 +188,7 @@ function HomePage({ setActivePage }) {
             </div>
           </div>
           {!isAdmin && (
-            <button className="btn-primary flex items-center gap-2 px-6 py-3">
+            <button onClick={() => setShowAddCropModal(true)} className="btn-primary flex items-center gap-2 px-6 py-3">
               <div className="icon-plus text-lg"></div>
               <span>{t('addCrop')}</span>
             </button>
@@ -180,6 +201,39 @@ function HomePage({ setActivePage }) {
           </p>
         </div>
       </div>
+
+      <ModalDialog
+        isOpen={showAddCropModal}
+        onClose={() => setShowAddCropModal(false)}
+        title="Add New Crop"
+        footer={
+          <>
+            <button onClick={() => setShowAddCropModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button type="submit" form="add-crop-form" className="btn-primary">Add Crop</button>
+          </>
+        }
+      >
+        <form id="add-crop-form" onSubmit={handleAddCrop} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
+            <select name="cropName" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <option value="">Select Crop</option>
+              <option value="Soybean">Soybean</option>
+              <option value="Mustard">Mustard</option>
+              <option value="Groundnut">Groundnut</option>
+              <option value="Sunflower">Sunflower</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Land Area (Acres)</label>
+            <input name="landArea" type="number" step="0.1" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. 5.5" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sowing Date</label>
+            <input name="sowingDate" type="date" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+          </div>
+        </form>
+      </ModalDialog>
 
       {/* Dashboard Section */}
       <div className="mb-8">
@@ -304,7 +358,7 @@ function HomePage({ setActivePage }) {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">My Crops Status</h3>
             <div className="space-y-3">
-              {mockData.userCrops.map((crop, idx) => (
+              {userCrops.map((crop, idx) => (
                 <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition-all border border-gray-200 dark:border-gray-600">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
@@ -360,11 +414,85 @@ function WarehousePage() {
 }
 
 function CreditPage() {
+  const [loanAmount, setLoanAmount] = React.useState(100000);
+  const [interestRate, setInterestRate] = React.useState(7);
+  const [tenure, setTenure] = React.useState(12);
+  const [showApplyModal, setShowApplyModal] = React.useState(false);
+  const toast = useToast();
+
+  const monthlyInterest = (interestRate / 12 / 100);
+  const emi = (loanAmount * monthlyInterest * Math.pow(1 + monthlyInterest, tenure)) / (Math.pow(1 + monthlyInterest, tenure) - 1);
+  const totalAmount = emi * tenure;
+  const totalInterest = totalAmount - loanAmount;
+
+  const handleApplyLoan = (e) => {
+    e.preventDefault();
+    toast.success('Loan application submitted successfully! You will receive a confirmation shortly.');
+    setShowApplyModal(false);
+  };
+
   return (
     <div data-name="credit-page" data-file="app.js">
-      <h1 className="text-3xl font-bold mb-6">{t('credit')}</h1>
-      <div className="card">
-        <p className="text-[var(--text-secondary)]">{t('credit')} module coming soon...</p>
+      <h1 className="text-3xl font-bold mb-6">Agricultural Credit & Loans</h1>
+
+      <ModalDialog
+        isOpen={showApplyModal}
+        onClose={() => setShowApplyModal(false)}
+        title="Apply for Agricultural Loan"
+        size="md"
+        footer={
+          <>
+            <button onClick={() => setShowApplyModal(false)} className="px-4 py-2 border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-light)] transition-all">Cancel</button>
+            <button type="submit" form="loan-apply-form" className="btn-primary">Submit Application</button>
+          </>
+        }
+      >
+        <form id="loan-apply-form" onSubmit={handleApplyLoan} className="space-y-4">
+          <div><label className="block text-sm font-medium mb-2">Full Name *</label><input type="text" required className="w-full px-4 py-2 border rounded-lg" /></div>
+          <div><label className="block text-sm font-medium mb-2">Loan Purpose *</label><select required className="w-full px-4 py-2 border rounded-lg"><option value="">Select...</option><option>Equipment Purchase</option><option>Crop Cultivation</option><option>Land Development</option></select></div>
+          <div><label className="block text-sm font-medium mb-2">Requested Amount *</label><input type="number" required min="10000" className="w-full px-4 py-2 border rounded-lg" /></div>
+        </form>
+      </ModalDialog>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="card">
+          <h3 className="text-lg font-semibold mb-4">Loan Calculator</h3>
+          <div className="space-y-4">
+            <div><label className="block text-sm font-medium mb-2">Loan Amount: ₹{loanAmount.toLocaleString()}</label><input type="range" min="10000" max="1000000" step="10000" value={loanAmount} onChange={(e) => setLoanAmount(Number(e.target.value))} className="w-full" /></div>
+            <div><label className="block text-sm font-medium mb-2">Interest Rate: {interestRate}%</label><input type="range" min="5" max="15" step="0.5" value={interestRate} onChange={(e) => setInterestRate(Number(e.target.value))} className="w-full" /></div>
+            <div><label className="block text-sm font-medium mb-2">Tenure: {tenure} months</label><input type="range" min="6" max="60" step="6" value={tenure} onChange={(e) => setTenure(Number(e.target.value))} className="w-full" /></div>
+          </div>
+        </div>
+        <div className="card bg-green-50 dark:bg-green-900/20">
+          <h3 className="text-lg font-semibold mb-4">Loan Summary</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between"><span>Monthly EMI</span><span className="font-bold text-2xl text-green-600">₹{emi.toFixed(0).toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>Principal Amount</span><span className="font-medium">₹{loanAmount.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>Total Interest</span><span className="font-medium">₹{totalInterest.toFixed(0).toLocaleString()}</span></div>
+            <div className="flex justify-between border-t pt-3"><span className="font-semibold">Total Amount</span><span className="font-bold">₹{totalAmount.toFixed(0).toLocaleString()}</span></div>
+          </div>
+          <button onClick={() => setShowApplyModal(true)} className="btn-primary w-full mt-4">Apply for Loan</button>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card hover:shadow-lg transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-3"><div className="icon-landmark text-2xl text-blue-600"></div></div>
+          <h4 className="font-semibold mb-2">Kisan Credit Card</h4>
+          <p className="text-sm text-[var(--text-secondary)] mb-3">Flexible credit for farming needs at low interest rates</p>
+          <p className="text-xs text-green-600 font-medium">Interest from 4%</p>
+        </div>
+        <div className="card hover:shadow-lg transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-3"><div className="icon-tractor text-2xl text-purple-600"></div></div>
+          <h4 className="font-semibold mb-2">Equipment Loan</h4>
+          <p className="text-sm text-[var(--text-secondary)] mb-3">Finance for tractors, harvesters, and farm equipment</p>
+          <p className="text-xs text-green-600 font-medium">Up to ₹25 Lakhs</p>
+        </div>
+        <div className="card hover:shadow-lg transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-3"><div className="icon-sprout text-2xl text-amber-600"></div></div>
+          <h4 className="font-semibold mb-2">Crop Loan</h4>
+          <p className="text-sm text-[var(--text-secondary)] mb-3">Short-term credit for cultivation expenses</p>
+          <p className="text-xs text-green-600 font-medium">Subsidized rates</p>
+        </div>
       </div>
     </div>
   );
@@ -380,11 +508,31 @@ function AdvisorPage() {
 }
 
 function PolicyPage() {
+  const policies = [
+    { title: 'Minimum Support Price (MSP)', category: 'Pricing', description: 'Government-assured minimum price for oilseeds to protect farmers from price fluctuations', impact: 'High', status: 'Active' },
+    { title: 'National Oilseeds Mission', category: 'Production', description: 'Comprehensive program to boost oilseed production and reduce import dependency', impact: 'High', status: 'Active' },
+    { title: 'PM-AASHA Scheme', category: 'Market', description: 'Price Support Scheme ensuring remunerative prices to farmers', impact: 'Medium', status: 'Active' },
+    { title: 'Import Duty on Edible Oils', category: 'Trade', description: 'Current import duty structure affecting domestic oilseed market', impact: 'High', status: 'Under Review' }
+  ];
+
   return (
     <div data-name="policy-page" data-file="app.js">
-      <h1 className="text-3xl font-bold mb-6">{t('policy')}</h1>
-      <div className="card">
-        <p className="text-[var(--text-secondary)]">{t('policy')} insights coming soon...</p>
+      <h1 className="text-3xl font-bold mb-6">Agricultural Policy Insights</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="card bg-blue-50 dark:bg-blue-900/20"><div className="flex items-center justify-between"><div><p className="text-sm text-[var(--text-secondary)]">Active Policies</p><p className="text-3xl font-bold text-blue-600">12</p></div><div className="icon-file-text text-4xl text-blue-600"></div></div></div>
+        <div className="card bg-green-50 dark:bg-green-900/20"><div className="flex items-center justify-between"><div><p className="text-sm text-[var(--text-secondary)]">Beneficiaries</p><p className="text-3xl font-bold text-green-600">2.5M+</p></div><div className="icon-users text-4xl text-green-600"></div></div></div>
+        <div className="card bg-amber-50 dark:bg-amber-900/20"><div className="flex items-center justify-between"><div><p className="text-sm text-[var(--text-secondary)]">Budget Allocation</p><p className="text-3xl font-bold text-amber-600">₹850Cr</p></div><div className="icon-indian-rupee text-4xl text-amber-600"></div></div></div>
+      </div>
+      <div className="space-y-4">
+        {policies.map((policy, idx) => (
+          <div key={idx} className="card hover:shadow-lg transition-all cursor-pointer">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1"><div className="flex items-center gap-2 mb-2"><h3 className="text-lg font-semibold">{policy.title}</h3><span className="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full">{policy.category}</span></div><p className="text-sm text-[var(--text-secondary)]">{policy.description}</p></div>
+              <span className={`px-3 py-1 text-xs rounded-full font-medium ${policy.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{policy.status}</span>
+            </div>
+            <div className="flex items-center gap-4 text-sm"><div className="flex items-center gap-1"><div className="icon-trending-up text-[var(--primary-color)]"></div><span>Impact: <strong>{policy.impact}</strong></span></div></div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -630,6 +778,8 @@ function CalculatorPage() {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ErrorBoundary>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </ErrorBoundary>
 );
