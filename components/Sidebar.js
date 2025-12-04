@@ -14,7 +14,8 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'user'] },
       { id: 'traceability', label: t('traceability'), icon: 'link', roles: ['admin', 'user'] },
       { id: 'agristack', label: t('agristack'), icon: 'database', roles: ['admin', 'user'] },
-      { id: 'logistics', label: t('logistics'), icon: 'truck', roles: ['admin', 'user'] }
+      { id: 'logistics', label: t('logistics'), icon: 'truck', roles: ['admin', 'user'] },
+      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'user'] }
     ];
 
     const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));

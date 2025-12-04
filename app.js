@@ -105,6 +105,8 @@ function App() {
           return <SchemesPage />;
         case 'calculator':
           return <CalculatorPage />;
+        case 'procurement':
+          return <ProcurementPage />;
         default:
           return <HomePage />;
       }
