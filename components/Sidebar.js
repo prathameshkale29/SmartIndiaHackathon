@@ -6,7 +6,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'user'] },
       { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'user'] },
       { id: 'market', label: t('market'), icon: 'trending-up', roles: ['admin', 'user'] },
-      { id: 'warehouse', label: t('warehouse'), icon: 'warehouse', roles: ['admin', 'user'] },
+      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'warehouse', roles: ['admin', 'user'] },
       { id: 'contracts', label: t('contracts'), icon: 'file-check', roles: ['admin', 'user'] },
       { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'user'] },
       { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'user'] },
@@ -14,7 +14,6 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'user'] },
       { id: 'traceability', label: t('traceability'), icon: 'link', roles: ['admin', 'user'] },
       { id: 'agristack', label: t('agristack'), icon: 'database', roles: ['admin', 'user'] },
-      { id: 'logistics', label: t('logistics'), icon: 'truck', roles: ['admin', 'user'] },
       { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'user'] }
     ];
 

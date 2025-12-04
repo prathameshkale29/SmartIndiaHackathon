@@ -96,9 +96,6 @@ function App() {
         case 'agristack':
           window.location.href = 'agristack.html';
           return null;
-        case 'logistics':
-          window.location.href = 'logistics.html';
-          return null;
         case 'weather':
           return <WeatherPage />;
         case 'schemes':
