@@ -15,7 +15,7 @@ const translations = {
     credit: 'Credit',
     advisor: 'AI Advisor',
     policy: 'Policy',
-    traceability: 'Traceability',
+    traceability: 'Supply Chain',
     agristack: 'Agri-Stack',
     logistics: 'Logistics',
     settings: 'Settings',
@@ -158,7 +158,7 @@ const translations = {
     credit: 'क्रेडिट',
     advisor: 'एआई सलाहकार',
     policy: 'नीति',
-    traceability: 'ट्रेसेबिलिटी',
+    traceability: 'आपूर्ति श्रृंखला',
     agristack: 'एग्री-स्टैक',
     logistics: 'लॉजिस्टिक्स',
     settings: 'सेटिंग्स',
@@ -301,7 +301,7 @@ const translations = {
     credit: 'क्रेडिट',
     advisor: 'एआय सल्लागार',
     policy: 'धोरण',
-    traceability: 'ट्रेसेबिलिटी',
+    traceability: 'पुरवठा साखळी',
     agristack: 'एग्री-स्टॅक',
     logistics: 'लॉजिस्टिक्स',
     settings: 'सेटिंग्ज',
@@ -436,8 +436,8 @@ function getLanguage() {
   // Check for google translate cookie
   const match = document.cookie.match(new RegExp('(^| )googtrans=([^;]+)'));
   if (match) {
-      const lang = match[2].split('/')[2];
-      if (lang) return lang;
+    const lang = match[2].split('/')[2];
+    if (lang) return lang;
   }
   return localStorage.getItem(LANGUAGE_KEY) || 'en';
 }
