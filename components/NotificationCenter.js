@@ -1,14 +1,31 @@
 function NotificationCenter({ onClose }) {
   try {
-    const notifications = [
-      { id: 1, type: 'info', title: 'Market Update', message: 'Mustard prices increased by 3%', time: '2 hours ago', read: false },
-      { id: 2, type: 'warning', title: 'Weather Alert', message: 'Heavy rainfall expected on Wednesday', time: '5 hours ago', read: false },
-      { id: 3, type: 'success', title: 'Contract Accepted', message: 'Your soybean contract has been approved', time: '1 day ago', read: true },
-      { id: 4, type: 'info', title: 'New Scheme', message: 'PM-KUSUM subsidy applications now open', time: '2 days ago', read: true }
-    ];
+    const { notifications, markAllAsRead } = useNotification();
+
+    // Helper function to get relative time
+    const getRelativeTime = (timestamp) => {
+      const now = new Date();
+      const notifTime = new Date(timestamp);
+      const diffMs = now - notifTime;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+      if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    };
+
+    // Mark all as read when opening the notification center
+    React.useEffect(() => {
+      if (notifications.length > 0) {
+        markAllAsRead();
+      }
+    }, []);
 
     const getIcon = (type) => {
-      switch(type) {
+      switch (type) {
         case 'success': return 'check-circle';
         case 'warning': return 'alert-triangle';
         case 'info': return 'info';
@@ -17,7 +34,7 @@ function NotificationCenter({ onClose }) {
     };
 
     const getColor = (type) => {
-      switch(type) {
+      switch (type) {
         case 'success': return 'text-green-600';
         case 'warning': return 'text-amber-600';
         case 'info': return 'text-blue-600';
@@ -35,18 +52,25 @@ function NotificationCenter({ onClose }) {
             </button>
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {notifications.map(notif => (
-              <div key={notif.id} className={`p-4 border-b border-[var(--border-color)] hover:bg-[var(--bg-light)] transition-colors ${!notif.read ? 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20' : ''}`}>
-                <div className="flex gap-3">
-                  <div className={`icon-${getIcon(notif.type)} text-xl ${getColor(notif.type)} flex-shrink-0`}></div>
-                  <div className="flex-1">
-                    <p className="font-medium mb-1">{notif.title}</p>
-                    <p className="text-sm text-[var(--text-secondary)] mb-2">{notif.message}</p>
-                    <p className="text-xs text-[var(--text-secondary)]">{notif.time}</p>
+            {notifications.length === 0 ? (
+              <div className="p-8 text-center">
+                <div className="icon-bell text-4xl text-gray-300 dark:text-gray-600 mb-2"></div>
+                <p className="text-sm text-[var(--text-secondary)]">No notifications yet</p>
+              </div>
+            ) : (
+              notifications.map(notif => (
+                <div key={notif.id} className={`p-4 border-b border-[var(--border-color)] hover:bg-[var(--bg-light)] transition-colors ${!notif.read ? 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20' : ''}`}>
+                  <div className="flex gap-3">
+                    <div className={`icon-${getIcon(notif.type)} text-xl ${getColor(notif.type)} flex-shrink-0`}></div>
+                    <div className="flex-1">
+                      <p className="font-medium mb-1">{notif.title}</p>
+                      <p className="text-sm text-[var(--text-secondary)] mb-2">{notif.message}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{getRelativeTime(notif.time)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

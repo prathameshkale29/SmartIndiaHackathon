@@ -141,6 +141,7 @@ function HomePage({ setActivePage }) {
   const [showAddCropModal, setShowAddCropModal] = React.useState(false);
   const [userCrops, setUserCrops] = React.useState(mockData.userCrops || []);
   const toast = useToast();
+  const { addNotification } = useNotification();
 
   const handleAddCrop = (e) => {
     e.preventDefault();
@@ -155,6 +156,7 @@ function HomePage({ setActivePage }) {
     setUserCrops([newCrop, ...userCrops]);
     setShowAddCropModal(false);
     toast.success('New crop added successfully!');
+    addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success');
   };
 
   const totalCrops = userCrops.length;
@@ -416,6 +418,7 @@ function CreditPage() {
   const [tenure, setTenure] = React.useState(12);
   const [showApplyModal, setShowApplyModal] = React.useState(false);
   const toast = useToast();
+  const { addNotification } = useNotification();
 
   const monthlyInterest = (interestRate / 12 / 100);
   const emi = (loanAmount * monthlyInterest * Math.pow(1 + monthlyInterest, tenure)) / (Math.pow(1 + monthlyInterest, tenure) - 1);
@@ -425,6 +428,7 @@ function CreditPage() {
   const handleApplyLoan = (e) => {
     e.preventDefault();
     toast.success('Loan application submitted successfully! You will receive a confirmation shortly.');
+    addNotification('Loan Application Submitted', `Your loan application for ₹${loanAmount.toLocaleString()} has been submitted for review`, 'info');
     setShowApplyModal(false);
   };
 
@@ -776,7 +780,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ErrorBoundary>
     <ToastProvider>
-      <App />
+      <NotificationProvider>
+        <App />
+      </NotificationProvider>
     </ToastProvider>
   </ErrorBoundary>
 );
