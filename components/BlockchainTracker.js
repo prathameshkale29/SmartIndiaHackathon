@@ -126,7 +126,7 @@ function BlockchainTracker({ user }) {
     return (
       <div className="space-y-6 max-w-full overflow-x-hidden">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Blockchain Traceability</h2>
+          <h2 className="text-2xl font-bold">Supply Chain</h2>
           <button onClick={() => setShowAddModal(true)} className="btn-primary flex items-center gap-2">
             <div className="icon-plus text-lg"></div>
             <span>New Batch</span>

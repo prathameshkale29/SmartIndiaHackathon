@@ -1,5 +1,30 @@
 {
   "dependencies": {
-    "ethers": "^6.15.0"
-  }
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.0.1"
+  },
+  "name": "smartindiahackathon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "agristack-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prathameshkale29/SmartIndiaHackathon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/prathameshkale29/SmartIndiaHackathon/issues"
+  },
+  "homepage": "https://github.com/prathameshkale29/SmartIndiaHackathon#readme"
 }

@@ -91,8 +91,11 @@ function App() {
         case 'contracts':
           return <ContractsPage />;
         case 'traceability':
-          window.location.href = 'blockchain.html';
-          return null;
+          return (
+            <div className="animate-fade-in" data-name="supply-chain-page" data-file="app.js">
+              <BlockchainTracker user={user} />
+            </div>
+          );
         case 'agristack':
           window.location.href = 'agristack.html';
           return null;
@@ -126,7 +129,7 @@ function App() {
         </div>
         {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} />}
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-        <VoiceAssistant />
+
       </div>
     );
   } catch (error) {
