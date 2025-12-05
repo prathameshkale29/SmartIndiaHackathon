@@ -20,10 +20,77 @@ const mockData = {
   ],
 
   marketPrices: [
-    { region: 'Wardha', crop: 'Mustard', price: 6000, change: 2.5 },
-    { region: 'Indore', crop: 'Soybean', price: 5500, change: -1.2 },
-    { region: 'Rajkot', crop: 'Groundnut', price: 5800, change: 3.8 },
-    { region: 'Guntur', crop: 'Sunflower', price: 6200, change: 1.5 }
+    // Maharashtra - Soybean, Groundnut, Sunflower
+    { state: 'Maharashtra', district: 'Pune', market: 'Pune Market', region: 'Pune Market, Pune, Maharashtra', crop: 'Soybean', price: 5800, change: 2.5 },
+    { state: 'Maharashtra', district: 'Nagpur', market: 'Nagpur APMC', region: 'Nagpur APMC, Nagpur, Maharashtra', crop: 'Soybean', price: 5750, change: 1.8 },
+    { state: 'Maharashtra', district: 'Ahmednagar', market: 'Ahmednagar Market', region: 'Ahmednagar Market, Ahmednagar, Maharashtra', crop: 'Groundnut', price: 6200, change: -1.2 },
+    { state: 'Maharashtra', district: 'Solapur', market: 'Solapur APMC', region: 'Solapur APMC, Solapur, Maharashtra', crop: 'Sunflower', price: 6750, change: 2.1 },
+
+    // Madhya Pradesh - Soybean, Mustard, Linseed
+    { state: 'Madhya Pradesh', district: 'Indore', market: 'Indore Mandi', region: 'Indore Mandi, Indore, Madhya Pradesh', crop: 'Soybean', price: 5900, change: 3.1 },
+    { state: 'Madhya Pradesh', district: 'Bhopal', market: 'Bhopal Market', region: 'Bhopal Market, Bhopal, Madhya Pradesh', crop: 'Mustard', price: 6100, change: 2.3 },
+    { state: 'Madhya Pradesh', district: 'Ujjain', market: 'Ujjain APMC', region: 'Ujjain APMC, Ujjain, Madhya Pradesh', crop: 'Soybean', price: 5850, change: 1.5 },
+    { state: 'Madhya Pradesh', district: 'Mandsaur', market: 'Mandsaur Mandi', region: 'Mandsaur Mandi, Mandsaur, Madhya Pradesh', crop: 'Linseed', price: 7200, change: 3.4 },
+
+    // Rajasthan - Mustard, Rapeseed, Sesame
+    { state: 'Rajasthan', district: 'Jaipur', market: 'Jaipur Mandi', region: 'Jaipur Mandi, Jaipur, Rajasthan', crop: 'Mustard', price: 6300, change: 4.2 },
+    { state: 'Rajasthan', district: 'Kota', market: 'Kota Market', region: 'Kota Market, Kota, Rajasthan', crop: 'Mustard', price: 6250, change: 3.8 },
+    { state: 'Rajasthan', district: 'Alwar', market: 'Alwar APMC', region: 'Alwar APMC, Alwar, Rajasthan', crop: 'Rapeseed', price: 6150, change: 2.1 },
+    { state: 'Rajasthan', district: 'Bharatpur', market: 'Bharatpur Mandi', region: 'Bharatpur Mandi, Bharatpur, Rajasthan', crop: 'Sesame', price: 12500, change: 4.5 },
+
+    // Gujarat - Groundnut, Castor, Cotton Seed
+    { state: 'Gujarat', district: 'Ahmedabad', market: 'Ahmedabad Market', region: 'Ahmedabad Market, Ahmedabad, Gujarat', crop: 'Groundnut', price: 6400, change: 3.5 },
+    { state: 'Gujarat', district: 'Rajkot', market: 'Rajkot APMC', region: 'Rajkot APMC, Rajkot, Gujarat', crop: 'Groundnut', price: 6350, change: 2.9 },
+    { state: 'Gujarat', district: 'Junagadh', market: 'Junagadh Market', region: 'Junagadh Market, Junagadh, Gujarat', crop: 'Groundnut', price: 6500, change: 4.1 },
+    { state: 'Gujarat', district: 'Mehsana', market: 'Mehsana APMC', region: 'Mehsana APMC, Mehsana, Gujarat', crop: 'Castor', price: 7800, change: 3.2 },
+    { state: 'Gujarat', district: 'Surendranagar', market: 'Surendranagar Market', region: 'Surendranagar Market, Surendranagar, Gujarat', crop: 'Cotton Seed', price: 4200, change: 1.8 },
+
+    // Karnataka - Sunflower, Groundnut, Safflower
+    { state: 'Karnataka', district: 'Bangalore', market: 'Bangalore APMC', region: 'Bangalore APMC, Bangalore, Karnataka', crop: 'Sunflower', price: 6800, change: 2.7 },
+    { state: 'Karnataka', district: 'Belgaum', market: 'Belgaum Market', region: 'Belgaum Market, Belgaum, Karnataka', crop: 'Sunflower', price: 6750, change: 1.9 },
+    { state: 'Karnataka', district: 'Davangere', market: 'Davangere APMC', region: 'Davangere APMC, Davangere, Karnataka', crop: 'Groundnut', price: 6300, change: 3.2 },
+    { state: 'Karnataka', district: 'Bijapur', market: 'Bijapur Market', region: 'Bijapur Market, Bijapur, Karnataka', crop: 'Safflower', price: 7500, change: 2.6 },
+
+    // Andhra Pradesh - Groundnut, Sunflower, Niger Seed
+    { state: 'Andhra Pradesh', district: 'Guntur', market: 'Guntur Market', region: 'Guntur Market, Guntur, Andhra Pradesh', crop: 'Groundnut', price: 6250, change: 2.4 },
+    { state: 'Andhra Pradesh', district: 'Kurnool', market: 'Kurnool APMC', region: 'Kurnool APMC, Kurnool, Andhra Pradesh', crop: 'Sunflower', price: 6900, change: 3.6 },
+    { state: 'Andhra Pradesh', district: 'Anantapur', market: 'Anantapur Market', region: 'Anantapur Market, Anantapur, Andhra Pradesh', crop: 'Niger Seed', price: 8200, change: 2.8 },
+
+    // Telangana - Sunflower, Soybean, Castor
+    { state: 'Telangana', district: 'Hyderabad', market: 'Hyderabad Market', region: 'Hyderabad Market, Hyderabad, Telangana', crop: 'Sunflower', price: 6850, change: 2.8 },
+    { state: 'Telangana', district: 'Warangal', market: 'Warangal APMC', region: 'Warangal APMC, Warangal, Telangana', crop: 'Soybean', price: 5700, change: 1.6 },
+    { state: 'Telangana', district: 'Nizamabad', market: 'Nizamabad Market', region: 'Nizamabad Market, Nizamabad, Telangana', crop: 'Castor', price: 7650, change: 3.1 },
+
+    // Uttar Pradesh - Mustard, Linseed
+    { state: 'Uttar Pradesh', district: 'Lucknow', market: 'Lucknow Mandi', region: 'Lucknow Mandi, Lucknow, Uttar Pradesh', crop: 'Mustard', price: 6050, change: 2.2 },
+    { state: 'Uttar Pradesh', district: 'Kanpur', market: 'Kanpur Market', region: 'Kanpur Market, Kanpur, Uttar Pradesh', crop: 'Mustard', price: 6000, change: 1.7 },
+    { state: 'Uttar Pradesh', district: 'Varanasi', market: 'Varanasi Mandi', region: 'Varanasi Mandi, Varanasi, Uttar Pradesh', crop: 'Linseed', price: 7100, change: 2.9 },
+
+    // Haryana - Mustard, Sunflower
+    { state: 'Haryana', district: 'Karnal', market: 'Karnal Mandi', region: 'Karnal Mandi, Karnal, Haryana', crop: 'Mustard', price: 6200, change: 3.3 },
+    { state: 'Haryana', district: 'Hisar', market: 'Hisar Market', region: 'Hisar Market, Hisar, Haryana', crop: 'Mustard', price: 6150, change: 2.6 },
+    { state: 'Haryana', district: 'Sirsa', market: 'Sirsa APMC', region: 'Sirsa APMC, Sirsa, Haryana', crop: 'Sunflower', price: 6700, change: 2.3 },
+
+    // Punjab - Mustard, Sunflower
+    { state: 'Punjab', district: 'Ludhiana', market: 'Ludhiana APMC', region: 'Ludhiana APMC, Ludhiana, Punjab', crop: 'Mustard', price: 6100, change: 2.1 },
+    { state: 'Punjab', district: 'Amritsar', market: 'Amritsar Mandi', region: 'Amritsar Mandi, Amritsar, Punjab', crop: 'Sunflower', price: 6650, change: 1.9 },
+
+    // West Bengal - Mustard, Sesame
+    { state: 'West Bengal', district: 'Kolkata', market: 'Kolkata Market', region: 'Kolkata Market, Kolkata, West Bengal', crop: 'Mustard', price: 5950, change: 1.4 },
+    { state: 'West Bengal', district: 'Burdwan', market: 'Burdwan Mandi', region: 'Burdwan Mandi, Burdwan, West Bengal', crop: 'Sesame', price: 12200, change: 3.7 },
+
+    // Tamil Nadu - Groundnut, Sesame, Coconut
+    { state: 'Tamil Nadu', district: 'Chennai', market: 'Chennai Market', region: 'Chennai Market, Chennai, Tamil Nadu', crop: 'Groundnut', price: 6100, change: 2.5 },
+    { state: 'Tamil Nadu', district: 'Coimbatore', market: 'Coimbatore APMC', region: 'Coimbatore APMC, Coimbatore, Tamil Nadu', crop: 'Sesame', price: 12800, change: 4.2 },
+    { state: 'Tamil Nadu', district: 'Erode', market: 'Erode Market', region: 'Erode Market, Erode, Tamil Nadu', crop: 'Coconut', price: 3500, change: 1.8 },
+
+    // Kerala - Coconut, Palm Oil
+    { state: 'Kerala', district: 'Kochi', market: 'Kochi Market', region: 'Kochi Market, Kochi, Kerala', crop: 'Coconut', price: 3600, change: 2.1 },
+    { state: 'Kerala', district: 'Thiruvananthapuram', market: 'Trivandrum Market', region: 'Trivandrum Market, Thiruvananthapuram, Kerala', crop: 'Copra', price: 11500, change: 3.4 },
+
+    // Odisha - Mustard, Niger Seed
+    { state: 'Odisha', district: 'Bhubaneswar', market: 'Bhubaneswar Market', region: 'Bhubaneswar Market, Bhubaneswar, Odisha', crop: 'Mustard', price: 5900, change: 1.6 },
+    { state: 'Odisha', district: 'Cuttack', market: 'Cuttack APMC', region: 'Cuttack APMC, Cuttack, Odisha', crop: 'Niger Seed', price: 8100, change: 2.7 }
   ],
 
   warehouses: [
@@ -129,6 +196,34 @@ const mockData = {
       location: 'Nagpur',
       status: 'completed'
     }
+  ],
+
+  produceListings: [
+    {
+      id: 1,
+      crop: 'Mustard',
+      quantity: 25,
+      pricePerQuintal: 6200,
+      quality: 'Premium',
+      availableFrom: '2025-01-15',
+      deliveryPreference: 'Warehouse delivery',
+      targetBuyers: ['FPO', 'Processor'],
+      status: 'active',
+      listedDate: '2024-12-05',
+      notes: 'Certified organic mustard seeds, stored in climate-controlled warehouse'
+    },
+    {
+      id: 2,
+      crop: 'Soybean',
+      quantity: 40,
+      pricePerQuintal: 5700,
+      quality: 'Grade A',
+      availableFrom: '2024-12-10',
+      deliveryPreference: 'Farm pickup',
+      targetBuyers: ['Processor', 'Retailer'],
+      status: 'active',
+      listedDate: '2024-12-01',
+      notes: 'High protein content, suitable for oil extraction'
+    }
   ]
 };
-

@@ -477,7 +477,7 @@ function AIAdvisor() {
             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">🤖</div>
             <div>
               <h3 className="font-semibold">Agri-Assistant</h3>
-              <p className="text-xs text-green-600 flex items-center gap-1">
+              <p className="text-xs text-gray-900 dark:text-gray-100 flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 Online
               </p>

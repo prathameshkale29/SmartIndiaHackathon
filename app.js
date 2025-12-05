@@ -131,7 +131,7 @@ function App() {
             {renderContent()}
           </main>
         </div>
-        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} />}
+        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
       </div>
@@ -146,7 +146,9 @@ function HomePage({ setActivePage }) {
   const [user, setUser] = React.useState(getCurrentUser());
   const isAdmin = user?.role === 'admin';
   const [showAddCropModal, setShowAddCropModal] = React.useState(false);
+  const [showListProduceModal, setShowListProduceModal] = React.useState(false);
   const [userCrops, setUserCrops] = React.useState(mockData.userCrops || []);
+  const [produceListings, setProduceListings] = React.useState(mockData.produceListings || []);
   const toast = useToast();
   const { addNotification } = useNotification();
 
@@ -163,7 +165,26 @@ function HomePage({ setActivePage }) {
     setUserCrops([newCrop, ...userCrops]);
     setShowAddCropModal(false);
     toast.success('New crop added successfully!');
-    addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success');
+    addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success', 'home');
+  };
+
+  const handleListProduce = (newListing) => {
+    setProduceListings([newListing, ...produceListings]);
+    toast.success('Produce listed successfully!');
+    addNotification('Produce Listed', `${newListing.quantity} quintals of ${newListing.crop} listed for sale at ₹${newListing.pricePerQuintal}/quintal`, 'success', 'home');
+  };
+
+  const handleDeleteListing = (id) => {
+    setProduceListings(produceListings.filter(listing => listing.id !== id));
+    toast.success('Listing deleted successfully');
+  };
+
+  const handleMarkSold = (id) => {
+    setProduceListings(produceListings.map(listing =>
+      listing.id === id ? { ...listing, status: 'sold' } : listing
+    ));
+    toast.success('Listing marked as sold!');
+    addNotification('Produce Sold', 'Congratulations! Your produce has been marked as sold', 'success', 'home');
   };
 
   const totalCrops = userCrops.length;
@@ -207,10 +228,16 @@ function HomePage({ setActivePage }) {
           </div>
 
           {!isAdmin && (
-            <button onClick={() => setShowAddCropModal(true)} className="bg-[var(--accent-color)] text-black hover:bg-white flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-[var(--accent-color)] group/btn">
-              <div className="icon-plus text-xl group-hover/btn:rotate-90 transition-transform"></div>
-              <span>{t('addCrop')}</span>
-            </button>
+            <div className="flex gap-3">
+              <button onClick={() => setShowAddCropModal(true)} className="bg-[var(--accent-color)] text-black hover:bg-white flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-[var(--accent-color)] group/btn">
+                <div className="icon-plus text-xl group-hover/btn:rotate-90 transition-transform"></div>
+                <span>{t('addCrop')}</span>
+              </button>
+              <button onClick={() => setShowListProduceModal(true)} className="bg-white text-gray-900 hover:bg-[var(--accent-color)] hover:text-black flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-white group/btn">
+                <div className="icon-package text-xl"></div>
+                <span>List Produce</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -247,6 +274,12 @@ function HomePage({ setActivePage }) {
           </div>
         </form>
       </ModalDialog>
+
+      <ListProduceModal
+        isOpen={showListProduceModal}
+        onClose={() => setShowListProduceModal(false)}
+        onAdd={handleListProduce}
+      />
 
       {/* Dashboard Section */}
       <div className="mb-8">
@@ -376,6 +409,29 @@ function HomePage({ setActivePage }) {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Price Trends</h3>
             <PriceChart />
           </div>
+
+          {/* Produce Listings Section (Farmers only) */}
+          {!isAdmin && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">My Produce Listings</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Manage your produce available for sale</p>
+                </div>
+                <button
+                  onClick={() => setShowListProduceModal(true)}
+                  className="text-sm text-[var(--primary-color)] font-medium hover:underline flex items-center gap-1"
+                >
+                  <div className="icon-plus"></div> Add Listing
+                </button>
+              </div>
+              <ProduceListings
+                listings={produceListings}
+                onDelete={handleDeleteListing}
+                onMarkSold={handleMarkSold}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar Column - Quick Actions */}

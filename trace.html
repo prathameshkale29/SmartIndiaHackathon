@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Traceability - AgriSync</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .trace-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .trace-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .batch-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #10b981, #3b82f6);
+        }
+
+        .timeline-event {
+            position: relative;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .timeline-event:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 1.5rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: #10b981;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #10b981;
+        }
+
+        .timeline-event.milestone::before {
+            background: #f59e0b;
+            box-shadow: 0 0 0 3px #f59e0b;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .event-type {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .event-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-blockchain {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            font-size: 0.875rem;
+            color: #1f2937;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .hash-display {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .verification-panel {
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .verification-panel.invalid {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .actor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .actor-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background: #10b981;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="trace-container">
+        <div class="trace-header">
+            <h1>Batch Traceability</h1>
+            <p>Complete farm-to-fork journey with blockchain verification</p>
+            <div class="batch-info" id="batchInfo"></div>
+        </div>
+
+        <div id="verificationPanel"></div>
+        <div id="loadingIndicator" class="loading">Loading trace data...</div>
+        <div id="errorDisplay"></div>
+        <div id="timeline" class="timeline"></div>
+    </div>
+
+    <script>
+        // Get batchId from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const batchId = urlParams.get('batchId') || 'BTC001';
+
+        const API_BASE = window.location.origin + '/api';
+
+        // Actor role icons
+        const actorIcons = {
+            FARMER: '🌾',
+            FPO: '🏢',
+            PROCESSOR: '⚙️',
+            DISTRIBUTOR: '🚚',
+            RETAILER: '🏪',
+            WAREHOUSE: '📦'
+        };
+
+        // Event type display names
+        const eventTypeNames = {
+            PLANTED: 'Crop Planted',
+            HARVESTED: 'Harvested',
+            PROCURED_BY_PROCESSOR: 'Procured by Processor',
+            PROCESSED: 'Processed',
+            PACKED: 'Packed',
+            SHIPPED: 'Shipped',
+            DELIVERED: 'Delivered',
+            QUALITY_CHECK: 'Quality Check',
+            STORED: 'Stored in Warehouse'
+        };
+
+        // Milestone events (anchored on blockchain)
+        const milestoneEvents = ['HARVESTED', 'PROCURED_BY_PROCESSOR', 'PROCESSED', 'PACKED'];
+
+        async function loadTraceData() {
+            try {
+                // Fetch off-chain events
+                const offChainResponse = await fetch(`${API_BASE}/trace-events/${batchId}`);
+                const offChainData = await offChainResponse.json();
+
+                if (offChainData.status !== 'success') {
+                    throw new Error(offChainData.error || 'Failed to load trace data');
+                }
+
+                // Fetch on-chain events
+                let onChainData = { events: [] };
+                try {
+                    const onChainResponse = await fetch(`${API_BASE}/trace-events/${batchId}/onchain`);
+                    onChainData = await onChainResponse.json();
+                } catch (err) {
+                    console.warn('Could not fetch on-chain data:', err);
+                }
+
+                // Display data
+                displayBatchInfo(offChainData);
+                displayVerification(offChainData.verification);
+                displayTimeline(offChainData.events, onChainData.events);
+
+                document.getElementById('loadingIndicator').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('errorDisplay').innerHTML = `
+          <div class="error">
+            <strong>Error:</strong> ${error.message}
+          </div>
+        `;
+            }
+        }
+
+        function displayBatchInfo(data) {
+            const batchInfoEl = document.getElementById('batchInfo');
+            batchInfoEl.innerHTML = `
+        <div class="info-card">
+          <div class="detail-label">Batch ID</div>
+          <div class="detail-value">${data.batchId}</div>
+        </div>
+        <div class="info-card">
+          <div class="detail-label">Total Events</div>
+          <div class="detail-value">${data.eventCount}</div>
+        </div>
+        <div class="info-card">
+          <div class="detail-label">Hash Chain</div>
+          <div class="detail-value">${data.hashChainValid ? '✅ Valid' : '❌ Invalid'}</div>
+        </div>
+      `;
+        }
+
+        function displayVerification(verification) {
+            const panelEl = document.getElementById('verificationPanel');
+            const isValid = verification.valid;
+
+            panelEl.innerHTML = `
+        <div class="verification-panel ${isValid ? '' : 'invalid'}">
+          <h3>${isValid ? '✅ Hash Chain Verified' : '❌ Hash Chain Invalid'}</h3>
+          <p>${verification.message}</p>
+          ${verification.eventCount ? `<p>Verified ${verification.eventCount} events</p>` : ''}
+        </div>
+      `;
+        }
+
+        function displayTimeline(events, onChainEvents) {
+            const timelineEl = document.getElementById('timeline');
+
+            if (events.length === 0) {
+                timelineEl.innerHTML = '<p class="loading">No events found for this batch.</p>';
+                return;
+            }
+
+            // Create map of on-chain events by event type for quick lookup
+            const onChainMap = {};
+            onChainEvents.forEach(e => {
+                onChainMap[e.eventType] = e;
+            });
+
+            timelineEl.innerHTML = events.map(event => {
+                const isMilestone = milestoneEvents.includes(event.eventType);
+                const onChainEvent = onChainMap[event.eventType];
+                const isOnChain = !!onChainEvent;
+
+                return `
+          <div class="timeline-event ${isMilestone ? 'milestone' : ''}">
+            <div class="event-header">
+              <div class="event-type">${eventTypeNames[event.eventType] || event.eventType}</div>
+              <div class="event-badges">
+                ${isMilestone ? '<span class="badge badge-blockchain">Milestone</span>' : ''}
+                ${isOnChain ? '<span class="badge badge-verified">✅ On Blockchain</span>' : ''}
+                ${event.onChainStatus === 'PENDING' ? '<span class="badge badge-pending">⏳ Pending</span>' : ''}
+              </div>
+            </div>
+            
+            <div class="actor-badge">
+              <div class="actor-icon">${actorIcons[event.actorRole] || '👤'}</div>
+              <span>${event.actorRole} - ${event.actorId}</span>
+            </div>
+
+            <div class="event-details">
+              <div class="detail-item">
+                <span class="detail-label">Timestamp</span>
+                <span class="detail-value">${new Date(event.timestamp).toLocaleString()}</span>
+              </div>
+              ${Object.entries(event.eventData).map(([key, value]) => `
+                <div class="detail-item">
+                  <span class="detail-label">${key}</span>
+                  <span class="detail-value">${value}</span>
+                </div>
+              `).join('')}
+              ${event.txHash ? `
+                <div class="detail-item">
+                  <span class="detail-label">Transaction Hash</span>
+                  <span class="detail-value" style="font-family: monospace; font-size: 0.75rem;">${event.txHash.substring(0, 20)}...</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="hash-display">
+              <strong>Hash:</strong> ${event.currentHash}<br>
+              <strong>Prev:</strong> ${event.prevHash}
+            </div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        // Load data on page load
+        loadTraceData();
+    </script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-function NotificationCenter({ onClose }) {
+function NotificationCenter({ onClose, onNavigate }) {
   try {
     const { notifications, markAllAsRead } = useNotification();
 
@@ -42,6 +42,13 @@ function NotificationCenter({ onClose }) {
       }
     };
 
+    const handleNotificationClick = (notif) => {
+      if (notif.link && onNavigate) {
+        onNavigate(notif.link);
+        onClose();
+      }
+    };
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end p-4 z-50" onClick={onClose}>
         <div className="bg-[var(--bg-white)] rounded-lg shadow-2xl w-full max-w-md animate-fade-in" onClick={(e) => e.stopPropagation()}>
@@ -59,13 +66,24 @@ function NotificationCenter({ onClose }) {
               </div>
             ) : (
               notifications.map(notif => (
-                <div key={notif.id} className={`p-4 border-b border-[var(--border-color)] hover:bg-[var(--bg-light)] transition-colors ${!notif.read ? 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20' : ''}`}>
+                <div
+                  key={notif.id}
+                  className={`p-4 border-b border-[var(--border-color)] hover:bg-[var(--bg-light)] transition-colors ${!notif.read ? 'bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20' : ''} ${notif.link ? 'cursor-pointer' : ''}`}
+                  onClick={() => handleNotificationClick(notif)}
+                >
                   <div className="flex gap-3">
                     <div className={`icon-${getIcon(notif.type)} text-xl ${getColor(notif.type)} flex-shrink-0`}></div>
                     <div className="flex-1">
                       <p className="font-medium mb-1">{notif.title}</p>
                       <p className="text-sm text-[var(--text-secondary)] mb-2">{notif.message}</p>
-                      <p className="text-xs text-[var(--text-secondary)]">{getRelativeTime(notif.time)}</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-[var(--text-secondary)]">{getRelativeTime(notif.time)}</p>
+                        {notif.link && (
+                          <span className="text-xs text-[var(--primary-color)] font-medium flex items-center gap-1">
+                            View <div className="icon-arrow-right text-xs"></div>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
