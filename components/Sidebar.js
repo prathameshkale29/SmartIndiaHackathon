@@ -13,7 +13,6 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'user'] },
       { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'user'] },
       { id: 'traceability', label: t('traceability'), icon: 'link', roles: ['admin', 'user'] },
-      { id: 'agristack', label: t('agristack'), icon: 'database', roles: ['admin', 'user'] },
       { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'user'] }
     ];
 
