@@ -92,7 +92,7 @@ function App() {
           return <ContractsPage />;
         case 'traceability':
           return (
-            <div className="animate-fade-in" data-name="supply-chain-page" data-file="app.js">
+            <div className="animate-circular-reveal" data-name="supply-chain-page" data-file="app.js">
               <BlockchainTracker user={user} />
             </div>
           );
@@ -106,7 +106,11 @@ function App() {
         case 'calculator':
           return <CalculatorPage />;
         case 'procurement':
-          return <ProcurementPage />;
+          return (
+            <div className="animate-circular-reveal" data-name="procurement-page" data-file="app.js">
+              <ProcurementPage />
+            </div>
+          );
         default:
           return <HomePage />;
       }
@@ -174,7 +178,7 @@ function HomePage({ setActivePage }) {
   ];
 
   return (
-    <div className="animate-fade-in" data-name="home-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="home-page" data-file="app.js">
       {/* Hero Section - Professional Header */}
       <div className="mb-12 relative rounded-3xl overflow-hidden shadow-2xl min-h-[280px] flex items-end p-8 transition-transform hover:scale-[1.01] duration-500 group">
         <img src="hero_banner.png" alt="AgriSync Hero" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
@@ -397,7 +401,7 @@ function HomePage({ setActivePage }) {
 
 function FarmersPage() {
   return (
-    <div className="animate-fade-in" data-name="farmers-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="farmers-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('farmers')}</h1>
       <FarmersList />
     </div>
@@ -406,7 +410,7 @@ function FarmersPage() {
 
 function MarketPage() {
   return (
-    <div className="animate-fade-in" data-name="market-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="market-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('market')}</h1>
       <MarketTable />
     </div>
@@ -415,7 +419,7 @@ function MarketPage() {
 
 function WarehousePage() {
   return (
-    <div data-name="warehouse-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="warehouse-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('warehouse')}</h1>
       <WarehouseMap />
     </div>
@@ -443,7 +447,7 @@ function CreditPage() {
   };
 
   return (
-    <div data-name="credit-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="credit-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">Agricultural Credit & Loans</h1>
 
       <ModalDialog
@@ -511,7 +515,7 @@ function CreditPage() {
 
 function AdvisorPage() {
   return (
-    <div data-name="advisor-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="advisor-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('aiChatAdvisor')}</h1>
       <AIAdvisor />
     </div>
@@ -527,7 +531,7 @@ function PolicyPage() {
   ];
 
   return (
-    <div data-name="policy-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="policy-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">Agricultural Policy Insights</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="card bg-blue-50 dark:bg-blue-900/20"><div className="flex items-center justify-between"><div><p className="text-sm text-[var(--text-secondary)]">Active Policies</p><p className="text-3xl font-bold text-blue-600">12</p></div><div className="icon-file-text text-4xl text-blue-600"></div></div></div>
@@ -551,7 +555,7 @@ function PolicyPage() {
 
 function ContractsPage() {
   return (
-    <div className="animate-fade-in" data-name="contracts-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="contracts-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('contractSystem')}</h1>
       <ContractsList />
     </div>
@@ -683,7 +687,7 @@ function WeatherPage() {
 
   if (loading || !districtData || !selectedState) {
     return (
-      <div className="animate-fade-in" data-name="weather-page" data-file="app.js">
+      <div className="animate-circular-reveal" data-name="weather-page" data-file="app.js">
         <h1 className="text-3xl font-bold mb-2">Weather & Oilseed Advisory</h1>
         <div className="card p-4">
           <p className="text-sm text-[var(--text-secondary)]">
@@ -701,7 +705,7 @@ function WeatherPage() {
     .sort();
 
   return (
-    <div className="animate-fade-in" data-name="weather-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="weather-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-2">Weather & Oilseed Advisory</h1>
 
       <div className="card mb-4 p-4">
@@ -770,7 +774,7 @@ function WeatherPage() {
 
 function SchemesPage() {
   return (
-    <div className="animate-fade-in" data-name="schemes-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="schemes-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('govSchemes')}</h1>
       <SchemesList />
     </div>
@@ -779,7 +783,7 @@ function SchemesPage() {
 
 function CalculatorPage() {
   return (
-    <div className="animate-fade-in" data-name="calculator-page" data-file="app.js">
+    <div className="animate-circular-reveal" data-name="calculator-page" data-file="app.js">
       <h1 className="text-3xl font-bold mb-6">{t('financialCalculator')}</h1>
       <FinancialCalculator />
     </div>

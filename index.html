@@ -163,6 +163,15 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
+
+        @keyframes circularReveal {
+            0% { clip-path: circle(0% at 50% 50%); }
+            100% { clip-path: circle(150% at 50% 50%); }
+        }
+        
+        .animate-circular-reveal {
+            animation: circularReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
         
         @keyframes shimmer {
             0% { background-position: -1000px 0; }
