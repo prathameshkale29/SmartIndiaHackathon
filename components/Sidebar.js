@@ -26,14 +26,14 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
               <img src="agrisync-logo.jpg" alt="AgriSync Logo" className="w-full h-full object-cover" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">{t('appName')}</h1>
+              <h1 className="text-xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'var(--gradient-primary)' }}>{t('appName')}</h1>
               <p className="text-xs text-[var(--text-secondary)]">{t('tagline')}</p>
             </div>
           </div>
         </div>
         <div className="px-4 py-3 bg-gradient-to-r from-[var(--bg-lighter)] to-[var(--bg-light)] border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-md text-white" style={{ background: 'var(--gradient-primary)' }}>
               <div className="icon-user text-sm text-white"></div>
             </div>
             <div className="flex-1 min-w-0">

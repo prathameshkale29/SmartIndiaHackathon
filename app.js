@@ -173,31 +173,38 @@ function HomePage({ setActivePage }) {
   return (
     <div className="animate-fade-in" data-name="home-page" data-file="app.js">
       {/* Hero Section - Professional Header */}
-      <div className="mb-12 pb-8 border-b border-[var(--border-color)]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xl bg-white">
-              <img src="agrisync-logo.jpg" alt="AgriSync Logo" className="w-full h-full object-cover" />
+      <div className="mb-12 relative rounded-3xl overflow-hidden shadow-2xl min-h-[280px] flex items-end p-8 transition-transform hover:scale-[1.01] duration-500 group">
+        <img src="hero_banner.png" alt="AgriSync Hero" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+        <div className="relative z-10 w-full flex flex-col md:flex-row items-end justify-between gap-6">
+          <div className="text-white">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
+                <div className="icon-sprout text-3xl text-[var(--accent-color)]"></div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight text-white mb-0 drop-shadow-md">
+                  {t('appName')}
+                </h1>
+                <p className="text-gray-300 font-medium">{t('tagline')}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-1">
-                {t('appName')}
-              </h1>
-              <p className="text-base text-[var(--text-secondary)]">{t('tagline')}</p>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 max-w-2xl">
+              <p className="text-sm text-gray-200">
+                Welcome back, <span className="font-bold text-[var(--accent-color)]">{user?.name}</span>!
+                {isAdmin ? ' Managing the complete oilseed value chain ecosystem.' : ' Track your crops and connect with the market.'}
+              </p>
             </div>
           </div>
+
           {!isAdmin && (
-            <button onClick={() => setShowAddCropModal(true)} className="btn-primary flex items-center gap-2 px-6 py-3">
-              <div className="icon-plus text-lg"></div>
+            <button onClick={() => setShowAddCropModal(true)} className="bg-[var(--accent-color)] text-black hover:bg-white flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-[var(--accent-color)] group/btn">
+              <div className="icon-plus text-xl group-hover/btn:rotate-90 transition-transform"></div>
               <span>{t('addCrop')}</span>
             </button>
           )}
-        </div>
-        <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-800">
-          <p className="text-sm text-[var(--text-secondary)]">
-            Welcome back, <span className="font-semibold text-emerald-700 dark:text-emerald-400">{user?.name}</span>!
-            {isAdmin ? ' Managing the complete oilseed value chain ecosystem.' : ' Track your crops and connect with the market.'}
-          </p>
         </div>
       </div>
 

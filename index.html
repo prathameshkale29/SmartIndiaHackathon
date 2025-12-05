@@ -26,64 +26,64 @@
     <style type="text/tailwindcss">
         @layer theme {
         :root {
-            /* Rich Harvest Palette */
-            --primary-color: #15803d; /* deep green-700 */
-            --secondary-color: #ecfccb; /* lime-100 */
-            --accent-color: #ea580c; /* orange-600 */
-            --success-color: #166534; /* green-800 */
-            --warning-color: #d97706; /* amber-600 */
-            --error-color: #dc2626; /* red-600 */
-            --info-color: #0369a1; /* sky-700 */
+            /* Agritech Theme Palette */
+            --primary-color: #3A7D44; /* Agritech Green */
+            --secondary-color: #E8E5D7; /* Neutral Sand - used for backgrounds/accents */
+            --accent-color: #F0C24B; /* Oilseed Yellow */
+            --success-color: #3A7D44; 
+            --warning-color: #FFD56A; /* Soft Gold */
+            --error-color: #dc2626;
+            --info-color: #2C5F9E; /* Tech Blue */
             
-            --text-primary: #1c1917; /* stone-900 */
-            --text-secondary: #57534e; /* stone-600 */
-            --text-tertiary: #78716c; /* stone-500 */
-            --text-muted: #a8a29e; /* stone-400 */
+            --text-primary: #1B2B1E; /* Dark Green-Grey */
+            --text-secondary: #4A5D4E;
+            --text-tertiary: #6C7A6F;
+            --text-muted: #94A3B8;
             
-            --bg-light: #fafaf9; /* stone-50 - Warm paper */
-            --bg-lighter: #f5f5f4; /* stone-100 */
-            --bg-card: #ffffff;
-            --border-color: #e7e5e4; /* stone-200 */
-            --bg-white: #ffffff;
+            --bg-light: #F9F9F7; /* Very light sand/white mixture */
+            --bg-lighter: #FFFFFF;
+            --bg-card: rgba(255, 255, 255, 0.92); /* Glassmorphism base */
+            --border-color: #D6D3C5; /* Sand-Grey */
+            --bg-white: #FFFFFF;
             
-            --shadow-sm: 0 1px 2px 0 rgba(28, 25, 23, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(28, 25, 23, 0.1);
+            --shadow-sm: 0 1px 2px 0 rgba(58, 125, 68, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(58, 125, 68, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(58, 125, 68, 0.1);
             
-            --gradient-primary: linear-gradient(135deg, #15803d 0%, #166534 100%);
-            --gradient-secondary: linear-gradient(135deg, #84cc16 0%, #4d7c0f 100%);
-            --gradient-success: linear-gradient(135deg, #166534 0%, #14532d 100%);
-            --gradient-warning: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            --gradient-primary: linear-gradient(135deg, #3A7D44 0%, #2A5C32 100%);
+            --gradient-secondary: linear-gradient(135deg, #2C5F9E 0%, #00A2FF 100%); /* Tech Blue */
+            --gradient-success: linear-gradient(135deg, #3A7D44 0%, #2e6636 100%);
+            --gradient-warning: linear-gradient(135deg, #F0C24B 0%, #FFD56A 100%);
         }
         
         [data-theme="dark"] {
-            --primary-color: #4ade80; /* green-400 */
-            --secondary-color: #14532d; /* green-900 */
-            --accent-color: #fcd34d; /* amber-300 */
-            --success-color: #22c55e;
-            --warning-color: #fbbf24;
-            --error-color: #f87171;
-            --info-color: #38bdf8;
+            --primary-color: #4CAF50; /* Lighter Green for dark mode */
+            --secondary-color: #1a3320; /* Dark Green BG */
+            --accent-color: #FFD56A; /* Soft Gold */
+            --success-color: #4CAF50;
+            --warning-color: #FFD56A;
+            --error-color: #ef5350;
+            --info-color: #42A5F5;
             
-            --text-primary: #f5f5f4; /* stone-100 */
-            --text-secondary: #d6d3d1; /* stone-300 */
-            --text-tertiary: #a8a29e; /* stone-400 */
-            --text-muted: #78716c; /* stone-500 */
+            --text-primary: #EDEBE6; /* Sand White */
+            --text-secondary: #C5C2B8;
+            --text-tertiary: #9E9B91;
+            --text-muted: #706D63;
             
-            --bg-light: #1c1917; /* stone-900 - Dark earth */
-            --bg-lighter: #292524; /* stone-800 */
-            --bg-card: #1c1917;
-            --border-color: #44403c; /* stone-700 */
-            --bg-white: #0c0a09; /* stone-950 */
+            --bg-light: #0D140F; /* Very Dark Green/Black */
+            --bg-lighter: #162119;
+            --bg-card: rgba(22, 33, 25, 0.9);
+            --border-color: #2A4030;
+            --bg-white: #0A0F0B;
             
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             
-            --gradient-primary: linear-gradient(135deg, #166534 0%, #14532d 100%);
-            --gradient-secondary: linear-gradient(135deg, #3f6212 0%, #1a2e05 100%);
-            --gradient-success: linear-gradient(135deg, #15803d 0%, #166534 100%);
-            --gradient-warning: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+            --gradient-primary: linear-gradient(135deg, #3A7D44 0%, #2A5C32 100%);
+            --gradient-secondary: linear-gradient(135deg, #2C5F9E 0%, #1565C0 100%);
+            --gradient-success: linear-gradient(135deg, #3A7D44 0%, #2A5C32 100%);
+            --gradient-warning: linear-gradient(135deg, #F0C24B 0%, #FFB300 100%);
         }
     }
 
@@ -142,7 +142,8 @@
             background: linear-gradient(135deg, rgba(30,41,59,0.98) 0%, rgba(30,41,59,0.95) 100%);
         }
         .btn-primary {
-            @apply bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 md:px-6 py-2.5 rounded-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300 active:scale-95 text-sm md:text-base;
+            @apply bg-[var(--primary-color)] text-white px-4 md:px-6 py-2.5 rounded-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-300 active:scale-95 text-sm md:text-base;
+            background-image: var(--gradient-primary);
         }
         .sidebar-link {
             @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer text-[var(--text-primary)];
@@ -151,7 +152,7 @@
             @apply bg-[var(--bg-lighter)] transform translate-x-1;
         }
         .sidebar-link.active {
-            @apply bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 text-[var(--primary-color)] font-semibold border-l-4 border-[var(--primary-color)] shadow-md;
+            @apply bg-[var(--secondary-color)] text-[var(--primary-color)] font-semibold border-l-4 border-[var(--primary-color)] shadow-md;
         }
         
         @keyframes fadeIn {
@@ -302,7 +303,8 @@
     </style>
 </head>
 
-<body class="bg-[var(--bg-light)]">
+<body class="bg-[var(--bg-light)]"
+    style="background-image: url('dashboard_bg.png'); background-size: cover; background-attachment: fixed; background-blend-mode: overlay;">
     <div id="root"></div>
 
     <!-- Google Translate Element (Hidden) -->
