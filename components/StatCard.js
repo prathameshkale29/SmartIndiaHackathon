@@ -1,12 +1,12 @@
 function StatCard({ title, value, change, icon, color = 'from-emerald-500 to-teal-500' }) {
   try {
     const [isExpanded, setIsExpanded] = React.useState(false);
-    
+
     return (
-      <div 
-        className="card cursor-pointer transform hover:scale-105 transition-transform duration-200" 
+      <div
+        className="card cursor-pointer transform hover:scale-105 transition-transform duration-200"
         onClick={() => setIsExpanded(!isExpanded)}
-        data-name="stat-card" 
+        data-name="stat-card"
         data-file="components/StatCard.js"
       >
         <div className="flex items-start justify-between">

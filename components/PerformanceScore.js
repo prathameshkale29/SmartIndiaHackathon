@@ -49,37 +49,37 @@ function PerformanceScore() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">AI Advice Adherence</span>
                 <span className="font-medium">{scoreData.aiAdherence}/30</span>
               </div>
               <div className="bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{width: `${(scoreData.aiAdherence/30)*100}%`}}></div>
+                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(scoreData.aiAdherence / 30) * 100}%` }}></div>
               </div>
-              
+
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Yield History</span>
                 <span className="font-medium">{scoreData.yieldHistory}/40</span>
               </div>
               <div className="bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{width: `${(scoreData.yieldHistory/40)*100}%`}}></div>
+                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(scoreData.yieldHistory / 40) * 100}%` }}></div>
               </div>
-              
+
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Sales Record</span>
                 <span className="font-medium">{scoreData.salesRecord}/30</span>
               </div>
               <div className="bg-gray-200 rounded-full h-2">
-                <div className="bg-amber-500 h-2 rounded-full" style={{width: `${(scoreData.salesRecord/30)*100}%`}}></div>
+                <div className="bg-amber-500 h-2 rounded-full" style={{ width: `${(scoreData.salesRecord / 30) * 100}%` }}></div>
               </div>
             </div>
 
             <div className="pt-3 border-t border-[var(--border-color)]">
               <p className="text-xs text-[var(--text-secondary)]">
-                {scoreData.totalScore >= 71 
-                  ? '🎉 Your excellent score qualifies you for premium loan rates and insurance benefits!' 
+                {scoreData.totalScore >= 71
+                  ? '🎉 Your excellent score qualifies you for premium loan rates and insurance benefits!'
                   : scoreData.totalScore >= 41
                     ? 'Good score! Keep improving to access better credit terms.'
                     : 'Follow AI advice and improve yield to boost your score.'}

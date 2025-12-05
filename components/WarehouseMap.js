@@ -56,8 +56,8 @@ function WarehouseMap() {
               <div
                 key={idx}
                 className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 hover:shadow-lg ${selectedWarehouse === idx
-                    ? 'border-[var(--primary-color)] shadow-md scale-105'
-                    : 'border-[var(--border-color)]'
+                  ? 'border-[var(--primary-color)] shadow-md scale-105'
+                  : 'border-[var(--border-color)]'
                   }`}
                 onClick={() => setSelectedWarehouse(selectedWarehouse === idx ? null : idx)}
               >

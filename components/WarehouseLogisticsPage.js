@@ -10,8 +10,8 @@ function WarehousePage() {
                 <button
                     onClick={() => setActiveTab('warehouses')}
                     className={`px-4 py-2 font-medium transition-colors ${activeTab === 'warehouses'
-                            ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                 >
                     Warehouses
@@ -19,8 +19,8 @@ function WarehousePage() {
                 <button
                     onClick={() => setActiveTab('logistics')}
                     className={`px-4 py-2 font-medium transition-colors ${activeTab === 'logistics'
-                            ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                         }`}
                 >
                     Logistics

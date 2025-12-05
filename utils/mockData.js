@@ -79,55 +79,55 @@ const mockData = {
   },
 
   contracts: [
-    { 
-      crop: 'Mustard Seeds', 
-      processor: 'AgriCorp Processing Ltd', 
-      quantity: 50, 
-      price: 6200, 
+    {
+      crop: 'Mustard Seeds',
+      processor: 'AgriCorp Processing Ltd',
+      quantity: 50,
+      price: 6200,
       marketRate: 6000,
-      deliveryDate: 'March 2025', 
-      location: 'Wardha', 
-      status: 'open' 
+      deliveryDate: 'March 2025',
+      location: 'Wardha',
+      status: 'open'
     },
-    { 
-      crop: 'Soybean', 
-      processor: 'United Oil Mills', 
-      quantity: 100, 
-      price: 5700, 
+    {
+      crop: 'Soybean',
+      processor: 'United Oil Mills',
+      quantity: 100,
+      price: 5700,
       marketRate: 5500,
-      deliveryDate: 'April 2025', 
-      location: 'Indore', 
-      status: 'open' 
+      deliveryDate: 'April 2025',
+      location: 'Indore',
+      status: 'open'
     },
-    { 
-      crop: 'Groundnut', 
-      processor: 'Premium Oils Pvt Ltd', 
-      quantity: 30, 
-      price: 6000, 
+    {
+      crop: 'Groundnut',
+      processor: 'Premium Oils Pvt Ltd',
+      quantity: 30,
+      price: 6000,
       marketRate: 5800,
-      deliveryDate: 'February 2025', 
-      location: 'Rajkot', 
-      status: 'open' 
+      deliveryDate: 'February 2025',
+      location: 'Rajkot',
+      status: 'open'
     },
-    { 
-      crop: 'Mustard Seeds', 
-      processor: 'Local FPO Cooperative', 
-      quantity: 20, 
-      price: 6100, 
+    {
+      crop: 'Mustard Seeds',
+      processor: 'Local FPO Cooperative',
+      quantity: 20,
+      price: 6100,
       marketRate: 6000,
-      deliveryDate: 'January 2025', 
-      location: 'Wardha', 
-      status: 'active' 
+      deliveryDate: 'January 2025',
+      location: 'Wardha',
+      status: 'active'
     },
-    { 
-      crop: 'Soybean', 
-      processor: 'AgriCorp Processing Ltd', 
-      quantity: 15, 
-      price: 5600, 
+    {
+      crop: 'Soybean',
+      processor: 'AgriCorp Processing Ltd',
+      quantity: 15,
+      price: 5600,
       marketRate: 5500,
-      deliveryDate: 'December 2024', 
-      location: 'Nagpur', 
-      status: 'completed' 
+      deliveryDate: 'December 2024',
+      location: 'Nagpur',
+      status: 'completed'
     }
   ]
 };

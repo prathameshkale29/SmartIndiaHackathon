@@ -152,8 +152,8 @@ function ProcurementPage() {
                         <button
                             onClick={() => setActiveTab('dashboard')}
                             className={`px-4 py-2 font-medium transition-colors ${activeTab === 'dashboard'
-                                    ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             Dashboard
@@ -161,8 +161,8 @@ function ProcurementPage() {
                         <button
                             onClick={() => setActiveTab('tenders')}
                             className={`px-4 py-2 font-medium transition-colors ${activeTab === 'tenders'
-                                    ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             Available Tenders
@@ -170,8 +170,8 @@ function ProcurementPage() {
                         <button
                             onClick={() => setActiveTab('mybids')}
                             className={`px-4 py-2 font-medium transition-colors ${activeTab === 'mybids'
-                                    ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             My Bids
@@ -179,8 +179,8 @@ function ProcurementPage() {
                         <button
                             onClick={() => setActiveTab('guidelines')}
                             className={`px-4 py-2 font-medium transition-colors ${activeTab === 'guidelines'
-                                    ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
-                                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'text-[var(--primary-color)] border-b-2 border-[var(--primary-color)]'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             Guidelines
@@ -306,8 +306,8 @@ function ProcurementPage() {
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h3 className="text-xl font-bold text-[var(--text-primary)]">{tender.title}</h3>
                                                 <span className={`px-3 py-1 text-xs font-bold rounded-full ${tender.status === 'Open' ? 'bg-green-100 text-green-700' :
-                                                        tender.status === 'Closing Soon' ? 'bg-amber-100 text-amber-700' :
-                                                            'bg-gray-100 text-gray-700'
+                                                    tender.status === 'Closing Soon' ? 'bg-amber-100 text-amber-700' :
+                                                        'bg-gray-100 text-gray-700'
                                                     }`}>
                                                     {tender.status}
                                                 </span>

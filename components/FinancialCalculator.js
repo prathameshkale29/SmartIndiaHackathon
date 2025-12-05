@@ -24,7 +24,7 @@ function FinancialCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-name="financial-calculator" data-file="components/FinancialCalculator.js">
         <div className="card">
           <h3 className="text-lg font-semibold mb-4">{t('inputParameters')}</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('cropType')}</label>
@@ -82,19 +82,19 @@ function FinancialCalculator() {
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Seeds</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{seedCost.toLocaleString()} ({((seedCost/totalCost)*100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{seedCost.toLocaleString()} ({((seedCost / totalCost) * 100).toFixed(1)}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Fertilizer</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{fertilizerCost.toLocaleString()} ({((fertilizerCost/totalCost)*100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{fertilizerCost.toLocaleString()} ({((fertilizerCost / totalCost) * 100).toFixed(1)}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Labor</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{laborCost.toLocaleString()} ({((laborCost/totalCost)*100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{laborCost.toLocaleString()} ({((laborCost / totalCost) * 100).toFixed(1)}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Other Costs</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{otherCost.toLocaleString()} ({((otherCost/totalCost)*100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{otherCost.toLocaleString()} ({((otherCost / totalCost) * 100).toFixed(1)}%)</span>
               </div>
               <div className="pt-3 border-t border-[var(--border-color)] flex justify-between">
                 <span className="font-semibold text-[var(--text-primary)]">{t('totalInvestment')}</span>

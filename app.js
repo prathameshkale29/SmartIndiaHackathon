@@ -187,8 +187,8 @@ function HomePage({ setActivePage }) {
         <div className="relative z-10 w-full flex flex-col md:flex-row items-end justify-between gap-6">
           <div className="text-white">
             <div className="flex items-center gap-4 mb-3">
-              <div className="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
-                <div className="icon-sprout text-3xl text-[var(--accent-color)]"></div>
+              <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-[var(--accent-color)]">
+                <img src="agrisync-logo.jpg" alt="AgriSync Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold tracking-tight text-white mb-0 drop-shadow-md">

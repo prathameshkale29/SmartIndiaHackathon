@@ -16,17 +16,16 @@ function VoiceAssistant() {
 
   return (
     <div className="fixed bottom-6 right-6 z-40">
-      <button 
+      <button
         onClick={startListening}
         disabled={isListening}
-        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all ${
-          isListening ? 'bg-red-500 animate-pulse' : 'bg-[var(--primary-color)] hover:scale-110'
-        }`}
+        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all ${isListening ? 'bg-red-500 animate-pulse' : 'bg-[var(--primary-color)] hover:scale-110'
+          }`}
         title="Voice Assistant"
       >
         <div className={`icon-${isListening ? 'mic-off' : 'mic'} text-2xl text-white`}></div>
       </button>
-      
+
       {(transcript || response) && (
         <div className="absolute bottom-20 right-0 w-80 bg-white rounded-lg shadow-2xl p-4">
           {transcript && (

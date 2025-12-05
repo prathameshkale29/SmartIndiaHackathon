@@ -114,13 +114,12 @@ function LogisticsTracker({ user }) {
             <h3 className="font-semibold mb-4">Active Shipments</h3>
             <div className="space-y-3">
               {shipments.map(ship => (
-                <div 
-                  key={ship.id} 
-                  className={`p-4 rounded-xl cursor-pointer transition-all ${
-                    selectedShipment?.id === ship.id 
-                      ? 'bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900 dark:to-blue-900 border-2 border-[var(--primary-color)] shadow-lg' 
+                <div
+                  key={ship.id}
+                  className={`p-4 rounded-xl cursor-pointer transition-all ${selectedShipment?.id === ship.id
+                      ? 'bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900 dark:to-blue-900 border-2 border-[var(--primary-color)] shadow-lg'
                       : 'bg-[var(--bg-light)] hover:shadow-md hover:scale-102'
-                  }`} 
+                    }`}
                   onClick={() => setSelectedShipment(ship)}
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -128,11 +127,10 @@ function LogisticsTracker({ user }) {
                       <p className="font-bold text-lg text-[var(--primary-color)]">{ship.id}</p>
                       <p className="text-base font-medium text-[var(--text-primary)] mt-1">{ship.crop}</p>
                     </div>
-                    <span className={`px-3 py-1.5 text-sm font-bold rounded-lg ${
-                      ship.status === 'In Transit' 
-                        ? 'bg-blue-500 text-white' 
+                    <span className={`px-3 py-1.5 text-sm font-bold rounded-lg ${ship.status === 'In Transit'
+                        ? 'bg-blue-500 text-white'
                         : 'bg-gray-400 text-white'
-                    }`}>{ship.status}</span>
+                      }`}>{ship.status}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm font-medium mb-2">
                     <div className="icon-map-pin text-base text-[var(--primary-color)]"></div>
@@ -145,7 +143,7 @@ function LogisticsTracker({ user }) {
                     <span className="font-medium">ETA: {ship.eta}</span>
                   </div>
                   <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div className="bg-[var(--primary-color)] h-2 rounded-full transition-all" style={{width: `${ship.progress}%`}}></div>
+                    <div className="bg-[var(--primary-color)] h-2 rounded-full transition-all" style={{ width: `${ship.progress}%` }}></div>
                   </div>
                 </div>
               ))}
@@ -162,7 +160,7 @@ function LogisticsTracker({ user }) {
                     <span>Optimize Route</span>
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div className="p-4 bg-gradient-to-br from-red-400 to-red-600 rounded-xl shadow-lg text-white">
                     <div className="flex items-center gap-2 mb-2">
@@ -220,16 +218,14 @@ function LogisticsTracker({ user }) {
                   <div className="relative pl-8">
                     {selectedShipment.route.map((stop, idx) => (
                       <div key={idx} className="mb-8 relative">
-                        <div className={`absolute left-[-32px] w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
-                          stop.status === 'completed' ? 'bg-green-500' :
-                          stop.status === 'in-progress' ? 'bg-blue-500' :
-                          'bg-gray-400'
-                        }`}>
-                          <div className={`icon-${
-                            stop.status === 'completed' ? 'check' :
-                            stop.status === 'in-progress' ? 'truck' :
-                            'circle'
-                          } text-white text-xl`}></div>
+                        <div className={`absolute left-[-32px] w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${stop.status === 'completed' ? 'bg-green-500' :
+                            stop.status === 'in-progress' ? 'bg-blue-500' :
+                              'bg-gray-400'
+                          }`}>
+                          <div className={`icon-${stop.status === 'completed' ? 'check' :
+                              stop.status === 'in-progress' ? 'truck' :
+                                'circle'
+                            } text-white text-xl`}></div>
                         </div>
                         {idx < selectedShipment.route.length - 1 && (
                           <div className="absolute left-[-26px] top-12 w-1 h-full bg-gray-300"></div>
@@ -239,11 +235,10 @@ function LogisticsTracker({ user }) {
                             <p className="font-bold text-lg text-[var(--text-primary)]">{stop.location}</p>
                             <p className="text-sm text-[var(--text-secondary)] font-medium">{stop.time}</p>
                           </div>
-                          <span className={`px-3 py-1.5 text-sm font-bold rounded-lg capitalize ${
-                            stop.status === 'completed' ? 'bg-green-500 text-white' :
-                            stop.status === 'in-progress' ? 'bg-blue-500 text-white' :
-                            'bg-gray-400 text-white'
-                          }`}>{stop.status.replace('-', ' ')}</span>
+                          <span className={`px-3 py-1.5 text-sm font-bold rounded-lg capitalize ${stop.status === 'completed' ? 'bg-green-500 text-white' :
+                              stop.status === 'in-progress' ? 'bg-blue-500 text-white' :
+                                'bg-gray-400 text-white'
+                            }`}>{stop.status.replace('-', ' ')}</span>
                         </div>
                       </div>
                     ))}
