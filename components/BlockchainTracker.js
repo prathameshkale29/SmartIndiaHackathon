@@ -60,7 +60,10 @@ function BlockchainTracker({ user }) {
           ]
         }
       ];
-      setBatches(mockBatches);
+
+      // Load local blockchain batches
+      const localBatches = (typeof getBlockchainBatches === 'function') ? getBlockchainBatches() : [];
+      setBatches([...localBatches, ...mockBatches]);
     };
 
     const generateQR = (batchId) => {
@@ -78,37 +81,34 @@ function BlockchainTracker({ user }) {
         return;
       }
 
-      const batchId = 'BTC' + String(Date.now()).substr(-6);
-
       try {
-        const res = await fetch('/api/trace/register-batch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            batchId,
-            crop: newBatch.crop,
-            originFarm: user?.name || 'Current User'
-          })
-        });
-
-        const data = await res.json();
-        if (data.status !== 'ok') throw new Error(data.error);
-
-        const batch = {
-          id: batchId,
+        const batchData = {
           crop: newBatch.crop,
           quantity: parseFloat(newBatch.quantity),
           farmer: user?.name || 'Current User',
           location: newBatch.location,
-          timestamp: new Date().toISOString(),
           status: 'In Progress',
-          blockchainHash: data.txHash,
           stages: [
             { stage: 'Farm Harvest', date: new Date().toISOString(), verified: true, verifier: 'Self', notes: 'Batch created' }
           ],
           certificates: []
         };
-        setBatches([...batches, batch]);
+
+        let savedBatch;
+        if (typeof saveBatchToBlockchain === 'function') {
+          savedBatch = saveBatchToBlockchain(batchData);
+        } else {
+          // Fallback if utility not loaded
+          savedBatch = {
+            ...batchData,
+            id: 'BTC' + String(Date.now()).substr(-6),
+            blockchainHash: '0x' + Math.random().toString(16).substr(2, 64),
+            timestamp: new Date().toISOString()
+          };
+        }
+
+        const updatedBatches = [...batches, savedBatch];
+        setBatches(updatedBatches);
         setShowAddModal(false);
         setNewBatch({ crop: 'Mustard Seeds', quantity: '', location: '' });
       } catch (err) {
