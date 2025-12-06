@@ -21,12 +21,14 @@ app.use(express.json());
 app.use('/api/oilseed-advisor', require('./routes/oilseedAdvisor'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/trace', require('./routes/traceability'));
+app.use('/api/trace-events', require('./routes/traceEvents'));
 app.use('/api/warehouses', require('./routes/warehouses'));
 app.use('/api/forecast', require('./routes/forecast'));
 app.use('/api/weather', require('./routes/weather'));
 app.use('/api/satellite', require('./routes/satellite'));
 app.use('/api/procurement', require('./routes/procurement'));
 app.use('/api/contracts', require('./routes/contracts'));
+app.use('/api/produce-listings', require('./routes/produceListings'));
 
 // Serve static frontend from project root (parent of backend/)
 const frontendPath = path.join(__dirname, '..');

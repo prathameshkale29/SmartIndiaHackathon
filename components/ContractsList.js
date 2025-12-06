@@ -5,6 +5,7 @@ function ContractsList() {
     const [showCreateModal, setShowCreateModal] = React.useState(false);
     const [showAcceptModal, setShowAcceptModal] = React.useState(false);
     const [selectedContract, setSelectedContract] = React.useState(null);
+    const [contributionQuintals, setContributionQuintals] = React.useState('');
     const [govContracts, setGovContracts] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [dataSource, setDataSource] = React.useState('loading');
@@ -59,10 +60,27 @@ function ContractsList() {
     };
 
     const handleAcceptContract = () => {
-      if (selectedContract) {
-        toast.success(`Contract accepted! You'll receive confirmation shortly for ${selectedContract.crop}.`);
+      if (selectedContract && contributionQuintals) {
+        const quintals = parseFloat(contributionQuintals);
+        const maxQuintals = selectedContract.quantity * 10; // Convert MT to quintals
+
+        if (quintals <= 0) {
+          toast.error('Please enter a valid quantity');
+          return;
+        }
+
+        if (quintals > maxQuintals) {
+          toast.error(`Contribution cannot exceed ${maxQuintals} quintals (${selectedContract.quantity} MT)`);
+          return;
+        }
+
+        const payment = quintals * selectedContract.price;
+        toast.success(`Contract accepted! You will receive ₹${payment.toLocaleString()} for ${quintals} quintals of ${selectedContract.crop}.`);
         setShowAcceptModal(false);
         setSelectedContract(null);
+        setContributionQuintals('');
+      } else {
+        toast.error('Please enter your contribution quantity');
       }
     };
 
@@ -186,8 +204,8 @@ function ContractsList() {
                 <h4 className="font-semibold text-lg mb-3">{selectedContract.crop}</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[var(--text-secondary)]">Quantity</p>
-                    <p className="font-medium">{selectedContract.quantity} MT</p>
+                    <p className="text-[var(--text-secondary)]">Total Contract</p>
+                    <p className="font-medium">{selectedContract.quantity} MT ({selectedContract.quantity * 10} Qt)</p>
                   </div>
                   <div>
                     <p className="text-[var(--text-secondary)]">Price</p>
@@ -202,12 +220,53 @@ function ContractsList() {
                     <p className="font-medium">{selectedContract.location}</p>
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    Total Value: <span className="font-bold text-[var(--primary-color)]">₹{(selectedContract.quantity * selectedContract.price * 10).toLocaleString()}</span>
-                  </p>
-                </div>
               </div>
+
+              {/* Farmer Contribution Input */}
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                  Your Contribution (Quintals) *
+                </label>
+                <input
+                  type="number"
+                  value={contributionQuintals}
+                  onChange={(e) => setContributionQuintals(e.target.value)}
+                  min="1"
+                  max={selectedContract.quantity * 10}
+                  step="0.1"
+                  placeholder={`Enter quantity (max: ${selectedContract.quantity * 10} Qt)`}
+                  className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
+                />
+                <p className="text-xs text-[var(--text-secondary)] mt-1">
+                  Contract total: {selectedContract.quantity} MT = {selectedContract.quantity * 10} quintals
+                </p>
+              </div>
+
+              {/* Payment Calculation */}
+              {contributionQuintals && parseFloat(contributionQuintals) > 0 && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-[var(--text-primary)]">Your Contribution:</span>
+                    <span className="text-lg font-bold text-[var(--primary-color)]">{parseFloat(contributionQuintals).toFixed(2)} Qt</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-[var(--text-primary)]">Price per Quintal:</span>
+                    <span className="text-lg font-bold">₹{selectedContract.price.toLocaleString()}</span>
+                  </div>
+                  <div className="pt-2 border-t border-green-300 dark:border-green-700">
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-semibold text-[var(--text-primary)]">You will receive:</span>
+                      <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        ₹{(parseFloat(contributionQuintals) * selectedContract.price).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)] mt-1 text-right">
+                      ({parseFloat(contributionQuintals).toFixed(2)} Qt × ₹{selectedContract.price}/Qt)
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                 <div className="flex items-start gap-2">
                   <div className="icon-alert-triangle text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"></div>

@@ -3,17 +3,17 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
     // Removed incorrect useContext call. t() is global.
 
     const allMenuItems = [
-      { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'user'] },
-      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'user'] },
-      { id: 'market', label: t('market'), icon: 'trending-up', roles: ['admin', 'user'] },
-      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'warehouse', roles: ['admin', 'user'] },
-      { id: 'contracts', label: t('contracts'), icon: 'file-check', roles: ['admin', 'user'] },
-      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'user'] },
-      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'user'] },
-      { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'user'] },
-      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'user'] },
-      { id: 'traceability', label: t('traceability'), icon: 'truck', roles: ['admin', 'user'] },
-      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'user'] }
+      { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
+      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'fpo', 'government'] },
+      { id: 'market', label: t('market'), icon: 'trending-up', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
+      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'warehouse', roles: ['admin', 'farmer', 'fpo', 'processor'] },
+      { id: 'contracts', label: t('contracts'), icon: 'file-check', roles: ['admin', 'farmer', 'fpo', 'processor'] },
+      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'traceability', label: t('traceability'), icon: 'truck', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
+      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'fpo', 'processor', 'government'] }
     ];
 
     const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));

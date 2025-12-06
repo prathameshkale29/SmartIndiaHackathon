@@ -21,14 +21,15 @@ function NotificationProvider({ children }) {
         }
     }, [notifications]);
 
-    const addNotification = React.useCallback((title, message, type = 'info') => {
+    const addNotification = React.useCallback((title, message, type = 'info', link = null) => {
         const newNotification = {
             id: Date.now(),
             title,
             message,
             type,
             time: new Date().toISOString(),
-            read: false
+            read: false,
+            link: link // Optional: page to navigate to when clicked
         };
         setNotifications(prev => [newNotification, ...prev]);
     }, []);

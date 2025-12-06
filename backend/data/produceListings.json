@@ -1,0 +1,56 @@
+{
+    "produceListings": [
+        {
+            "id": 1,
+            "userId": "farmer1",
+            "crop": "Mustard",
+            "quantity": 25,
+            "pricePerQuintal": 6200,
+            "quality": "Premium",
+            "availableFrom": "2025-01-15",
+            "deliveryPreference": "Warehouse delivery",
+            "targetBuyers": [
+                "FPO",
+                "Processor"
+            ],
+            "status": "active",
+            "listedDate": "2024-12-05",
+            "notes": "Certified organic mustard seeds, stored in climate-controlled warehouse"
+        },
+        {
+            "id": 2,
+            "userId": "farmer1",
+            "crop": "Soybean",
+            "quantity": 40,
+            "pricePerQuintal": 5700,
+            "quality": "Grade A",
+            "availableFrom": "2024-12-10",
+            "deliveryPreference": "Farm pickup",
+            "targetBuyers": [
+                "Processor",
+                "Retailer"
+            ],
+            "status": "active",
+            "listedDate": "2024-12-01",
+            "notes": "High protein content, suitable for oil extraction"
+        },
+        {
+            "id": 3,
+            "userId": "farmer2",
+            "crop": "Groundnut",
+            "quantity": 30,
+            "pricePerQuintal": 6000,
+            "quality": "Premium",
+            "availableFrom": "2025-01-20",
+            "deliveryPreference": "Negotiable",
+            "targetBuyers": [
+                "FPO",
+                "Processor",
+                "Retailer"
+            ],
+            "status": "active",
+            "listedDate": "2024-12-03",
+            "notes": "Fresh harvest, excellent oil content"
+        }
+    ]
+}

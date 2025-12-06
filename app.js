@@ -131,7 +131,7 @@ function App() {
             {renderContent()}
           </main>
         </div>
-        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} />}
+        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
         {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
       </div>
@@ -146,7 +146,9 @@ function HomePage({ setActivePage }) {
   const [user, setUser] = React.useState(getCurrentUser());
   const isAdmin = user?.role === 'admin';
   const [showAddCropModal, setShowAddCropModal] = React.useState(false);
+  const [showListProduceModal, setShowListProduceModal] = React.useState(false);
   const [userCrops, setUserCrops] = React.useState(mockData.userCrops || []);
+  const [produceListings, setProduceListings] = React.useState(mockData.produceListings || []);
   const toast = useToast();
   const { addNotification } = useNotification();
 
@@ -163,7 +165,26 @@ function HomePage({ setActivePage }) {
     setUserCrops([newCrop, ...userCrops]);
     setShowAddCropModal(false);
     toast.success('New crop added successfully!');
-    addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success');
+    addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success', 'home');
+  };
+
+  const handleListProduce = (newListing) => {
+    setProduceListings([newListing, ...produceListings]);
+    toast.success('Produce listed successfully!');
+    addNotification('Produce Listed', `${newListing.quantity} quintals of ${newListing.crop} listed for sale at ₹${newListing.pricePerQuintal}/quintal`, 'success', 'home');
+  };
+
+  const handleDeleteListing = (id) => {
+    setProduceListings(produceListings.filter(listing => listing.id !== id));
+    toast.success('Listing deleted successfully');
+  };
+
+  const handleMarkSold = (id) => {
+    setProduceListings(produceListings.map(listing =>
+      listing.id === id ? { ...listing, status: 'sold' } : listing
+    ));
+    toast.success('Listing marked as sold!');
+    addNotification('Produce Sold', 'Congratulations! Your produce has been marked as sold', 'success', 'home');
   };
 
   const totalCrops = userCrops.length;
@@ -207,10 +228,16 @@ function HomePage({ setActivePage }) {
           </div>
 
           {!isAdmin && (
-            <button onClick={() => setShowAddCropModal(true)} className="bg-[var(--accent-color)] text-black hover:bg-white flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-[var(--accent-color)] group/btn">
-              <div className="icon-plus text-xl group-hover/btn:rotate-90 transition-transform"></div>
-              <span>{t('addCrop')}</span>
-            </button>
+            <div className="flex gap-3">
+              <button onClick={() => setShowAddCropModal(true)} className="bg-[var(--accent-color)] text-black hover:bg-white flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-[var(--accent-color)] group/btn">
+                <div className="icon-plus text-xl group-hover/btn:rotate-90 transition-transform"></div>
+                <span>{t('addCrop')}</span>
+              </button>
+              <button onClick={() => setShowListProduceModal(true)} className="bg-white text-gray-900 hover:bg-[var(--accent-color)] hover:text-black flex items-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:-translate-y-1 border-2 border-white group/btn">
+                <div className="icon-package text-xl"></div>
+                <span>List Produce</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -248,6 +275,12 @@ function HomePage({ setActivePage }) {
         </form>
       </ModalDialog>
 
+      <ListProduceModal
+        isOpen={showListProduceModal}
+        onClose={() => setShowListProduceModal(false)}
+        onAdd={handleListProduce}
+      />
+
       {/* Dashboard Section */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
@@ -278,123 +311,155 @@ function HomePage({ setActivePage }) {
         ))}
       </div>
 
-      {/* Feature Cards Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
-            <div className="icon-satellite text-2xl text-blue-600 dark:text-blue-400"></div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Satellite Monitoring</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Real-time crop health analysis using satellite imagery</p>
-          <SatelliteWidget />
-        </div>
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-10">
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
-            <div className="icon-trending-up text-2xl text-purple-600 dark:text-purple-400"></div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Performance Score</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Track your farming efficiency and productivity</p>
-          <PerformanceScore />
-        </div>
+        {/* Left Content Column */}
+        <div className="xl:col-span-9 space-y-6">
+          {/* Feature Cards Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all border-l-4 border-l-blue-500">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+                <div className="icon-satellite text-2xl"></div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Satellite Monitoring</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Real-time crop health analysis</p>
+              <SatelliteWidget />
+            </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mb-4">
-            <div className="icon-brain text-2xl text-amber-600 dark:text-amber-400"></div>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI Predictions</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Smart forecasting for better decision making</p>
-          <PredictiveAnalytics />
-        </div>
-      </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all border-l-4 border-l-purple-500">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 text-purple-600">
+                <div className="icon-trending-up text-2xl"></div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Performance Score</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Farming efficiency metrics</p>
+              <PerformanceScore />
+            </div>
 
-      {/* Market Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Live Market Auction</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Real-time bidding for oilseed contracts</p>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all border-l-4 border-l-amber-500">
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mb-4 text-amber-600">
+                <div className="icon-brain text-2xl"></div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI Predictions</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Smart yield forecasting</p>
+              <PredictiveAnalytics />
             </div>
           </div>
-          <LiveAuction />
-        </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button onClick={() => setActivePage('contracts')} className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center gap-3 border border-transparent hover:border-amber-200">
-              <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                <div className="icon-file-text text-lg text-amber-600 dark:text-amber-400"></div>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">View Contracts</p>
-                <p className="text-xs text-gray-500">Browse available tenders</p>
-              </div>
-            </button>
-
-            <button onClick={() => setActivePage('market')} className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-all flex items-center gap-3 border border-transparent hover:border-green-200">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                <div className="icon-trending-up text-lg text-green-600 dark:text-green-400"></div>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">Market Prices</p>
-                <p className="text-xs text-gray-500">Check current rates</p>
-              </div>
-            </button>
-
-            <button onClick={() => setActivePage('advisor')} className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center gap-3 border border-transparent hover:border-blue-200">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                <div className="icon-bot text-lg text-blue-600 dark:text-blue-400"></div>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">AI Advisor</p>
-                <p className="text-xs text-gray-500">Get expert guidance</p>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts Section */}
-      {isAdmin ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <PriceChart />
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <DemandSupplyChart />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">My Crops Status</h3>
-            <div className="space-y-3">
-              {userCrops.map((crop, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition-all border border-gray-200 dark:border-gray-600">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                      <div className="icon-sprout text-xl text-green-600 dark:text-green-400"></div>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">{crop.name}</p>
-                      <p className="text-sm text-gray-500">{crop.area} {t('acres')}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-emerald-600 dark:text-emerald-400">{crop.status}</p>
-                    <p className="text-sm text-gray-500">{crop.days} days</p>
-                  </div>
+          {/* Live Market & My Crops Side-by-Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Live Market */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm h-full">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Live Market Auction</h3>
+                  <p className="text-xs text-gray-500">Real-time bidding</p>
                 </div>
-              ))}
+                <div className="animate-pulse w-3 h-3 bg-red-500 rounded-full"></div>
+              </div>
+              <LiveAuction />
+            </div>
+
+            {/* My Crops Status (User) or Demand Chart (Admin) */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm h-full">
+              {isAdmin ? (
+                <>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Demand & Supply</h3>
+                  <DemandSupplyChart />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">My Crops Status</h3>
+                      <p className="text-xs text-gray-500">Live growth tracking</p>
+                    </div>
+                    <button onClick={() => setShowAddCropModal(true)} className="text-sm text-[var(--primary-color)] font-medium hover:underline flex items-center gap-1">
+                      <div className="icon-plus"></div> Add
+                    </button>
+                  </div>
+                  <div className="space-y-3 custom-scrollbar overflow-y-auto max-h-[300px]">
+                    {userCrops.map((crop, idx) => (
+                      <div key={idx} className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-[var(--secondary-color)] transition-colors border border-gray-100 dark:border-gray-600">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm text-green-600">
+                            <div className="icon-sprout text-lg"></div>
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-800 dark:text-gray-100 group-hover:text-[var(--primary-color)] transition-colors">{crop.name}</p>
+                            <p className="text-xs text-gray-500">{crop.area} {t('acres')}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="inline-block px-2 py-1 bg-green-100/80 text-green-700 text-xs rounded-lg font-medium mb-1">
+                            {crop.status}
+                          </span>
+                          <p className="text-xs text-gray-400">{crop.days} days</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+
+          {/* Charts Row */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Price Trends</h3>
             <PriceChart />
           </div>
+
+          {/* Produce Listings Section (Farmers only) */}
+          {!isAdmin && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">My Produce Listings</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Manage your produce available for sale</p>
+                </div>
+                <button
+                  onClick={() => setShowListProduceModal(true)}
+                  className="text-sm text-[var(--primary-color)] font-medium hover:underline flex items-center gap-1"
+                >
+                  <div className="icon-plus"></div> Add Listing
+                </button>
+              </div>
+              <ProduceListings
+                listings={produceListings}
+                onDelete={handleDeleteListing}
+                onMarkSold={handleMarkSold}
+              />
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Right Sidebar Column - Quick Actions */}
+        <div className="xl:col-span-3 space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-md sticky top-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 border-b pb-4">Quick Actions</h3>
+            <div className="grid grid-cols-4 gap-4">
+
+              <button onClick={() => setActivePage('contracts')} title="View Contracts" className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                <div className="icon-file-text text-2xl text-amber-600 group-hover:scale-110 transition-transform"></div>
+              </button>
+
+              <button onClick={() => setActivePage('market')} title="Market Prices" className="aspect-square bg-gradient-to-br from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border border-emerald-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                <div className="icon-trending-up text-2xl text-emerald-600 group-hover:scale-110 transition-transform"></div>
+              </button>
+
+              <button onClick={() => setActivePage('advisor')} title="AI Advisor" className="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                <div className="icon-bot text-2xl text-blue-600 group-hover:scale-110 transition-transform"></div>
+              </button>
+
+              <button onClick={() => setActivePage('traceability')} title="Supply Chain" className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                <div className="icon-truck text-2xl text-purple-600 group-hover:scale-110 transition-transform"></div>
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

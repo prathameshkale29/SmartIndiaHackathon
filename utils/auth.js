@@ -2,8 +2,12 @@ const AUTH_KEY = 'agrisync_user';
 const USERS_KEY = 'agrisync_users';
 
 const defaultUsers = {
-  admin: { username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
-  user: { username: 'user', password: 'user123', role: 'user', name: 'Regular User' }
+  admin: { username: 'admin', password: 'admin123', role: 'admin', name: 'System Administrator' },
+  farmer: { username: 'farmer', password: 'farmer123', role: 'farmer', name: 'Demo Farmer' },
+  fpo: { username: 'fpo', password: 'fpo123', role: 'fpo', name: 'Demo FPO Representative' },
+  processor: { username: 'processor', password: 'processor123', role: 'processor', name: 'Demo Processor' },
+  retailer: { username: 'retailer', password: 'retailer123', role: 'retailer', name: 'Demo Retailer' },
+  government: { username: 'government', password: 'gov123', role: 'government', name: 'Demo Government Official' }
 };
 
 function getStoredUsers() {
