@@ -12,6 +12,8 @@ function Login({ onLogin }) {
     const [phoneNumber, setPhoneNumber] = React.useState('');
     const [otp, setOtp] = React.useState('');
     const [showOtpInput, setShowOtpInput] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
     // Placeholder for User's actual Client ID
     // TODO: User needs to replace this
@@ -150,26 +152,30 @@ function Login({ onLogin }) {
         }
       }
 
-      // Simulate API delay
-      setTimeout(() => {
-        try {
-          let result;
-          if (isRegistering) {
-            result = register(username, password, fullName, role);
-          } else {
-            result = login(username, password, role);
-          }
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-          if (result.success) {
-            onLogin(result.user);
-          } else {
-            setError(result.message);
-          }
-        } catch (err) {
-          setError("An unexpected error occurred");
+        console.log("Attempting login/register with role:", role);
+        let result;
+        if (isRegistering) {
+          result = await register(username, password, fullName, role);
+        } else {
+          result = await login(username, password, role);
         }
+
+        if (result.success) {
+          console.log("Login successful, calling onLogin with:", result.user);
+          onLogin(result.user);
+        } else {
+          setError(result.message);
+        }
+      } catch (err) {
+        console.error("Auth error:", err);
+        setError("An unexpected error occurred");
+      } finally {
         setLoading(false);
-      }, 800);
+      }
     };
 
     return (
@@ -194,6 +200,25 @@ function Login({ onLogin }) {
               </div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{t('appName')}</h1>
               <p className="text-sm text-[var(--text-secondary)]">{t('tagline')}</p>
+
+              {/* Test Accounts Info */}
+              <details className="mt-4 text-left">
+                <summary className="cursor-pointer text-xs text-[var(--primary-color)] hover:underline font-medium">
+                  🔑 Show Test Accounts
+                </summary>
+                <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-xs space-y-1">
+                  <p className="font-semibold text-[var(--text-primary)] mb-2">Quick Login Credentials:</p>
+                  <div className="grid grid-cols-2 gap-2 text-[var(--text-secondary)]">
+                    <div><strong>user1</strong> / pass1</div>
+                    <div><strong>user2</strong> / pass2</div>
+                    <div><strong>user3</strong> / pass3</div>
+                    <div><strong>user4</strong> / pass4</div>
+                  </div>
+                  <p className="text-[var(--text-secondary)] mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+                    Or use role-specific: <strong>farmer</strong>/farmer123, <strong>fpo</strong>/fpo123, etc.
+                  </p>
+                </div>
+              </details>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -251,25 +276,43 @@ function Login({ onLogin }) {
 
                   <div>
                     <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('password')}</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                      placeholder={t('password')}
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                        placeholder={t('password')}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                      >
+                        <div className={showPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
+                      </button>
+                    </div>
                   </div>
 
                   {isRegistering && (
                     <div>
                       <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('confirmPassword')}</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                        placeholder={t('confirmPassword')}
-                      />
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                          placeholder={t('confirmPassword')}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        >
+                          <div className={showConfirmPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </>
