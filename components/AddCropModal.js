@@ -1,3 +1,5 @@
+import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
+
 function AddCropModal({ isOpen, onClose, onAdd }) {
     const [formData, setFormData] = React.useState({
         name: '',
@@ -7,10 +9,7 @@ function AddCropModal({ isOpen, onClose, onAdd }) {
         variety: ''
     });
 
-    const cropOptions = [
-        'Soybean', 'Sunflower', 'Groundnut', 'Mustard', 'Safflower',
-        'Sesame', 'Linseed', 'Castor', 'Niger Seed'
-    ];
+    const cropOptions = INDIAN_OILSEEDS;
 
     const handleSubmit = (e) => {
         e.preventDefault();

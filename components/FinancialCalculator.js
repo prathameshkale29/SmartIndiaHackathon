@@ -1,3 +1,5 @@
+import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
+
 function FinancialCalculator() {
   try {
     const [cropType, setCropType] = React.useState('mustard');
@@ -29,10 +31,9 @@ function FinancialCalculator() {
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('cropType')}</label>
               <select value={cropType} onChange={(e) => setCropType(e.target.value)} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]">
-                <option value="mustard">Mustard</option>
-                <option value="soybean">Soybean</option>
-                <option value="groundnut">Groundnut</option>
-                <option value="sunflower">Sunflower</option>
+                {INDIAN_OILSEEDS.map(crop => (
+                  <option key={crop} value={crop.toLowerCase()}>{crop}</option>
+                ))}
               </select>
             </div>
 

@@ -1,3 +1,5 @@
+import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
+
 function AIAdvisor() {
   try {
     const t = (typeof window !== 'undefined' && window.t) ? window.t : (key => key);
@@ -72,6 +74,12 @@ function AIAdvisor() {
               varieties: ['JS-335', 'JS-20-34'],
               baseYieldRainfed: 5,
               baseYieldIrrigated: 7
+            },
+            summer: {
+              window: 'January-February (requires assured irrigation)',
+              varieties: ['JS-335', 'NRC-37'],
+              baseYieldRainfed: 6,
+              baseYieldIrrigated: 9
             }
           },
           fertilizer: {
@@ -94,6 +102,12 @@ function AIAdvisor() {
         mustard: {
           name: 'Mustard',
           seasons: {
+            kharif: {
+              window: 'Not suitable for Kharif',
+              varieties: [],
+              baseYieldRainfed: 0,
+              baseYieldIrrigated: 0
+            },
             rabi: {
               window: 'Mid October to mid November after withdrawal of monsoon',
               varieties: ['Pusa Bold', 'Varuna', 'Pusa Jai Kisan'],
@@ -134,6 +148,12 @@ function AIAdvisor() {
               baseYieldRainfed: 8,
               baseYieldIrrigated: 11
             },
+            rabi: {
+              window: 'October-November (requires irrigation)',
+              varieties: ['TAG-24', 'TG-37A'],
+              baseYieldRainfed: 10,
+              baseYieldIrrigated: 15
+            },
             summer: {
               window: 'Late January to February under assured irrigation',
               varieties: ['JL-24', 'TAG-24'],
@@ -172,6 +192,12 @@ function AIAdvisor() {
               varieties: ['Morden', 'KBSH-1'],
               baseYieldRainfed: 5,
               baseYieldIrrigated: 8
+            },
+            summer: {
+              window: 'January-February',
+              varieties: ['KBSH-44', 'DRSH-1'],
+              baseYieldRainfed: 6,
+              baseYieldIrrigated: 9
             }
           },
           fertilizer: {
@@ -189,6 +215,142 @@ function AIAdvisor() {
               '1st irrigation: immediately after sowing, then at flower bud stage and flowering.',
               'Avoid moisture stress during flowering and grain filling.'
             ]
+          }
+        },
+        sesame: {
+          name: 'Sesame',
+          seasons: {
+            kharif: {
+              window: 'June-July (Monsoon onset)',
+              varieties: ['Phule Til-1', 'RT-351'],
+              baseYieldRainfed: 3,
+              baseYieldIrrigated: 4
+            },
+            rabi: {
+              window: 'September-October (Semi-rabi)',
+              varieties: ['AKT-64'],
+              baseYieldRainfed: 3,
+              baseYieldIrrigated: 4
+            },
+            summer: {
+              window: 'January-February',
+              varieties: ['RT-346', 'RT-127'],
+              baseYieldRainfed: 4,
+              baseYieldIrrigated: 5
+            }
+          },
+          fertilizer: { n: 20, p: 10, k: 0, organic: 'Agro-climatically hardy crop, needs less input' },
+          irrigation: {
+            rainfed: ['Sow in lines to conserve moisture', 'Thinning at 15 days is crucial'],
+            irrigated: ['Give irrigation at flowering and capsule formation']
+          }
+        },
+        safflower: {
+          name: 'Safflower',
+          seasons: {
+            kharif: { window: 'Not typical', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 },
+            rabi: {
+              window: 'September-October',
+              varieties: ['Bhima', 'Tara', 'Manjira'],
+              baseYieldRainfed: 5,
+              baseYieldIrrigated: 8
+            },
+            summer: { window: 'Not typical', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 }
+          },
+          fertilizer: { n: 40, p: 20, k: 0, organic: 'Incorporating FYM improves moisture retention' },
+          irrigation: {
+            rainfed: ['Deep soil preferred for moisture retention', 'Sow at optimum moisture'],
+            irrigated: ['One irrigation at rosette stage, one at flowering']
+          }
+        },
+        'niger seed': {
+          name: 'Niger Seed',
+          seasons: {
+            kharif: {
+              window: 'June-August',
+              varieties: ['IGP-76', 'PNS-6'],
+              baseYieldRainfed: 2,
+              baseYieldIrrigated: 3
+            },
+            rabi: { window: 'Subject to local conditions', varieties: ['Local'], baseYieldRainfed: 2, baseYieldIrrigated: 3 },
+            summer: { window: 'Not typical', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 }
+          },
+          fertilizer: { n: 10, p: 10, k: 0, organic: 'Low input crop' },
+          irrigation: {
+            rainfed: ['Mainly rainfed in tribal/hilly areas'],
+            irrigated: ['Critical stages: Flowering and seed setting']
+          }
+        },
+        castor: {
+          name: 'Castor',
+          seasons: {
+            kharif: {
+              window: 'July-August',
+              varieties: ['GCH-7', 'DCH-177'],
+              baseYieldRainfed: 6,
+              baseYieldIrrigated: 10
+            },
+            rabi: {
+              window: 'September-October',
+              varieties: ['GCH-7'],
+              baseYieldRainfed: 6,
+              baseYieldIrrigated: 8
+            },
+            summer: {
+              window: 'January-February',
+              varieties: ['GCH-7'],
+              baseYieldRainfed: 8,
+              baseYieldIrrigated: 12
+            }
+          },
+          fertilizer: { n: 40, p: 40, k: 20, organic: 'Castor cake or FYM is beneficial' },
+          irrigation: {
+            rainfed: ['Drought tolerant, but responsive to irrigation'],
+            irrigated: ['Drip irrigation increases yield by 40%']
+          }
+        },
+        linseed: {
+          name: 'Linseed',
+          seasons: {
+            kharif: { window: 'Not typical', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 },
+            rabi: {
+              window: 'October-November',
+              varieties: ['NL-97', 'Padmini'],
+              baseYieldRainfed: 4,
+              baseYieldIrrigated: 6
+            },
+            summer: { window: 'Not typical', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 }
+          },
+          fertilizer: { n: 30, p: 15, k: 0, organic: 'Use FYM for better soil health' },
+          irrigation: {
+            rainfed: ['Sow in residual moisture'],
+            irrigated: ['Irrigate at branching, flowering, and grain filling']
+          }
+        },
+        'oil palm': {
+          name: 'Oil Palm',
+          seasons: {
+            kharif: { window: 'Planting June-December', varieties: ['Tenera'], baseYieldRainfed: 0, baseYieldIrrigated: 200 }, // Yield in bunches/tons? keeping generic Qt for now roughly
+            rabi: { window: 'Planting June-December', varieties: ['Tenera'], baseYieldRainfed: 0, baseYieldIrrigated: 200 },
+            summer: { window: 'Planting June-December', varieties: ['Tenera'], baseYieldRainfed: 0, baseYieldIrrigated: 200 },
+          },
+          fertilizer: { n: 120, p: 60, k: 120, organic: 'High nutrient feeder, requires regular application' },
+          irrigation: {
+            rainfed: ['Not suitable for rainfed'],
+            irrigated: ['Requires assured irrigation throughout the year']
+          }
+        },
+        coconut: {
+          name: 'Coconut',
+          seasons: {
+            kharif: { window: 'May-June', varieties: ['WCT', 'COD'], baseYieldRainfed: 40, baseYieldIrrigated: 60 },
+            rabi: { window: 'September-October', varieties: ['WCT'], baseYieldRainfed: 40, baseYieldIrrigated: 60 },
+            summer: { window: 'Not typical for planting', varieties: [], baseYieldRainfed: 0, baseYieldIrrigated: 0 }
+          },
+          fertilizer: { n: 50, p: 30, k: 100, organic: 'Green manuring and compost' },
+          irrigation: {
+            rainfed: ['Coastal areas with high water table'],
+            irrigated: ['Drip irrigation recommended for inland areas']
           }
         }
       };
@@ -329,10 +491,9 @@ function AIAdvisor() {
                   value={formData.crop}
                   onChange={e => handleFormChange('crop', e.target.value)}
                 >
-                  <option value="soybean">Soybean</option>
-                  <option value="mustard">Mustard</option>
-                  <option value="groundnut">Groundnut</option>
-                  <option value="sunflower">Sunflower</option>
+                  {INDIAN_OILSEEDS.map(crop => (
+                    <option key={crop} value={crop.toLowerCase()}>{crop}</option>
+                  ))}
                 </select>
               </div>
 

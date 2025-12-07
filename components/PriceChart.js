@@ -6,7 +6,7 @@ function PriceChart() {
     if (chartRef.current) {
       const ctx = chartRef.current.getContext('2d');
       const ChartJS = window.Chart;
-      
+
       if (chartInstance.current) {
         chartInstance.current.destroy();
       }
@@ -27,13 +27,25 @@ function PriceChart() {
             borderColor: '#f59e0b',
             backgroundColor: 'rgba(245, 158, 11, 0.1)',
             tension: 0.4
+          }, {
+            label: 'Groundnut',
+            data: [6100, 6200, 6000, 6300, 6500, 6700],
+            borderColor: '#e11d48',
+            backgroundColor: 'rgba(225, 29, 72, 0.1)',
+            tension: 0.4
+          }, {
+            label: 'Sunflower',
+            data: [4500, 4600, 4700, 4800, 4900, 5000],
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            tension: 0.4
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: true, position: 'bottom' }
+            legend: { display: true, position: 'bottom', labels: { boxWidth: 10, padding: 10 } }
           }
         }
       });

@@ -1,3 +1,5 @@
+import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
+
 // Enhanced FarmersList with Add Farmer/Connect modal
 function FarmersList() {
   try {
@@ -81,10 +83,9 @@ function FarmersList() {
                 <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Primary Crop *</label>
                 <select name="crop" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none">
                   <option value="">Select crop...</option>
-                  <option value="Mustard">Mustard</option>
-                  <option value="Soybean">Soybean</option>
-                  <option value="Groundnut">Groundnut</option>
-                  <option value="Sunflower">Sunflower</option>
+                  {INDIAN_OILSEEDS.map(crop => (
+                    <option key={crop} value={crop}>{crop}</option>
+                  ))}
                 </select>
               </div>
               <div>
