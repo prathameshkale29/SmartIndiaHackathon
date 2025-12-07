@@ -255,8 +255,8 @@ function HomePage({ setActivePage }) {
       >
         <form id="add-crop-form" onSubmit={handleAddCrop} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
-            <select name="cropName" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">Crop Type</label>
+            <select name="cropName" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] bg-[var(--bg-white)] text-[var(--text-primary)]" style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-white)' }}>
               <option value="">Select Crop</option>
               <option value="Soybean">Soybean</option>
               <option value="Mustard">Mustard</option>
@@ -265,12 +265,12 @@ function HomePage({ setActivePage }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Land Area (Acres)</label>
-            <input name="landArea" type="number" step="0.1" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g. 5.5" />
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">Land Area (Acres)</label>
+            <input name="landArea" type="number" step="0.1" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] bg-[var(--bg-white)] text-[var(--text-primary)]" placeholder="e.g. 5.5" style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-white)' }} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sowing Date</label>
-            <input name="sowingDate" type="date" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">Sowing Date</label>
+            <input name="sowingDate" type="date" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] bg-[var(--bg-white)] text-[var(--text-primary)]" style={{ color: 'var(--text-primary)', backgroundColor: 'var(--bg-white)', colorScheme: 'dark' }} />
           </div>
         </form>
       </ModalDialog>
