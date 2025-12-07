@@ -51,6 +51,7 @@ async function register(username, password, fullName, role) {
           role: role
         };
         localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+        window.dispatchEvent(new Event('auth-change'));
         return { success: true, user: userData };
       }
     } catch (e) {
@@ -66,6 +67,7 @@ async function register(username, password, fullName, role) {
     };
 
     localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    window.dispatchEvent(new Event('auth-change'));
     return { success: true, user: userData };
 
   } catch (error) {
@@ -87,6 +89,7 @@ async function login(username, password, role) {
           role: role || testAccount.defaultRole // Use selected role or default
         };
         localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+        window.dispatchEvent(new Event('auth-change'));
         return { success: true, user: userData };
       } else {
         return { success: false, message: 'Invalid password' };
@@ -109,6 +112,7 @@ async function login(username, password, role) {
           role: role // Trust UI role for now or use data.user.role if strict
         };
         localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+        window.dispatchEvent(new Event('auth-change'));
         return { success: true, user: userData };
       }
     } catch (e) {
@@ -124,6 +128,7 @@ async function login(username, password, role) {
     };
 
     localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    window.dispatchEvent(new Event('auth-change'));
     return { success: true, user: userData };
 
   } catch (error) {
@@ -134,6 +139,7 @@ async function login(username, password, role) {
 
 function logout() {
   localStorage.removeItem(AUTH_KEY);
+  window.dispatchEvent(new Event('auth-change'));
 }
 
 function getCurrentUser() {
@@ -177,5 +183,6 @@ function googleLogin(profile) {
   };
 
   localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+  window.dispatchEvent(new Event('auth-change'));
   return { success: true, user: userData };
 }
