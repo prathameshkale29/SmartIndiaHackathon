@@ -22,9 +22,7 @@ function Login({ onLogin }) {
       { value: 'farmer', label: 'Farmer', icon: 'sprout', description: 'Individual farmers growing oilseeds' },
       { value: 'fpo', label: 'FPO (Farmer Producer Organization)', icon: 'users', description: 'Collective of farmers' },
       { value: 'processor', label: 'Processor', icon: 'factory', description: 'Oil mills and processing units' },
-      { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' },
-      { value: 'government', label: 'Government Official', icon: 'shield', description: 'Government departments and officials' },
-      { value: 'admin', label: 'System Administrator', icon: 'settings', description: 'Platform administrators' }
+      { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' }
     ];
 
     // Initialize Google Sign-In
