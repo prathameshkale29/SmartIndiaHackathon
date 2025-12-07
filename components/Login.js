@@ -200,25 +200,6 @@ function Login({ onLogin }) {
               </div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{t('appName')}</h1>
               <p className="text-sm text-[var(--text-secondary)]">{t('tagline')}</p>
-
-              {/* Test Accounts Info */}
-              <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-xs text-[var(--primary-color)] hover:underline font-medium">
-                  🔑 Show Test Accounts
-                </summary>
-                <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-xs space-y-1">
-                  <p className="font-semibold text-[var(--text-primary)] mb-2">Quick Login Credentials:</p>
-                  <div className="grid grid-cols-2 gap-2 text-[var(--text-secondary)]">
-                    <div><strong>user1</strong> / pass1</div>
-                    <div><strong>user2</strong> / pass2</div>
-                    <div><strong>user3</strong> / pass3</div>
-                    <div><strong>user4</strong> / pass4</div>
-                  </div>
-                  <p className="text-[var(--text-secondary)] mt-2 pt-2 border-t border-blue-200 dark:border-blue-700">
-                    Or use role-specific: <strong>farmer</strong>/farmer123, <strong>fpo</strong>/fpo123, etc.
-                  </p>
-                </div>
-              </details>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
