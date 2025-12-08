@@ -23,52 +23,74 @@ function Login({ onLogin }) {
       { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' }
     ];
 
+    const [confirmationResult, setConfirmationResult] = React.useState(null);
+
+    React.useEffect(() => {
+      // Clean up recaptcha on unmount
+      return () => {
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+        }
+      }
+    }, []);
+
     const handleSendOTP = async () => {
       if (!phoneNumber) {
-        setError('Please enter your phone number');
+        setError('Please enter your phone number with country code (e.g., +919876543210)');
         return;
       }
       setLoading(true);
-      // Simulate API delay for OTP
-      setTimeout(() => {
+      setError('');
+
+      try {
+        const appVerifier = setupRecaptcha('recaptcha-container');
+        const result = await sendOTP(phoneNumber, appVerifier);
+
+        if (result.success) {
+          setConfirmationResult(result.confirmationResult);
+          setShowOtpInput(true);
+          // alert("OTP Sent!"); // Optional: Remove in productions
+        } else {
+          setError(result.message);
+        }
+      } catch (err) {
+        console.error("OTP Send Error:", err);
+        let msg = err.message || "Failed to send OTP. Try again.";
+        if (err.code === 'auth/billing-not-enabled') {
+          msg = "Free Plan Limit: Please add a 'Test Phone Number' in Firebase Console > Authentication > Sign-in method > Phone > 'Phone numbers for testing' section to test without billing.";
+        }
+        setError(msg);
+      } finally {
         setLoading(false);
-        setShowOtpInput(true);
-        alert(`Mock OTP Sent: 123456`); // Demo purpose
-      }, 1000);
+      }
     };
 
     const handleVerifyOTP = async () => {
-      if (otp !== '123456') {
-        setError('Invalid OTP (Use 123456)');
+      if (!otp) {
+        setError('Please enter the OTP');
         return;
       }
       setLoading(true);
-      setTimeout(() => {
-        const user = {
-          name: 'Phone User',
-          phoneNumber: phoneNumber,
-          role: role,
-          authMethod: 'phone'
-        };
-        console.log("Phone Login Success:", user);
-        onLogin(user);
+
+      try {
+        const result = await verifyOTP(confirmationResult, otp, role);
+        if (result.success) {
+          console.log("Phone Login Success:", result.user);
+          onLogin(result.user);
+        } else {
+          setError(result.message);
+        }
+      } catch (err) {
+        console.error("OTP Verify Error:", err);
+        setError("Invalid OTP");
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
       setError('');
-
-      if (authMethod === 'phone') {
-        if (showOtpInput) {
-          handleVerifyOTP();
-        } else {
-          handleSendOTP();
-        }
-        return;
-      }
-
       setLoading(true);
 
       // Local Auth Validation
@@ -141,125 +163,68 @@ function Login({ onLogin }) {
 
             <form onSubmit={handleSubmit} className="space-y-4">
 
-              {/* Method Switcher */}
-              <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg mb-4">
-                <button
-                  type="button"
-                  onClick={() => { setAuthMethod('email'); setError(''); }}
-                  className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${authMethod === 'email'
-                    ? 'bg-white dark:bg-gray-600 shadow text-[var(--primary-color)]'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-                    }`}
-                >
-                  Email / Password
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setAuthMethod('phone'); setError(''); }}
-                  className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${authMethod === 'phone'
-                    ? 'bg-white dark:bg-gray-600 shadow text-[var(--primary-color)]'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-                    }`}
-                >
-                  Phone OTP
-                </button>
-              </div>
-
-              {authMethod === 'email' && (
-                <>
-
-                  {isRegistering && (
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('fullName')}</label>
-                      <input
-                        type="text"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                        placeholder={t('fullName')}
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('username')}</label>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                      placeholder={t('username')}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('password')}</label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                        placeholder={t('password')}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                      >
-                        <div className={showPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
-                      </button>
-                    </div>
-                  </div>
-
-                  {isRegistering && (
-                    <div>
-                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('confirmPassword')}</label>
-                      <div className="relative">
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                          placeholder={t('confirmPassword')}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                        >
-                          <div className={showConfirmPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
+              {isRegistering && (
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('fullName')}</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                    placeholder={t('fullName')}
+                  />
+                </div>
               )}
 
-              {authMethod === 'phone' && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('username')}</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                  placeholder={t('username')}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('password')}</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                    placeholder={t('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  >
+                    <div className={showPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
+                  </button>
+                </div>
+              </div>
+
+              {isRegistering && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                    {showOtpInput ? 'Enter OTP' : 'Phone Number'}
-                  </label>
-                  <div className="space-y-3">
-                    {!showOtpInput ? (
-                      <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
-                        placeholder="+919876543210"
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        maxLength="6"
-                        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)] tracking-widest text-center text-lg"
-                        placeholder="123456"
-                      />
-                    )}
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('confirmPassword')}</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full px-4 py-3 pr-12 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition-all bg-[var(--bg-white)] text-[var(--text-primary)]"
+                      placeholder={t('confirmPassword')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    >
+                      <div className={showConfirmPassword ? "icon-eye-off text-xl" : "icon-eye text-xl"}></div>
+                    </button>
                   </div>
                 </div>
               )}
@@ -316,11 +281,7 @@ function Login({ onLogin }) {
                 disabled={loading}
                 className="w-full btn-primary py-3 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Please wait...' : (
-                  authMethod === 'phone'
-                    ? (showOtpInput ? 'Verify & Login' : 'Send OTP')
-                    : (isRegistering ? t('register') : t('login'))
-                )}
+                {loading ? 'Please wait...' : (isRegistering ? t('register') : t('login'))}
               </button>
 
               <div className="relative my-4">
@@ -349,7 +310,7 @@ function Login({ onLogin }) {
                   className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-200 font-medium py-2.5 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
-                  Sign in with Google
+                  {isRegistering ? 'Sign up with Google' : 'Sign in with Google'}
                 </button>
               </div>
 

@@ -1,22 +1,25 @@
 const AUTH_KEY = 'agrisync_user';
 
-// FIREBASE CONFIGURATION - TODO: REPLACE WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE
+// FIREBASE CONFIGURATION
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCGakiYQhmMxTrqayrfX9E7m4JN0KRdJag",
+  authDomain: "agri-sync-2025.firebaseapp.com",
+  projectId: "agri-sync-2025",
+  storageBucket: "agri-sync-2025.firebasestorage.app",
+  messagingSenderId: "429545867932",
+  appId: "1:429545867932:web:3a9aee0c5662f844737b59",
+  measurementId: "G-V82F6E5R6Z"
 };
 
 // Initialize Firebase
 let auth;
+let analytics;
 try {
   if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
-    console.log("Firebase initialized");
+    analytics = firebase.analytics();
+    console.log("Firebase initialized with Analytics");
   } else if (typeof firebase !== 'undefined') {
     auth = firebase.auth();
   } else {
@@ -112,7 +115,11 @@ async function googleLogin(role) {
 
   } catch (error) {
     console.error('Google Sign-In Error:', error);
-    return { success: false, message: error.message };
+    let msg = error.message;
+    if (error.code === 'auth/unauthorized-domain') {
+      msg = "Domain not authorized. Please add this domain to Firebase Console > Authentication > Settings > Authorized Domains.";
+    }
+    return { success: false, message: msg };
   }
 }
 
