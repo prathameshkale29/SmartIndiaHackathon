@@ -1,0 +1,97 @@
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const User = require('./models/User');
+const Product = require('./models/Product');
+const Listing = require('./models/Listing');
+const Advisory = require('./models/Advisory');
+const connectDB = require('./config/db');
+
+dotenv.config();
+
+connectDB();
+
+const importData = async () => {
+    try {
+        await User.deleteMany();
+        await Product.deleteMany();
+        await Listing.deleteMany();
+        await Advisory.deleteMany();
+
+        const createdUsers = await User.insertMany([
+            {
+                name: 'Admin User',
+                email: 'admin@example.com',
+                password: '$2a$10$examplehashedpassword', // password: 123
+                role: 'admin'
+            },
+            {
+                name: 'John Farmer',
+                email: 'farmer@example.com',
+                password: '$2a$10$examplehashedpassword',
+                role: 'farmer',
+                profile: { phone: '1234567890', address: { city: 'Pune', state: 'Maharashtra' } }
+            },
+            {
+                name: 'Buyer Inc',
+                email: 'buyer@example.com',
+                password: '$2a$10$examplehashedpassword',
+                role: 'buyer'
+            }
+        ]);
+
+        const admin = createdUsers[0]._id;
+        const farmer = createdUsers[1]._id;
+
+        const products = await Product.insertMany([
+            { name: 'Soybean', category: 'Oilseeds', gradingStandards: 'Grade A: Clean, <2% moisture' },
+            { name: 'Mustard Seeds', category: 'Oilseeds', gradingStandards: 'Grade A: Bold size' },
+            { name: 'Groundnut', category: 'Oilseeds', gradingStandards: 'Shell intact' }
+        ]);
+
+        await Listing.insertMany([
+            {
+                seller: farmer,
+                product: products[0]._id,
+                quantity: 100,
+                unit: 'quintal',
+                pricePerUnit: 4500,
+                location: { city: 'Pune', state: 'Maharashtra' },
+                description: 'Fresh harvest soybean available.'
+            },
+            {
+                seller: farmer,
+                product: products[1]._id,
+                quantity: 50,
+                unit: 'quintal',
+                pricePerUnit: 5200,
+                location: { city: 'Pune', state: 'Maharashtra' },
+                description: 'High oil content mustard seeds.'
+            }
+        ]);
+
+        await Advisory.insertMany([
+            {
+                title: 'Heavy Rainfall Alert',
+                content: 'Heavy rains expected in Pune district. Ensure proper drainage.',
+                type: 'weather',
+                targetStates: ['Maharashtra'],
+                targetCrops: ['Soybean']
+            },
+            {
+                title: 'Pest Control for Mustard',
+                content: 'Aphid attack prone these days. Use recommended bio-pesticides.',
+                type: 'pest',
+                targetStates: ['Maharashtra', 'Rajasthan'],
+                targetCrops: ['Mustard Seeds']
+            }
+        ]);
+
+        console.log('Data Imported!');
+        process.exit();
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+    }
+};
+
+importData();
