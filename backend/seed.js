@@ -45,27 +45,51 @@ const importData = async () => {
         const products = await Product.insertMany([
             { name: 'Soybean', category: 'Oilseeds', gradingStandards: 'Grade A: Clean, <2% moisture' },
             { name: 'Mustard Seeds', category: 'Oilseeds', gradingStandards: 'Grade A: Bold size' },
-            { name: 'Groundnut', category: 'Oilseeds', gradingStandards: 'Shell intact' }
+            { name: 'Groundnut', category: 'Oilseeds', gradingStandards: 'Shell intact' },
+            { name: 'Sunflower Seeds', category: 'Oilseeds', gradingStandards: 'High oil content >40%' },
+            { name: 'Sesame (Til)', category: 'Oilseeds', gradingStandards: 'White/Black sorted' },
+            { name: 'Castor Seeds', category: 'Oilseeds', gradingStandards: 'Commercial grade' }
         ]);
 
         await Listing.insertMany([
             {
                 seller: farmer,
-                product: products[0]._id,
+                product: products[0]._id, // Soybean
                 quantity: 100,
                 unit: 'quintal',
                 pricePerUnit: 4500,
-                location: { city: 'Pune', state: 'Maharashtra' },
+                location: {
+                    city: 'Pune',
+                    state: 'Maharashtra',
+                    coordinates: { type: 'Point', coordinates: [73.8567, 18.5204] }
+                },
                 description: 'Fresh harvest soybean available.'
             },
             {
                 seller: farmer,
-                product: products[1]._id,
+                product: products[1]._id, // Mustard
                 quantity: 50,
                 unit: 'quintal',
                 pricePerUnit: 5200,
-                location: { city: 'Pune', state: 'Maharashtra' },
+                location: {
+                    city: 'Jaipur',
+                    state: 'Rajasthan',
+                    coordinates: { type: 'Point', coordinates: [75.7873, 26.9124] }
+                },
                 description: 'High oil content mustard seeds.'
+            },
+            {
+                seller: farmer,
+                product: products[3]._id, // Sunflower
+                quantity: 200,
+                unit: 'quintal',
+                pricePerUnit: 3800,
+                location: {
+                    city: 'Latur',
+                    state: 'Maharashtra',
+                    coordinates: { type: 'Point', coordinates: [76.5604, 18.4088] }
+                },
+                description: 'Dried sunflower seeds for oil extraction.'
             }
         ]);
 

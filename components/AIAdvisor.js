@@ -31,13 +31,47 @@ function AIAdvisor() {
       { id: 'other', label: 'Other district' }
     ];
 
-    const quickChips = [
-      { label: '🛰️ Check Crop Health', query: 'Check my crop health via satellite' },
-      { label: '⚠️ Weather Alerts', query: 'Any weather alerts for my area?' },
-      { label: '💰 Market Prices', query: 'Current market price trends for soybean' },
-      { label: '🐛 Pest Control', query: 'How to control pests in groundnut?' },
-      { label: '🌱 Sowing Advice', query: 'Best sowing time for mustard' }
-    ];
+    const [userRole, setUserRole] = React.useState('farmer');
+
+    React.useEffect(() => {
+      const updateUser = () => {
+        const user = window.getCurrentUser ? window.getCurrentUser() : { role: 'farmer' };
+        if (user) setUserRole(user.role);
+      };
+
+      updateUser();
+      window.addEventListener('auth-change', updateUser);
+      return () => window.removeEventListener('auth-change', updateUser);
+    }, []);
+
+    const ROLE_CHIPS = {
+      farmer: [
+        { label: '🌾 Crop Health', query: 'Analyze my crop health from satellite imagery' },
+        { label: '🌦️ Weather', query: 'Any rain forecast for the next 3 days?' },
+        { label: '💰 Mandi Prices', query: 'Soybean prices in Wardha mandi today?' },
+        { label: '🐛 Pest Diagnosis', query: 'Identify this pest on my leaves' }
+      ],
+      fpo: [
+        { label: '🏭 Warehouse', query: 'Best practices for soybean storage to prevent moisture?' },
+        { label: '🚚 Logistics', query: 'Cost-effective transport for 50 tons of produce' },
+        { label: '🤝 FPO Schemes', query: 'Latest NABARD schemes for FPOs' },
+        { label: '⚖️ Fair Pricing', query: 'Fair price calculation for member farmers' }
+      ],
+      processor: [
+        { label: '🧪 Quality Specs', query: 'Acceptable moisture content for mustard seeds?' },
+        { label: '📉 Sourcing', query: 'Price trends for raw groundnut procurement' },
+        { label: '⚙️ Milling Yield', query: 'Techniques to increase oil extraction rate' },
+        { label: '📦 Bulk Packaging', query: 'Eco-friendly bulk oil packaging options' }
+      ],
+      retailer: [
+        { label: '🏷️ Consumer Trends', query: 'Which edible oils are trending in urban markets?' },
+        { label: '🏪 Stock Mgmt', query: 'How to manage shelf life of cold-pressed oils?' },
+        { label: '📢 Marketing', query: 'Ideas to promote organic oil in my shop' },
+        { label: '🥡 Storage', query: 'Storage conditions for preventing rancidity' }
+      ]
+    };
+
+    const quickChips = ROLE_CHIPS[userRole] || ROLE_CHIPS['farmer'];
 
     const handleFormChange = (field, value) => {
       setFormData(prev => ({
@@ -414,19 +448,20 @@ function AIAdvisor() {
       setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
       setInput('');
       setLoading(true);
+      setLoading(true);
       try {
-        const res = await fetch('/api/oilseed-advisor', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: userMessage })
-        });
-        const data = await res.json();
-        setMessages(prev => [...prev, { role: 'ai', text: data.reply || 'Sorry, I could not understand that.' }]);
+        const user = window.getCurrentUser ? window.getCurrentUser() : { role: 'farmer' };
+        const role = user ? user.role : 'farmer';
+
+        // Use local helper instead of fetch
+        const reply = await window.getAIAdvice(userMessage, role);
+
+        setMessages(prev => [...prev, { role: 'ai', text: reply }]);
       } catch (err) {
         console.error('AI advisor error', err);
         setMessages(prev => [
           ...prev,
-          { role: 'ai', text: 'Sorry, there was an error connecting to the advisor. Please try again.' }
+          { role: 'ai', text: `Error: ${err.message}. Please try again.` }
         ]);
       }
       setLoading(false);
@@ -634,14 +669,17 @@ function AIAdvisor() {
         {/* Conversational AI advisor */}
         <div className="card h-[600px] flex flex-col relative overflow-hidden">
           {/* Chat Header */}
-          <div className="absolute top-0 left-0 right-0 bg-white dark:bg-gray-800 p-4 border-b z-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">🤖</div>
-            <div>
-              <h3 className="font-semibold">Agri-Assistant</h3>
-              <p className="text-xs text-gray-900 dark:text-gray-100 flex items-center gap-1">
+          <div className="absolute top-0 left-0 right-0 bg-white dark:bg-gray-800 p-4 border-b z-10 flex flex-col">
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100">Agri-Assistant</h3>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 Online
-              </p>
+              </span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-500 dark:text-gray-400 capitalize">
+                Assisting: <b>{userRole}</b>
+              </span>
             </div>
           </div>
 

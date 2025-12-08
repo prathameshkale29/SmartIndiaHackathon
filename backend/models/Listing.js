@@ -6,21 +6,6 @@ const ListingSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
     unit: { type: String, required: true, default: 'kg' }, // kg, quintal, ton
     pricePerUnit: { type: Number, required: true },
-    location: {
-        address: String,
-        city: String,
-        state: String,
-        zip: String,
-        coordinates: { // GeoJSON
-            type: { type: String, enum: ['Point'], default: 'Point' },
-            coordinates: { type: [Number], required: false } // [longitude, latitude]
-        }
-    },
-    status: {
-        type: String,
-        enum: ['active', 'sold', 'expired', 'draft'],
-        default: 'active'
-    },
     qualityCertificates: [String], // URLs to images/docs
     description: String,
     createdAt: { type: Date, default: Date.now }
