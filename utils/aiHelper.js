@@ -126,7 +126,53 @@ function getWeatherAlerts() {
   return alerts[Math.floor(Math.random() * alerts.length)];
 }
 
-async function invokeAIAgent(systemPrompt, userQuestion) {
+// Role-specific Knowledge Base additions
+const ROLE_KB = {
+  fpo: [
+    {
+      keywords: ['storage', 'warehouse', 'loss'],
+      answer: "For FPOs, efficient storage is key. Ensure warehouses are dry, well-ventilated, and pest-free. Use hermetic bags for smaller lots. Regular fumigation and digital stock monitoring can reduce post-harvest losses by 15-20%."
+    },
+    {
+      keywords: ['scheme', 'funding', 'subsidy'],
+      answer: "FPOs can avail benefits under the 'Formation and Promotion of 10,000 FPOs' scheme. Equity Grant and Credit Guarantee Fund coverage are available. Check with NABARD or SFAC for application details."
+    },
+    {
+      keywords: ['aggregation', 'procurement', 'bulk'],
+      answer: "Aggregate produce at village level collection centers. Grade and sort immediately to ensure uniform quality for bulk buyers. This increases bargaining power and fetches premium rates."
+    }
+  ],
+  processor: [
+    {
+      keywords: ['quality', 'moisture', 'oil content', 'grade'],
+      answer: "Standard procurement specs: Soybean (Moisture < 12%, Oil > 18%), Mustard (Moisture < 8%, Oil > 38%). High moisture leads to fungal growth and rancidity during storage."
+    },
+    {
+      keywords: ['tender', 'procurement', 'buy'],
+      answer: "Use the Procurement section to float tenders for specific grades. Specifying clear quality parameters (e.g., 'Grade A, max 2% foreign matter') reduces rejection rates at the gate."
+    },
+    {
+      keywords: ['milling', 'efficiency', 'extraction'],
+      answer: "To improve milling efficiency: Clean seeds thoroughly before crushing. Maintain optimum moisture conditioning. Regular maintenance of expellers ensures maximum oil recovery."
+    }
+  ],
+  retailer: [
+    {
+      keywords: ['packaging', 'label', 'fssai'],
+      answer: "Edible oil packaging must comply with FSSAI regulations. Labels must show: FSSAI license no., nutritional information, trans-fat content, and 'Blended Edible Vegetable Oil' if applicable."
+    },
+    {
+      keywords: ['consumer', 'trend', 'demand'],
+      answer: "Current consumer trends show a shift towards 'Cold Pressed' (Kachi Ghani) and 'Fortified' oils. Promoting 'Locally Sourced' oil can also appeal to health-conscious buyers."
+    },
+    {
+      keywords: ['margin', 'profit', 'stock'],
+      answer: "Manage inventory to follow First-In-First-Out (FIFO) to avoid expiry. Stocking smaller packs (1L, 500ml) often yields higher turnover than bulk tins for urban markets."
+    }
+  ]
+};
+
+async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
   // Enhanced local "AI" using KB + rule-based fallback + Satellite/Weather simulation
   try {
     const q = (userQuestion || '').trim();
@@ -135,7 +181,27 @@ async function invokeAIAgent(systemPrompt, userQuestion) {
     const qTokens = tokenize(q);
     const lowerQ = q.toLowerCase();
 
-    // --- SATELLITE DATA QUERY ---
+    // --- ROLE-BASED LOGIC START ---
+    const currentRole = userRole || 'farmer'; // Default to farmer
+
+    if (ROLE_KB[currentRole]) {
+      // Check for role-specific matches first
+      for (const entry of ROLE_KB[currentRole]) {
+        if (entry.keywords.some(k => lowerQ.includes(k))) {
+          return `🤖 **Advisor for ${currentRole.toUpperCase()}:**\n\n${entry.answer}`;
+        }
+      }
+    }
+
+    // Role-specific fallback for generic intro
+    if (lowerQ.includes('hello') || lowerQ.includes('hi') || lowerQ.includes('help')) {
+      if (currentRole === 'processor') return "Hello! I can assist you with procurement specifications, quality standards, and milling efficiency.";
+      if (currentRole === 'fpo') return "Greetings! Ask me about aggregation strategies, storage solutions, or government schemes for FPOs.";
+      if (currentRole === 'retailer') return "Hi! I am here to help with packaging compliance, consumer trends, and inventory management.";
+    }
+    // --- ROLE-BASED LOGIC END ---
+
+    // --- SATELLITE DATA QUERY (Farmer/FPO context mostly) ---
     if (lowerQ.includes('satellite') || lowerQ.includes('ndvi') || lowerQ.includes('crop health') || lowerQ.includes('moisture')) {
       const satData = getSatelliteAnalysis();
       return `🛰️ **Satellite Analysis Report**\n\n` +
@@ -151,11 +217,11 @@ async function invokeAIAgent(systemPrompt, userQuestion) {
       if (alert) {
         return `⚠️ **Weather Alert**\n\n${alert}`;
       } else {
-        return `✅ **Weather Update**\n\nNo severe weather alerts for your region. Conditions are normal for farming operations.`;
+        return `✅ **Weather Update**\n\nNo severe weather alerts for your region. Conditions are normal for operations.`;
       }
     }
 
-    // 1. Check Knowledge Base first
+    // 1. Check General Oilseed Knowledge Base
     let best = [];
     let bestScore = 0;
 
@@ -183,7 +249,7 @@ async function invokeAIAgent(systemPrompt, userQuestion) {
 
     // Weather-related advice
     if (lowerQ.includes('weather') || lowerQ.includes('rain') || lowerQ.includes('monsoon')) {
-      return 'Check the 5-day forecast in the dashboard. Avoid spraying chemicals before expected rain and plan sowing when soil has good moisture but is not waterlogged.';
+      return 'Check the 5-day forecast in the dashboard. Avoid spraying chemicals before expected rain and plan operations accordingly.';
     }
 
     // Mustard-specific advice
@@ -222,20 +288,20 @@ async function invokeAIAgent(systemPrompt, userQuestion) {
     }
 
     // Generic fallback
-    return 'Based on your question, I suggest you adopt good agricultural practices: use quality seed, follow recommended sowing time and spacing, do timely weeding and irrigation, and regularly check market prices and weather updates. For specific issues, contact your local agriculture officer.';
+    return 'I can provide general advice on oilseed crops. For specific issues related to your role (' + currentRole + '), please query about your specific operational needs.';
   } catch (error) {
     console.error('invokeAIAgent error:', error);
     return 'I am unable to process your question right now. Please try again in some time.';
   }
 }
 
-async function getAIAdvice(userQuestion) {
+async function getAIAdvice(userQuestion, userRole = 'farmer') {
   const systemPrompt = `You are an expert agricultural advisor specializing in oilseed crops in India.`;
 
   try {
     // Simulate a small network delay for "thinking" effect
     await new Promise(resolve => setTimeout(resolve, 600));
-    const response = await invokeAIAgent(systemPrompt, userQuestion);
+    const response = await invokeAIAgent(systemPrompt, userQuestion, userRole);
     return response;
   } catch (error) {
     console.error('AI advice error:', error);
