@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-// import { useSharedData } from '../utils/SharedDataContext.js';
 // Enhanced ContractsList with Post Contract and Accept Contract modals
 function ContractsList() {
   try {

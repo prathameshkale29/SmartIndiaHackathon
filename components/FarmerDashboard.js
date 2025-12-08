@@ -207,17 +207,8 @@ function FarmerDashboard({ setActivePage, user }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm h-full">
-                            <div className="mb-4 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Live Market Auction</h3>
-                                    <p className="text-xs text-gray-500">Real-time bidding</p>
-                                </div>
-                                <div className="animate-pulse w-3 h-3 bg-red-500 rounded-full"></div>
-                            </div>
-                            <LiveAuction />
-                        </div>
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* Live Auction removed as per request */}
 
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm h-full">
                             <div className="flex items-center justify-between mb-4">
