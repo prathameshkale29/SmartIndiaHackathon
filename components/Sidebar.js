@@ -43,7 +43,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'map-pin', roles: ['admin'] },
       { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'government'] },
       { id: 'intercropping', label: 'Agri-Twin (Sim)', icon: 'layers', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'bhuvan', label: 'Oil Palm Zone (ISRO)', icon: 'map', roles: ['admin', 'fpo', 'government'] },
+      { id: 'bhuvan', label: 'Oil Palm Zone (ISRO)', icon: 'map', roles: ['admin', 'government'] },
     ];
 
     const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
