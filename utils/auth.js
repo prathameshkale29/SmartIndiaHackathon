@@ -1,138 +1,125 @@
 const AUTH_KEY = 'agrisync_user';
-const USERS_KEY = 'agrisync_users';
 
-// Test accounts for quick login - no Google auth needed
-const testAccounts = {
-  'user1': { password: 'pass1', name: 'Test User 1', defaultRole: 'farmer' },
-  'user2': { password: 'pass2', name: 'Test User 2', defaultRole: 'fpo' },
-  'user3': { password: 'pass3', name: 'Test User 3', defaultRole: 'processor' },
-  'user4': { password: 'pass4', name: 'Test User 4', defaultRole: 'retailer' },
-  'farmer': { password: 'farmer123', name: 'Demo Farmer', defaultRole: 'farmer' },
-  'fpo': { password: 'fpo123', name: 'Demo FPO Representative', defaultRole: 'fpo' },
-  'processor': { password: 'processor123', name: 'Demo Processor', defaultRole: 'processor' },
-  'retailer': { password: 'retailer123', name: 'Demo Retailer', defaultRole: 'retailer' }
+// FIREBASE CONFIGURATION - TODO: REPLACE WITH YOUR OWN CONFIG FROM FIREBASE CONSOLE
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-const defaultUsers = {
-  farmer: { username: 'farmer', password: 'farmer123', role: 'farmer', name: 'Demo Farmer' },
-  fpo: { username: 'fpo', password: 'fpo123', role: 'fpo', name: 'Demo FPO Representative' },
-  processor: { username: 'processor', password: 'processor123', role: 'processor', name: 'Demo Processor' },
-  retailer: { username: 'retailer', password: 'retailer123', role: 'retailer', name: 'Demo Retailer' }
-};
-
-function getStoredUsers() {
-  try {
-    const stored = localStorage.getItem(USERS_KEY);
-    return stored ? JSON.parse(stored) : defaultUsers;
-  } catch (error) {
-    return defaultUsers;
+// Initialize Firebase
+let auth;
+try {
+  if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    console.log("Firebase initialized");
+  } else if (typeof firebase !== 'undefined') {
+    auth = firebase.auth();
+  } else {
+    console.warn("Firebase SDK not loaded");
   }
+} catch (error) {
+  console.error("Firebase initialization error:", error);
 }
 
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+// Helper to save user to local storage for persistence across apps
+function saveUserToLocal(user) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
 }
 
-async function register(username, password, fullName, role) {
+async function register(email, password, fullName, role) {
   try {
-    // Try backend first
-    try {
-      const res = await fetch('/api/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: fullName, email: username, password, role })
-      });
+    if (!auth) throw new Error("Firebase not initialized. Please check your configuration.");
 
-      if (res.ok) {
-        const data = await res.json();
-        const userData = {
-          username: data.user.email,
-          name: data.user.name,
-          role: role
-        };
-        localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
-        return { success: true, user: userData };
-      }
-    } catch (e) {
-      // Backend not available, fall through to mock
-      console.log("Backend unavailable, using mock register");
-    }
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-    // Mock Fallback
+    // Update profile with name
+    await user.updateProfile({
+      displayName: fullName
+    });
+
     const userData = {
-      username: username,
+      uid: user.uid,
+      email: user.email,
       name: fullName,
-      role: role
+      role: role,
+      authProvider: 'firebase'
     };
 
-    localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    saveUserToLocal(userData);
     return { success: true, user: userData };
 
   } catch (error) {
-    console.error('Registration error:', error);
-    return { success: false, message: 'Registration failed' };
+    console.error('Firebase Registration error:', error);
+    let msg = error.message;
+    if (error.code === 'auth/email-already-in-use') msg = 'Email is already registered';
+    if (error.code === 'auth/weak-password') msg = 'Password should be at least 6 characters';
+    return { success: false, message: msg };
   }
 }
 
-async function login(username, password, role) {
+async function login(email, password, role) {
   try {
-    // Check test accounts first
-    if (testAccounts[username]) {
-      const testAccount = testAccounts[username];
-      if (testAccount.password === password) {
-        // Valid test account
-        const userData = {
-          username: username,
-          name: testAccount.name,
-          role: role || testAccount.defaultRole // Use selected role or default
-        };
-        localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
-        return { success: true, user: userData };
-      } else {
-        return { success: false, message: 'Invalid password' };
-      }
-    }
+    if (!auth) throw new Error("Firebase not initialized. Please check your configuration.");
 
-    // Try backend first
-    try {
-      const res = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: username, password })
-      });
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-      if (res.ok) {
-        const data = await res.json();
-        const userData = {
-          username: data.user.email,
-          name: data.user.name,
-          role: role // Trust UI role for now or use data.user.role if strict
-        };
-        localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
-        return { success: true, user: userData };
-      }
-    } catch (e) {
-      // Backend not available, fall through to mock
-      console.log("Backend unavailable, using mock login");
-    }
-
-    // Mock Fallback - allow any username/password for testing
     const userData = {
-      username: username,
-      name: username.split('@')[0], // Simple name derivation
-      role: role // CRITICAL: Use the role selected in UI
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName || email.split('@')[0],
+      role: role, // In a real app, role should come from database (Firestore), but for now we trust UI
+      authProvider: 'firebase'
     };
 
-    localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+    saveUserToLocal(userData);
     return { success: true, user: userData };
 
   } catch (error) {
-    console.error('Login error:', error);
-    return { success: false, message: 'Login failed' };
+    console.error('Firebase Login error:', error);
+    let msg = error.message;
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') msg = 'Invalid email or password';
+    return { success: false, message: msg };
+  }
+}
+
+async function googleLogin(role) {
+  try {
+    if (!auth) throw new Error("Firebase not initialized");
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    // In some hackathon environments, popup might be blocked, but generally works
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName,
+      picture: user.photoURL,
+      role: role,
+      authProvider: 'google'
+    };
+
+    saveUserToLocal(userData);
+    return { success: true, user: userData };
+
+  } catch (error) {
+    console.error('Google Sign-In Error:', error);
+    return { success: false, message: error.message };
   }
 }
 
 function logout() {
+  if (auth) {
+    auth.signOut();
+  }
   localStorage.removeItem(AUTH_KEY);
 }
 
@@ -141,41 +128,10 @@ function getCurrentUser() {
     const userData = localStorage.getItem(AUTH_KEY);
     return userData ? JSON.parse(userData) : null;
   } catch (error) {
-    console.error('Error getting current user:', error);
     return null;
   }
 }
 
 function isAdmin(user) {
   return user?.role === 'admin';
-}
-
-function googleLogin(profile) {
-  const users = getStoredUsers();
-  // Use email as username for Google login
-  const username = profile.email;
-
-  if (!users[username]) {
-    // Register new user automatically
-    users[username] = {
-      username: username,
-      password: '', // No password for Google auth
-      name: profile.name,
-      role: 'user', // Default role
-      picture: profile.picture,
-      authProvider: 'google'
-    };
-    saveUsers(users);
-  }
-
-  const user = users[username];
-  const userData = {
-    username: user.username,
-    name: user.name,
-    role: user.role,
-    picture: user.picture
-  };
-
-  localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
-  return { success: true, user: userData };
 }

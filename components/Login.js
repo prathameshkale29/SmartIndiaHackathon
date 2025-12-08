@@ -15,10 +15,6 @@ function Login({ onLogin }) {
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-    // Placeholder for User's actual Client ID
-    // TODO: User needs to replace this
-    const GOOGLE_CLIENT_ID = "668817215778-c9f5vqdkfjjbpqnjp7i7g3jrj4599efo.apps.googleusercontent.com";
-
     // Role definitions
     const roles = [
       { value: 'farmer', label: 'Farmer', icon: 'sprout', description: 'Individual farmers growing oilseeds' },
@@ -26,63 +22,6 @@ function Login({ onLogin }) {
       { value: 'processor', label: 'Processor', icon: 'factory', description: 'Oil mills and processing units' },
       { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' }
     ];
-
-    // Initialize Google Sign-In
-    React.useEffect(() => {
-      /* global google */
-      if (window.google && window.google.accounts) {
-        try {
-          google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true
-          });
-
-          // Render the Google button
-          google.accounts.id.renderButton(
-            document.getElementById("google-signin-btn"),
-            { theme: "outline", size: "large", width: "100%" }
-          );
-        } catch (e) {
-          console.error("Google Identity Services Error:", e);
-        }
-      }
-    }, [isRegistering]); // Re-render button if view changes
-
-    // Helper to decode JWT text
-    function parseJwt(token) {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-
-      return JSON.parse(jsonPayload);
-    }
-
-    const handleGoogleResponse = (response) => {
-      try {
-        const credential = response.credential;
-        const profile = parseJwt(credential);
-
-        // Map Google profile to our user structure
-        const user = {
-          name: profile.name,
-          email: profile.email,
-          picture: profile.picture,
-          role: role, // Use currently qualified role selection
-          authMethod: 'google'
-        };
-
-        console.log("Google Login Success:", user);
-        onLogin(user);
-
-      } catch (err) {
-        console.error("Token parse error:", err);
-        setError("Failed to process Google Sign-In");
-      }
-    };
 
     const handleSendOTP = async () => {
       if (!phoneNumber) {
@@ -153,9 +92,7 @@ function Login({ onLogin }) {
       }
 
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-
+        // Use Firebase Auth functions from auth.js
         console.log("Attempting login/register with role:", role);
         let result;
         if (isRegistering) {
@@ -396,12 +333,25 @@ function Login({ onLogin }) {
               </div>
 
               {/* Google Sign-In Button Container */}
-              <div id="google-signin-btn" className="w-full flex justify-center h-[44px]"></div>
-              {!GOOGLE_CLIENT_ID.includes("apps.googleusercontent") && (
-                <p className="text-xs text-center text-red-500 mt-2">
-                  Developer: Please set GOOGLE_CLIENT_ID in Login.js
-                </p>
-              )}
+              <div id="google-signin-btn" className="w-full flex justify-center min-h-[44px]">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setLoading(true);
+                    const result = await googleLogin(role);
+                    if (result.success) {
+                      onLogin(result.user);
+                    } else {
+                      setError(result.message);
+                    }
+                    setLoading(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-200 font-medium py-2.5 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+                  Sign in with Google
+                </button>
+              </div>
 
             </form>
 
