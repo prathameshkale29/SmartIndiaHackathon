@@ -134,7 +134,7 @@ function App() {
         case 'finance':
           return <FinancePage />;
         case 'procurement-mgmt':
-          return <ProcurementManagementPage />;
+          return <ProcurementManagementPage initialTab="procurement" />;
         case 'production':
           return <ProductionSchedulingPage />;
         case 'inventory':
@@ -143,20 +143,14 @@ function App() {
           return <DemandForecastPage />;
         case 'logistics':
           return <LogisticsPage />;
-
-        // FPO Aliases
         case 'quality':
-          return <ProcurementManagementPage />; // Quality managed here
+          return <ProcurementManagementPage initialTab="quality" />;
         case 'batches':
           return (
             <div className="animate-circular-reveal" data-name="batch-creation-page" data-file="app.js">
               <BlockchainTracker user={user} />
             </div>
           );
-        case 'contracts_fpo':
-          return <ContractsPage />;
-        case 'finance_fpo':
-          return <FinancePage />;
 
         // Processor Aliases
         case 'procurement_raw':
@@ -188,14 +182,7 @@ function App() {
               </div>
             </div>
           );
-        case 'inventory_processor':
-          return <InventoryManagementPage />;
-        case 'logistics_processor':
-          return <LogisticsPage />;
-        case 'contracts_processor':
-          return <ContractsPage />;
-        case 'price_trend':
-          return <MarketPage />;
+        // contracts, inventory, logistics, market handled by main cases above
 
         // Retailer Aliases
         case 'my-produce':
@@ -207,8 +194,7 @@ function App() {
               <BlockchainTracker user={user} />
             </div>
           );
-        case 'inventory_retailer':
-          return <InventoryManagementPage />;
+        // inventory handled by main case
         case 'procurement_orders':
           return <ProcurementPage />;
         case 'traceability_viewer':
@@ -224,6 +210,9 @@ function App() {
           );
         case 'supply_chain':
           return <LogisticsPage />;
+        // demand-forecast-retailer maps to DemandForecastPage if needed, or we can alias it:
+        case 'demand-forecast-retailer':
+          return <DemandForecastPage />;
 
         default:
           return <HomePage />;
