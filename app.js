@@ -143,6 +143,88 @@ function App() {
           return <DemandForecastPage />;
         case 'logistics':
           return <LogisticsPage />;
+
+        // FPO Aliases
+        case 'quality':
+          return <ProcurementManagementPage />; // Quality managed here
+        case 'batches':
+          return (
+            <div className="animate-circular-reveal" data-name="batch-creation-page" data-file="app.js">
+              <BlockchainTracker user={user} />
+            </div>
+          );
+        case 'contracts_fpo':
+          return <ContractsPage />;
+        case 'finance_fpo':
+          return <FinancePage />;
+
+        // Processor Aliases
+        case 'procurement_raw':
+          return <ProcurementPage />;
+        case 'production_batch':
+          return <ProductionSchedulingPage />;
+        case 'dashboard_processor':
+          return <ProcessorDashboard setActivePage={setActivePage} user={user} />;
+        case 'compliance':
+          return (
+            <div className="animate-circular-reveal" data-name="compliance-page" data-file="app.js">
+              {/* Wrapped ComplianceStatus in a page-like container */}
+              <h1 className="text-3xl font-bold mb-6">Quality & Compliance</h1>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ComplianceStatus />
+                <div className="card">
+                  <h3 className="text-lg font-semibold mb-4">Certifications</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
+                      <div><p className="font-bold text-green-800">FSSAI License</p><p className="text-xs text-green-600">Valid till 2028</p></div>
+                      <div className="icon-check-circle text-green-600 text-xl"></div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <div><p className="font-bold text-blue-800">Organic Certificate</p><p className="text-xs text-blue-600">Renewed: Dec 2024</p></div>
+                      <div className="icon-shield text-blue-600 text-xl"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        case 'inventory_processor':
+          return <InventoryManagementPage />;
+        case 'logistics_processor':
+          return <LogisticsPage />;
+        case 'contracts_processor':
+          return <ContractsPage />;
+        case 'price_trend':
+          return <MarketPage />;
+
+        // Retailer Aliases
+        case 'my-produce':
+          return <MyProducePage user={user} setActivePage={setActivePage} />;
+        case 'verified_batches':
+          return (
+            <div className="animate-circular-reveal" data-name="verified-batches-page" data-file="app.js">
+              {/* Could pass a specific filter prop if component supported it, for now reusing BlockchainTracker */}
+              <BlockchainTracker user={user} />
+            </div>
+          );
+        case 'inventory_retailer':
+          return <InventoryManagementPage />;
+        case 'procurement_orders':
+          return <ProcurementPage />;
+        case 'traceability_viewer':
+          return (
+            <div className="animate-circular-reveal" data-name="traceability-viewer-page" data-file="app.js">
+              {/* Emulate focusing on tracking */}
+              <h1 className="text-3xl font-bold mb-6">Traceability Viewer</h1>
+              <QRScanner />
+              <div className="mt-8">
+                <BlockchainTracker user={user} />
+              </div>
+            </div>
+          );
+        case 'supply_chain':
+          return <LogisticsPage />;
+
         default:
           return <HomePage />;
       }

@@ -1,8 +1,17 @@
 function FarmerDashboard({ setActivePage, user }) {
     const [showAddCropModal, setShowAddCropModal] = React.useState(false);
     const [showListProduceModal, setShowListProduceModal] = React.useState(false);
-    const [userCrops, setUserCrops] = React.useState(mockData.userCrops || []);
-    const [produceListings, setProduceListings] = React.useState(mockData.produceListings || []);
+
+    // Use Shared Data Context
+    const {
+        userCrops,
+        produceListings,
+        addCrop,
+        addListing: listProduce,
+        deleteListing,
+        markListingSold
+    } = useSharedData();
+
     const [weatherData, setWeatherData] = React.useState(null);
     const toast = useToast();
     const { addNotification } = useNotification();
@@ -29,27 +38,25 @@ function FarmerDashboard({ setActivePage, user }) {
             status: 'Healthy',
             days: 0
         };
-        setUserCrops([newCrop, ...userCrops]);
+        addCrop(newCrop);
         setShowAddCropModal(false);
         toast.success('New crop added successfully!');
         addNotification('Crop Added', `${newCrop.name} (${newCrop.area} acres) has been added to your farm`, 'success', 'home');
     };
 
     const handleListProduce = (newListing) => {
-        setProduceListings([newListing, ...produceListings]);
+        listProduce(newListing);
         toast.success('Produce listed successfully!');
         addNotification('Produce Listed', `${newListing.quantity} quintals of ${newListing.crop} listed for sale at ₹${newListing.pricePerQuintal}/quintal`, 'success', 'home');
     };
 
     const handleDeleteListing = (id) => {
-        setProduceListings(produceListings.filter(listing => listing.id !== id));
+        deleteListing(id);
         toast.success('Listing deleted successfully');
     };
 
     const handleMarkSold = (id) => {
-        setProduceListings(produceListings.map(listing =>
-            listing.id === id ? { ...listing, status: 'sold' } : listing
-        ));
+        markListingSold(id);
         toast.success('Listing marked as sold!');
         addNotification('Produce Sold', 'Congratulations! Your produce has been marked as sold', 'success', 'home');
     };
@@ -154,7 +161,7 @@ function FarmerDashboard({ setActivePage, user }) {
                                 <div className={`icon-${stat.icon} text-xl text-white`}></div>
                             </div>
                             {stat.change !== 0 && (
-                                <span className={`text-xs font-medium px-2 py-1 rounded-full ${stat.change > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                <span className={`text-xs font-medium px-2 py-1 rounded-full ${stat.change > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
                                     {stat.change > 0 ? '+' : ''}{stat.change}%
                                 </span>
                             )}
@@ -256,25 +263,7 @@ function FarmerDashboard({ setActivePage, user }) {
                         <PriceChart />
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">My Produce Listings</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Manage your produce available for sale</p>
-                            </div>
-                            <button
-                                onClick={() => setShowListProduceModal(true)}
-                                className="text-sm text-[var(--primary-color)] font-medium hover:underline flex items-center gap-1"
-                            >
-                                <div className="icon-plus"></div> Add Listing
-                            </button>
-                        </div>
-                        <ProduceListings
-                            listings={produceListings}
-                            onDelete={handleDeleteListing}
-                            onMarkSold={handleMarkSold}
-                        />
-                    </div>
+
                 </div>
 
                 {/* Right Sidebar Column - Quick Actions */}
@@ -282,28 +271,28 @@ function FarmerDashboard({ setActivePage, user }) {
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-md sticky top-6">
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 border-b pb-4">Quick Actions</h3>
                         <div className="grid grid-cols-4 gap-4">
-                            <button onClick={() => setActivePage('contracts')} title="View Contracts" className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
-                                <div className="icon-file-text text-2xl text-amber-600 group-hover:scale-110 transition-transform"></div>
+                            <button onClick={() => setActivePage('contracts')} title="View Contracts" className="aspect-square bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20 dark:hover:from-amber-800/30 dark:hover:to-orange-800/30 border border-amber-100 dark:border-amber-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                                <div className="icon-file-text text-2xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform"></div>
                             </button>
-                            <button onClick={() => setActivePage('market')} title="Market Prices" className="aspect-square bg-gradient-to-br from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border border-emerald-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
-                                <div className="icon-trending-up text-2xl text-emerald-600 group-hover:scale-110 transition-transform"></div>
+                            <button onClick={() => setActivePage('market')} title="Market Prices" className="aspect-square bg-gradient-to-br from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 dark:from-emerald-900/20 dark:to-green-900/20 dark:hover:from-emerald-800/30 dark:hover:to-green-800/30 border border-emerald-100 dark:border-emerald-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                                <div className="icon-trending-up text-2xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform"></div>
                             </button>
-                            <button onClick={() => setActivePage('advisor')} title="AI Advisor" className="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
-                                <div className="icon-bot text-2xl text-blue-600 group-hover:scale-110 transition-transform"></div>
+                            <button onClick={() => setActivePage('advisor')} title="AI Advisor" className="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 dark:hover:from-blue-800/30 dark:hover:to-indigo-800/30 border border-blue-100 dark:border-blue-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                                <div className="icon-bot text-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform"></div>
                             </button>
-                            <button onClick={() => setActivePage('traceability')} title="Supply Chain" className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-100 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
-                                <div className="icon-truck text-2xl text-purple-600 group-hover:scale-110 transition-transform"></div>
+                            <button onClick={() => setActivePage('traceability')} title="Supply Chain" className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 dark:hover:from-purple-800/30 dark:hover:to-pink-800/30 border border-purple-100 dark:border-purple-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                                <div className="icon-truck text-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"></div>
                             </button>
                         </div>
                         <div className="mt-6">
                             <h4 className="font-semibold text-sm mb-3">Recent Alerts</h4>
                             <div className="space-y-3">
-                                <div className="flex items-start gap-2 text-xs p-2 bg-yellow-50 rounded-lg text-yellow-800">
-                                    <div className="icon-alert-triangle mt-0.5"></div>
+                                <div className="flex items-start gap-2 text-xs p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 border border-yellow-100 dark:border-yellow-800/50">
+                                    <div className="icon-alert-triangle mt-0.5 text-yellow-600 dark:text-yellow-400"></div>
                                     <p>Heavy rain alert for next 2 days in your district.</p>
                                 </div>
-                                <div className="flex items-start gap-2 text-xs p-2 bg-green-50 rounded-lg text-green-800">
-                                    <div className="icon-check-circle mt-0.5"></div>
+                                <div className="flex items-start gap-2 text-xs p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-800 dark:text-green-200 border border-green-100 dark:border-green-800/50">
+                                    <div className="icon-check-circle mt-0.5 text-green-600 dark:text-green-400"></div>
                                     <p>Soil test report is ready.</p>
                                 </div>
                             </div>

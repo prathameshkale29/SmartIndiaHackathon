@@ -32,8 +32,8 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
                                         <h3 className="font-bold text-gray-900 dark:text-white">{listing.crop}</h3>
                                         <span
                                             className={`inline-block px-2 py-0.5 text-xs rounded-full font-medium ${listing.status === 'active'
-                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                                                 }`}
                                         >
                                             {listing.status === 'active' ? 'Active' : 'Sold'}
@@ -128,3 +128,5 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
         return null;
     }
 }
+
+window.ProduceListings = ProduceListings;

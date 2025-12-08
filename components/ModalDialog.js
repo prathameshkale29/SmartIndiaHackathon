@@ -64,3 +64,5 @@ function ModalDialog({ isOpen, onClose, title, children, footer, size = 'md' }) 
         </div>
     );
 }
+
+window.ModalDialog = ModalDialog;

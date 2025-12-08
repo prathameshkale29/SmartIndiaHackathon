@@ -100,6 +100,22 @@ const SharedDataProvider = ({ children }) => {
         }));
     };
 
+    const deleteListing = (id) => {
+        setState(prev => ({
+            ...prev,
+            produceListings: prev.produceListings.filter(l => l.id !== id)
+        }));
+    };
+
+    const markListingSold = (id) => {
+        setState(prev => ({
+            ...prev,
+            produceListings: prev.produceListings.map(l =>
+                l.id === id ? { ...l, status: 'sold' } : l
+            )
+        }));
+    };
+
     const resetData = () => {
         localStorage.removeItem('agrisync_state_v1');
         setState(mockData);
@@ -128,6 +144,8 @@ const SharedDataProvider = ({ children }) => {
         createTender,
         placeBid,
         updateContractStatus,
+        deleteListing,
+        markListingSold,
         resetData
     };
 

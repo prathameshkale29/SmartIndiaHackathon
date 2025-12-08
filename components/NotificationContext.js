@@ -75,3 +75,6 @@ function useNotification() {
     }
     return context;
 }
+
+window.NotificationProvider = NotificationProvider;
+window.useNotification = useNotification;

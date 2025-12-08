@@ -56,18 +56,11 @@ function RetailerDashboard({ setActivePage, user }) {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold">Demand Forecast</h3>
+                            <h3 className="text-lg font-bold">Sales & Demand Trend</h3>
                             <button onClick={() => setActivePage('demand-forecast')} className="text-sm text-pink-600 hover:underline">Full Report</button>
                         </div>
-                        {/* Placeholder for small chart */}
-                        <div className="h-40 flex items-end justify-between gap-1 px-4">
-                            {[40, 50, 45, 60, 70, 85, 80].map((h, i) => (
-                                <div key={i} className="w-full bg-pink-100 dark:bg-pink-900/30 rounded-t relative group">
-                                    <div className="absolute bottom-0 w-full bg-pink-500 rounded-t transition-all" style={{ height: `${h}%` }}></div>
-                                </div>
-                            ))}
-                        </div>
-                        <p className="text-center text-xs text-gray-500 mt-2">Sales projection for next 7 days</p>
+                        <SalesChart />
+                        <p className="text-center text-xs text-gray-500 mt-2">Sales projection vs Actuals (Last 7 Days)</p>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">

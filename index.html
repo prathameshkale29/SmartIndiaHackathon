@@ -19,7 +19,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: ['class', '[data-theme="dark"]'],
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -40,34 +40,34 @@
     <style type="text/tailwindcss">
         @layer theme {
         :root {
-            /* Agritech Theme Palette */
-            --primary-color: #66BB6A; /* Lighter Green */
-            --secondary-color: #E8E5D7;
-            --accent-color: #84CC16; /* Lime Green (was Yellow) */
-            --success-color: #66BB6A; 
-            --warning-color: #bef264; /* Lighter Lime */
-            --error-color: #ef5350;
-            --info-color: #42A5F5;
+            /* Agritech Farmer Theme - Light Green & White */
+            --primary-color: #16A34A; /* Vibrant Leaf Green */
+            --secondary-color: #DCFCE7; /* Pale Mint Green */
+            --accent-color: #EAB308; /* Sunshine Yellow */
+            --success-color: #16A34A;
+            --warning-color: #F59E0B;
+            --error-color: #DC2626;
+            --info-color: #0284C7;
             
-            --text-primary: #1B2B1E;
-            --text-secondary: #4A5D4E;
-            --text-tertiary: #6C7A6F;
-            --text-muted: #94A3B8;
+            --text-primary: #14532D; /* Deep Forest Green for text */
+            --text-secondary: #166534; /* Medium Green */
+            --text-tertiary: #4ADE80;
+            --text-muted: #86EFAC;
             
-            --bg-light: #F9F9F7;
+            --bg-light: #F0FDF4; /* Very Light Green Background */
             --bg-lighter: #FFFFFF;
-            --bg-card: rgba(255, 255, 255, 0.92);
-            --border-color: #D6D3C5;
+            --bg-card: #FFFFFF; /* Pure White Cards */
+            --border-color: #BBF7D0; /* Soft Green Border */
             --bg-white: #FFFFFF;
             
-            --shadow-sm: 0 1px 2px 0 rgba(76, 175, 80, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(76, 175, 80, 0.15);
-            --shadow-lg: 0 10px 15px -3px rgba(76, 175, 80, 0.15);
+            --shadow-sm: 0 1px 2px 0 rgba(22, 163, 74, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(22, 163, 74, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(22, 163, 74, 0.15);
             
-            --gradient-primary: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
-            --gradient-secondary: linear-gradient(135deg, #2C5F9E 0%, #00A2FF 100%);
-            --gradient-success: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
-            --gradient-warning: linear-gradient(135deg, #84CC16 0%, #65a30d 100%); /* Lime Gradient */
+            --gradient-primary: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+            --gradient-secondary: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
+            --gradient-success: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+            --gradient-warning: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
         }
         
         [data-theme="dark"] {
@@ -476,18 +476,12 @@
     <script type="text/babel" src="components/ProcurementManagementPage.js"></script>
     <script type="text/babel" src="components/ProductionSchedulingPage.js"></script>
     <script type="text/babel" src="components/InventoryManagementPage.js"></script>
-    <script type="text/babel" src="components/FarmerDashboard.js"></script>
-    <script type="text/babel" src="components/FPODashboard.js"></script>
-    <script type="text/babel" src="components/ProcessorDashboard.js"></script>
-    <script type="text/babel" src="components/RetailerDashboard.js"></script>
-    <script type="text/babel" src="components/DemandForecastPage.js"></script>
-    <script type="text/babel" src="components/LogisticsPage.js"></script>
-    <script type="text/babel" src="components/QRScanner.js"></script>
-    <script type="text/babel" src="components/Modal.js"></script>
+    <script type="text/babel" src="components/ModalDialog.js"></script>
     <script type="text/babel" src="components/ListProduceModal.js"></script>
     <script type="text/babel" src="components/ProduceListings.js"></script>
-    <script type="text/babel" src="utils/blockchain.js"></script>
-    <script type="text/babel" src="components/ModalDialog.js"></script>
+    <script type="text/babel" src="components/SalesChart.js"></script>
+    <script type="text/babel" src="components/MyProducePage.js"></script>
+    <script type="text/babel" src="components/FarmerDashboard.js"></script>
     <script type="text/babel" src="components/Toast.js"></script>
     <script type="text/babel" src="utils/produceListingsAPI.js"></script>
     <script type="text/babel" src="utils/mockData.js"></script>

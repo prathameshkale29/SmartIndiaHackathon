@@ -17,7 +17,7 @@ function Login({ onLogin }) {
 
     // Role definitions
     const roles = [
-      { value: 'farmer', label: 'Farmer', icon: 'sprout', description: 'Individual farmers growing oilseeds' },
+      { value: 'farmer', label: 'Farmer', icon: 'tractor', description: 'Individual farmers growing oilseeds' },
       { value: 'fpo', label: 'FPO (Farmer Producer Organization)', icon: 'users', description: 'Collective of farmers' },
       { value: 'processor', label: 'Processor', icon: 'factory', description: 'Oil mills and processing units' },
       { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' }
@@ -154,9 +154,7 @@ function Login({ onLogin }) {
             </div>
 
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <div className="icon-leaf text-4xl text-white"></div>
-              </div>
+              <img src="agrisync-logo.jpg" alt="Agri-Sync Logo" className="w-24 h-24 mx-auto mb-4 rounded-2xl shadow-lg object-cover" />
               <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{t('appName')}</h1>
               <p className="text-sm text-[var(--text-secondary)]">{t('tagline')}</p>
             </div>
@@ -250,9 +248,9 @@ function Login({ onLogin }) {
                         onChange={(e) => setRole(e.target.value)}
                         className="sr-only"
                       />
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 ${role === roleOption.value
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 transition-colors ${role === roleOption.value
                         ? 'bg-[var(--primary-color)] text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                        : 'bg-green-50 text-green-700 border border-green-100 group-hover:bg-green-100'
                         }`}>
                         <div className={`icon-${roleOption.icon} text-lg`}></div>
                       </div>

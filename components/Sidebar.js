@@ -1,41 +1,53 @@
 function Sidebar({ activePage, setActivePage, user, isOpen }) {
   try {
-    // Removed incorrect useContext call. t() is global.
-
     const allMenuItems = [
-      // Common
-      { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
 
-      // Farmer Specific
-      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer'] },
-      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'farmer'] },
-      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer'] },
+      // Farmer Specific Order (Priority)
+      { id: 'home', label: 'Home', icon: 'house', roles: ['admin', 'farmer'] },
+      { id: 'my-produce', label: 'My Produce', icon: 'sprout', roles: ['admin', 'farmer'] },
+      { id: 'advisor', label: 'AI Advisor', icon: 'bot', roles: ['admin', 'farmer'] },
+      { id: 'weather', label: 'Weather Dashboard', icon: 'cloud-sun', roles: ['admin', 'farmer'] },
+      { id: 'market', label: 'Market Prices', icon: 'trending-up', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
+      { id: 'schemes', label: 'Gov Schemes / Agri-Stack', icon: 'landmark', roles: ['admin', 'farmer'] },
+      { id: 'finance', label: 'Finance (Credit / Insurance)', icon: 'indian-rupee', roles: ['admin', 'farmer'] },
+      { id: 'contracts', label: 'Contracts', icon: 'file-check', roles: ['admin', 'farmer', 'processor'] },
+      { id: 'traceability', label: 'Shipment Tracking', icon: 'truck', roles: ['admin', 'farmer', 'retailer', 'government'] },
+      { id: 'calculator', label: 'Calculator', icon: 'calculator', roles: ['admin', 'farmer'] },
 
-      // FPO Specific
-      { id: 'procurement-mgmt', label: 'Procurement Mgmt', icon: 'clipboard-list', roles: ['admin', 'fpo'] },
+      // FPO Specific Order (Priority)
+      { id: 'procurement-mgmt', label: 'Farmer Procurement', icon: 'users', roles: ['admin', 'fpo'] },
+      { id: 'quality', label: 'Quality / Grading', icon: 'clipboard-check', roles: ['admin', 'fpo'] },
+      { id: 'batches', label: 'Batch Creation (Blockchain)', icon: 'box', roles: ['admin', 'fpo'] },
+      { id: 'inventory', label: 'Inventory & Warehouse', icon: 'warehouse', roles: ['admin', 'fpo', 'retailer'] },
+      { id: 'logistics', label: 'Logistics & Dispatch', icon: 'truck', roles: ['admin', 'fpo'] },
+      { id: 'contracts_fpo', label: 'Contracts', icon: 'file-text', roles: ['admin', 'fpo'] },
+      { id: 'finance_fpo', label: 'Finance (Working Capital)', icon: 'indian-rupee', roles: ['admin', 'fpo'] },
+      { id: 'demand-forecast', label: 'Market Demand Forecast', icon: 'bar-chart-2', roles: ['admin', 'retailer', 'fpo'] },
 
-      // Processor Specific
-      { id: 'production', label: 'Production', icon: 'settings', roles: ['admin', 'processor'] },
+      // Processor Specific Order (Priority)
+      { id: 'procurement_raw', label: 'Raw Material Procurement', icon: 'shopping-cart', roles: ['admin', 'processor'] },
+      { id: 'production_batch', label: 'Batch Processing', icon: 'settings', roles: ['admin', 'processor'] },
+      { id: 'dashboard_processor', label: 'Production Dashboard', icon: 'activity', roles: ['admin', 'processor'] },
+      { id: 'compliance', label: 'Quality & Compliance', icon: 'shield-check', roles: ['admin', 'processor'] },
+      { id: 'inventory_processor', label: 'Inventory (Raw + Finished)', icon: 'package', roles: ['admin', 'processor'] },
+      { id: 'logistics_processor', label: 'Logistics', icon: 'truck', roles: ['admin', 'processor'] },
+      { id: 'contracts_processor', label: 'Contracts', icon: 'file-check', roles: ['admin', 'processor'] },
+      { id: 'price_trend', label: 'Price Trend', icon: 'trending-up', roles: ['admin', 'processor'] },
 
-      // Retailer Specific
+      // Retailer Specific Order (Priority)
       { id: 'demand-forecast', label: 'Demand & Sales Forecast', icon: 'bar-chart-2', roles: ['admin', 'retailer'] },
+      { id: 'verified_batches', label: 'Verified Batches', icon: 'package-check', roles: ['admin', 'retailer'] },
+      { id: 'inventory_retailer', label: 'Inventory', icon: 'layers', roles: ['admin', 'retailer'] },
+      { id: 'procurement_orders', label: 'Procurement Orders', icon: 'shopping-bag', roles: ['admin', 'retailer'] },
+      { id: 'traceability_viewer', label: 'Traceability Viewer', icon: 'scan-line', roles: ['admin', 'retailer'] },
+      { id: 'supply_chain', label: 'Supply Chain', icon: 'share-2', roles: ['admin', 'retailer'] },
 
-      // Shared Components
-      { id: 'market', label: t('market'), icon: 'trending-up', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
-      { id: 'finance', label: 'Finance (Credit/Ins.)', icon: 'indian-rupee', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'inventory', label: 'Inventory', icon: 'package', roles: ['admin', 'fpo', 'processor', 'retailer'] },
-      { id: 'logistics', label: 'Logistics', icon: 'truck', roles: ['admin', 'fpo', 'processor'] },
-      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'processor', 'retailer', 'government'] },
-      { id: 'contracts', label: t('contracts'), icon: 'file-check', roles: ['admin', 'farmer', 'fpo', 'processor'] },
-      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer', 'fpo'] },
+      // Other/Utility
+      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'government'] },
+      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'map-pin', roles: ['admin'] },
+      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'government'] },
       { id: 'intercropping', label: 'Agri-Twin (Sim)', icon: 'layers', roles: ['admin', 'farmer', 'fpo'] },
       { id: 'bhuvan', label: 'Oil Palm Zone (ISRO)', icon: 'map', roles: ['admin', 'fpo', 'government'] },
-      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'map-pin', roles: ['admin', 'farmer', 'fpo', 'processor'] },
-      { id: 'traceability', label: t('traceability'), icon: 'truck', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
-      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'government'] }
     ];
 
     const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
