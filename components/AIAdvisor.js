@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 function AIAdvisor() {
   try {
     const t = (typeof window !== 'undefined' && window.t) ? window.t : (key => key);

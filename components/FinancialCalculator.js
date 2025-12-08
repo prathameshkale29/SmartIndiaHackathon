@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 function FinancialCalculator() {
   try {
     const [cropType, setCropType] = React.useState('mustard');

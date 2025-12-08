@@ -12,6 +12,8 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer', 'fpo'] },
       { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'farmer', 'fpo'] },
       { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'intercropping', label: 'Agri-Twin (Sim)', icon: 'layers', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'bhuvan', label: 'Oil Palm Zone (ISRO)', icon: 'map', roles: ['admin', 'fpo', 'government'] },
       { id: 'traceability', label: t('traceability'), icon: 'truck', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
       { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'fpo', 'processor', 'government'] }
     ];

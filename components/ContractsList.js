@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 // Enhanced ContractsList with Post Contract and Accept Contract modals
 function ContractsList() {
   try {

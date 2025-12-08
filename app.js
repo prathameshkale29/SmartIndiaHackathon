@@ -86,6 +86,18 @@ function App() {
           return <CreditPage />;
         case 'advisor':
           return <AdvisorPage />;
+        case 'intercropping':
+          return (
+            <div className="animate-circular-reveal" data-name="intercropping-page" data-file="app.js">
+              <IntercroppingSimulator />
+            </div>
+          );
+        case 'bhuvan':
+          return (
+            <div className="animate-circular-reveal" data-name="bhuvan-page" data-file="app.js">
+              <OilPalmZoningMap />
+            </div>
+          );
         case 'policy':
           return <PolicyPage />;
         case 'contracts':
