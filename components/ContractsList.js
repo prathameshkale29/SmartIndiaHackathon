@@ -1,8 +1,10 @@
 import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
+// import { useSharedData } from '../utils/SharedDataContext.js';
 
 // Enhanced ContractsList with Post Contract and Accept Contract modals
 function ContractsList() {
   try {
+    const { contracts: sharedContracts, addContract, updateContractStatus } = useSharedData();
     const [activeTab, setActiveTab] = React.useState('available');
     const [showCreateModal, setShowCreateModal] = React.useState(false);
     const [showAcceptModal, setShowAcceptModal] = React.useState(false);
@@ -40,21 +42,27 @@ function ContractsList() {
     }
 
     // Combine government contracts with local mock contracts
-    const localContracts = mockData.contracts;
-    const allContracts = [...govContracts, ...localContracts];
+    // Combine government contracts with shared context contracts
+    // We prefer sharedContracts over local mockData now
+    const allContracts = [...govContracts, ...(sharedContracts || [])];
     const availableContracts = allContracts.filter(c => c.status === 'open');
-    const myContracts = localContracts.filter(c => c.status === 'active' || c.status === 'completed');
+    const myContracts = allContracts.filter(c => c.status === 'active' || c.status === 'completed');
 
     const handlePostContract = (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const contractData = {
         crop: formData.get('crop'),
-        quantity: formData.get('quantity'),
-        price: formData.get('price'),
+        quantity: parseFloat(formData.get('quantity')),
+        price: parseFloat(formData.get('price')),
         deliveryDate: formData.get('deliveryDate'),
-        location: formData.get('location')
+        location: formData.get('location'),
+        processor: user?.name || 'Current User', // Use logged in user name
+        marketRate: parseFloat(formData.get('price')) - 500, // Dummy logic for demo
+        department: 'Private Procurement'
       };
+
+      addContract(contractData);
 
       toast.success(`Contract posted successfully for ${contractData.quantity} MT of ${contractData.crop} !`);
       setShowCreateModal(false);

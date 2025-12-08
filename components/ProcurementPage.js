@@ -1,10 +1,10 @@
+// import { useSharedData } from '../utils/SharedDataContext.js';
+
 function ProcurementPage() {
     try {
+        const { tenders, myBids, placeBid, dashboardStats: sharedStats } = useSharedData();
         const [activeTab, setActiveTab] = React.useState('dashboard');
-        const [dashboardStats, setDashboardStats] = React.useState(null);
-        const [tenders, setTenders] = React.useState([]);
-        const [myBids, setMyBids] = React.useState([]);
-        const [analytics, setAnalytics] = React.useState(null);
+        // Initial dashboard stats might be null in context if not fully loaded, or we use derived stats
         const [loading, setLoading] = React.useState(false);
         const [showBidModal, setShowBidModal] = React.useState(false);
         const [selectedTender, setSelectedTender] = React.useState(null);
@@ -15,60 +15,33 @@ function ProcurementPage() {
             notes: ''
         });
 
-        React.useEffect(() => {
-            loadDashboard();
-            loadTenders();
-            loadMyBids();
-            loadAnalytics();
-        }, []);
-
-        const loadDashboard = async () => {
-            try {
-                const res = await fetch('/api/procurement/dashboard');
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    setDashboardStats(data.data);
-                }
-            } catch (err) {
-                console.error('Failed to load dashboard:', err);
-            }
+        // Derived Dashboard Stats (simulating backend analytics)
+        const dashboardStats = {
+            totalTenders: tenders.length,
+            activeTenders: tenders.filter(t => t.status === 'Open').length,
+            closingSoon: tenders.filter(t => t.status === 'Closing Soon').length,
+            myBids: myBids.length,
+            totalValue: tenders.reduce((acc, t) => acc + (t.estimatedValue || 0), 0),
+            recentActivity: [
+                { type: 'tender', message: 'New Government Tender: Soybean Purchase', date: new Date().toISOString() },
+                { type: 'bid', message: 'Your bid on MSP Procurement was received', date: new Date(Date.now() - 86400000).toISOString() }
+            ]
         };
 
-        const loadTenders = async () => {
-            try {
-                const res = await fetch('/api/procurement/tenders');
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    setTenders(data.data);
-                }
-            } catch (err) {
-                console.error('Failed to load tenders:', err);
-            }
+        // Dummy analytics for now
+        const analytics = {
+            tendersByStatus: { 'Open': 5, 'Closed': 2, 'Pending': 1 },
+            averageBidValue: 6200,
+            monthlyTrends: [
+                { month: 'Oct', tenders: 12, bids: 8 },
+                { month: 'Nov', tenders: 15, bids: 10 },
+                { month: 'Dec', tenders: 8, bids: 5 }
+            ]
         };
 
-        const loadMyBids = async () => {
-            try {
-                const res = await fetch('/api/procurement/bids');
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    setMyBids(data.data);
-                }
-            } catch (err) {
-                console.error('Failed to load bids:', err);
-            }
-        };
 
-        const loadAnalytics = async () => {
-            try {
-                const res = await fetch('/api/procurement/analytics');
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    setAnalytics(data.data);
-                }
-            } catch (err) {
-                console.error('Failed to load analytics:', err);
-            }
-        };
+        // Removed useEffect API calls since we use direct Context data
+
 
         const handlePlaceBid = (tender) => {
             setSelectedTender(tender);
@@ -84,27 +57,20 @@ function ProcurementPage() {
         const submitBid = async () => {
             try {
                 setLoading(true);
-                const res = await fetch('/api/procurement/bids', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        tenderId: selectedTender.id,
-                        bidAmount: parseFloat(bidForm.bidAmount),
-                        quantity: parseFloat(bidForm.quantity),
-                        deliveryTimeline: parseInt(bidForm.deliveryTimeline),
-                        notes: bidForm.notes
-                    })
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                placeBid(selectedTender.id, {
+                    bidAmount: parseFloat(bidForm.bidAmount),
+                    quantity: parseFloat(bidForm.quantity),
+                    deliveryTimeline: parseInt(bidForm.deliveryTimeline),
+                    notes: bidForm.notes,
+                    tenderTitle: selectedTender.title,
+                    unit: selectedTender.unit
                 });
 
-                const data = await res.json();
-                if (data.status === 'ok') {
-                    alert('Bid submitted successfully!');
-                    setShowBidModal(false);
-                    loadMyBids();
-                    loadDashboard();
-                } else {
-                    alert('Failed to submit bid: ' + data.error);
-                }
+                alert('Bid submitted successfully!');
+                setShowBidModal(false);
             } catch (err) {
                 console.error('Bid submission error:', err);
                 alert('Failed to submit bid');

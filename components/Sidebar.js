@@ -3,17 +3,34 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
     // Removed incorrect useContext call. t() is global.
 
     const allMenuItems = [
+      // Common
       { id: 'home', label: t('home'), icon: 'house', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
-      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'fpo', 'government'] },
+
+      // Farmer Specific
+      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer'] },
+      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'farmer'] },
+      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer'] },
+
+      // FPO Specific
+      { id: 'procurement-mgmt', label: 'Procurement Mgmt', icon: 'clipboard-list', roles: ['admin', 'fpo'] },
+
+      // Processor Specific
+      { id: 'production', label: 'Production', icon: 'settings', roles: ['admin', 'processor'] },
+
+      // Retailer Specific
+      { id: 'demand-forecast', label: 'Demand & Sales Forecast', icon: 'bar-chart-2', roles: ['admin', 'retailer'] },
+
+      // Shared Components
       { id: 'market', label: t('market'), icon: 'trending-up', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
-      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'warehouse', roles: ['admin', 'farmer', 'fpo', 'processor'] },
+      { id: 'finance', label: 'Finance (Credit/Ins.)', icon: 'indian-rupee', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'inventory', label: 'Inventory', icon: 'package', roles: ['admin', 'fpo', 'processor', 'retailer'] },
+      { id: 'logistics', label: 'Logistics', icon: 'truck', roles: ['admin', 'fpo', 'processor'] },
+      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'processor', 'retailer', 'government'] },
       { id: 'contracts', label: t('contracts'), icon: 'file-check', roles: ['admin', 'farmer', 'fpo', 'processor'] },
-      { id: 'weather', label: t('weather'), icon: 'cloud-sun', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'schemes', label: t('schemes'), icon: 'landmark', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'advisor', label: t('advisor'), icon: 'bot', roles: ['admin', 'farmer', 'fpo'] },
-      { id: 'traceability', label: t('traceability'), icon: 'truck', roles: ['admin', 'farmer', 'fpo', 'processor', 'retailer', 'government'] },
-      { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'fpo', 'processor', 'government'] }
+      { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'map-pin', roles: ['admin', 'farmer'] },
+      { id: 'traceability', label: t('traceability'), icon: 'scan-line', roles: ['admin', 'retailer', 'government'] },
+      { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'government'] },
+      { id: 'calculator', label: t('calculator'), icon: 'calculator', roles: ['admin', 'farmer'] }
     ];
 
     const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));

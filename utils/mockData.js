@@ -225,5 +225,65 @@ const mockData = {
       listedDate: '2024-12-01',
       notes: 'High protein content, suitable for oil extraction'
     }
+  ],
+
+  tenders: [
+    {
+      id: 'T-2024-001',
+      title: 'Procurement of Grade A Soybean',
+      organization: 'National Agricultural Cooperative Marketing Federation (NAFED)',
+      description: 'Request for supply of 5000 MT of Grade A Soybean for central pool.',
+      quantity: 5000,
+      unit: 'MT',
+      estimatedValue: 30000000,
+      openingDate: '2024-12-01',
+      closingDate: '2024-12-15',
+      location: 'Nagpur, Maharashtra',
+      status: 'Open',
+      bidCount: 12,
+      specifications: {
+        'Moisture': 'Max 10%',
+        'Foreign Matter': 'Max 2%',
+        'Oil Content': 'Min 18%'
+      }
+    },
+    {
+      id: 'T-2024-002',
+      title: 'Mustard Seeds Supply for Oil Extraction',
+      organization: 'State Oil Federation',
+      description: 'Annual procurement of Mustard seeds for state-run oil mills.',
+      quantity: 2000,
+      unit: 'MT',
+      estimatedValue: 12000000,
+      openingDate: '2024-12-05',
+      closingDate: '2024-12-20',
+      location: 'Jaipur, Rajasthan',
+      status: 'Open',
+      bidCount: 8,
+      specifications: {
+        'Moisture': 'Max 8%',
+        'Oil Content': 'Min 40%'
+      }
+    },
+    {
+      id: 'T-2024-003',
+      title: 'Groundnut Procurement - Kharif Season',
+      organization: 'Gujarat State Seeds Corporation',
+      description: 'Procurement of high-quality groundnut pods.',
+      quantity: 3500,
+      unit: 'MT',
+      estimatedValue: 22750000,
+      openingDate: '2024-11-20',
+      closingDate: '2024-12-10',
+      location: 'Rajkot, Gujarat',
+      status: 'Closing Soon',
+      bidCount: 25,
+      specifications: {
+        'Shelling Percentage': 'Min 70%',
+        'Moisture': 'Max 9%'
+      }
+    }
   ]
 };
+
+window.mockData = mockData;

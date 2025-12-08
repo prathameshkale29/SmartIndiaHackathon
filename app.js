@@ -30,6 +30,10 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// Import Shared Data Context
+// Import Shared Data Context - already loaded globally
+// import { SharedDataProvider } from './utils/SharedDataContext.js';
+
 function App() {
   try {
     const [activePage, setActivePage] = React.useState('home');
@@ -47,7 +51,11 @@ function App() {
     }, []);
 
     const handleLogin = (userData) => {
-      setUser(userData);
+      console.log("App.js handleLogin called with:", userData);
+      // Force clear any cached user first
+      setUser(null);
+      // Then set the new user data
+      setTimeout(() => setUser(userData), 0);
     };
 
     const handleLogout = () => {
@@ -111,30 +119,44 @@ function App() {
               <ProcurementPage />
             </div>
           );
+        case 'finance':
+          return <FinancePage />;
+        case 'procurement-mgmt':
+          return <ProcurementManagementPage />;
+        case 'production':
+          return <ProductionSchedulingPage />;
+        case 'inventory':
+          return <InventoryManagementPage />;
+        case 'demand-forecast':
+          return <DemandForecastPage />;
+        case 'logistics':
+          return <LogisticsPage />;
         default:
           return <HomePage />;
       }
     };
 
     return (
-      <div className="flex min-h-screen max-w-full overflow-x-hidden" data-name="app" data-file="app.js">
-        <Sidebar activePage={activePage} setActivePage={setActivePage} user={user} isOpen={isSidebarOpen} />
-        <div className="flex-1 flex flex-col min-w-0 w-full">
-          <Header
-            user={user}
-            onLogout={handleLogout}
-            onNotificationClick={() => setShowNotifications(true)}
-            onSettingsClick={() => setShowSettings(true)}
-            onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-          <main className="flex-1 p-4 md:p-6 overflow-auto max-w-full">
-            {renderContent()}
-          </main>
-        </div>
-        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
-        {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+      <SharedDataProvider>
+        <div className="flex min-h-screen max-w-full overflow-x-hidden" data-name="app" data-file="app.js">
+          <Sidebar activePage={activePage} setActivePage={setActivePage} user={user} isOpen={isSidebarOpen} />
+          <div className="flex-1 flex flex-col min-w-0 w-full">
+            <Header
+              user={user}
+              onLogout={handleLogout}
+              onNotificationClick={() => setShowNotifications(true)}
+              onSettingsClick={() => setShowSettings(true)}
+              onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+            />
+            <main className="flex-1 p-4 md:p-6 overflow-auto max-w-full">
+              {renderContent()}
+            </main>
+          </div>
+          {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
+          {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
-      </div>
+        </div>
+      </SharedDataProvider>
     );
   } catch (error) {
     console.error('App component error:', error);
