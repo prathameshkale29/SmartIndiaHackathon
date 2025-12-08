@@ -143,9 +143,9 @@ function MarketTable() {
           </div>
 
           {/* Location Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 dark:bg-slate-800/50 border border-blue-200 dark:border-slate-700 rounded-lg">
             <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 <div className="flex items-center gap-2">
                   <div className="icon-map-pin text-sm"></div>
                   Select State
@@ -154,17 +154,17 @@ function MarketTable() {
               <select
                 value={selectedState}
                 onChange={handleStateChange}
-                className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
               >
-                <option value="">All States</option>
+                <option value="" className="text-gray-500">All States</option>
                 {availableStates.map(state => (
-                  <option key={state} value={state}>{state}</option>
+                  <option key={state} value={state} className="text-gray-900 dark:text-white">{state}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 <div className="flex items-center gap-2">
                   <div className="icon-map text-sm"></div>
                   Select District
@@ -174,11 +174,11 @@ function MarketTable() {
                 value={selectedDistrict}
                 onChange={handleDistrictChange}
                 disabled={!selectedState}
-                className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">All Districts</option>
+                <option value="" className="text-gray-500">All Districts</option>
                 {availableDistricts.map(district => (
-                  <option key={district} value={district}>{district}</option>
+                  <option key={district} value={district} className="text-gray-900 dark:text-white">{district}</option>
                 ))}
               </select>
             </div>
