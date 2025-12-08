@@ -1,4 +1,53 @@
 function ProduceListings({ listings, onDelete, onMarkSold }) {
+    const [showBidModal, setShowBidModal] = React.useState(false);
+    const [selectedListing, setSelectedListing] = React.useState(null);
+    const [bids, setBids] = React.useState({}); // Map listingId -> Highest Bid
+    const toast = window.useToast();
+
+    // Fetch bids for all listings on mount
+    React.useEffect(() => {
+        const fetchBids = async () => {
+            if (window.MockApiService && window.MockApiService.getBids) {
+                const newBids = {};
+                for (const listing of listings) {
+                    const listingBids = await window.MockApiService.getBids(listing.id);
+                    if (listingBids && listingBids.length > 0) {
+                        newBids[listing.id] = listingBids[0]; // Highest bid
+                    }
+                }
+                setBids(newBids);
+            }
+        };
+        fetchBids();
+    }, [listings]);
+
+    const handlePlaceBid = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const amount = parseFloat(formData.get('amount'));
+
+        if (!selectedListing) return;
+
+        try {
+            await window.MockApiService.placeBid(selectedListing.id, {
+                bidder: 'Current User (Demo)',
+                amount: amount,
+                note: formData.get('note')
+            });
+            toast.success(`Bid of ₹${amount}/qt placed successfully! 🏷️`);
+            setShowBidModal(false);
+
+            // Refresh local bid state immediately for demo effect
+            setBids(prev => ({
+                ...prev,
+                [selectedListing.id]: { amount, bidder: 'You' }
+            }));
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to place bid");
+        }
+    };
+
     try {
         if (!listings || listings.length === 0) {
             return (
@@ -20,8 +69,15 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
                     {listings.map((listing) => (
                         <div
                             key={listing.id}
-                            className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all"
+                            className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all relative"
                         >
+                            {/* Bidding Badge */}
+                            {bids[listing.id] && (
+                                <div className="absolute top-4 right-4 bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
+                                    <div className="icon-tag"></div> Top Bid: ₹{bids[listing.id].amount}
+                                </div>
+                            )}
+
                             {/* Header */}
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-3">
@@ -51,76 +107,85 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Price:</span>
+                                    <span className="text-gray-600 dark:text-gray-400">Ask Price:</span>
                                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                                         ₹{listing.pricePerQuintal}/quintal
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Quality:</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{listing.quality}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Delivery:</span>
-                                    <span className="text-xs text-gray-700 dark:text-gray-300">
-                                        {listing.deliveryPreference}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Target Buyers */}
-                            <div className="mb-4">
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Target Buyers:</p>
-                                <div className="flex flex-wrap gap-1">
-                                    {listing.targetBuyers.map((buyer) => (
-                                        <span
-                                            key={buyer}
-                                            className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs rounded-full"
-                                        >
-                                            {buyer}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Notes (if any) */}
-                            {listing.notes && (
-                                <div className="mb-4 p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                                        {listing.notes}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Metadata */}
-                            <div className="text-xs text-gray-400 dark:text-gray-500 mb-3">
-                                Listed on {new Date(listing.listedDate).toLocaleDateString()}
-                                {listing.availableFrom && (
-                                    <> • Available from {new Date(listing.availableFrom).toLocaleDateString()}</>
-                                )}
                             </div>
 
                             {/* Actions */}
-                            {listing.status === 'active' && (
-                                <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                    <button
-                                        onClick={() => onMarkSold(listing.id)}
-                                        className="flex-1 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors flex items-center justify-center gap-1"
-                                    >
-                                        <div className="icon-check text-sm"></div>
-                                        Mark Sold
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete(listing.id)}
-                                        className="px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-                                    >
-                                        <div className="icon-trash-2 text-sm"></div>
-                                    </button>
-                                </div>
-                            )}
+                            <div className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                {listing.status === 'active' && (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                setSelectedListing(listing);
+                                                setShowBidModal(true);
+                                            }}
+                                            className="flex-1 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-1"
+                                        >
+                                            <div className="icon-dollar-sign text-sm"></div>
+                                            Place Bid
+                                        </button>
+                                        <button
+                                            onClick={() => onMarkSold(listing.id)}
+                                            className="px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors"
+                                            title="Mark Sold"
+                                        >
+                                            <div className="icon-check text-sm"></div>
+                                        </button>
+                                        <button
+                                            onClick={() => onDelete(listing.id)}
+                                            className="px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                                        >
+                                            <div className="icon-trash-2 text-sm"></div>
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
+
+                {/* Bidding Modal */}
+                {showBidModal && selectedListing && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate-fade-in">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm m-4 shadow-xl">
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <div className="icon-dollar-sign text-green-600"></div> Place Bid
+                            </h3>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Bidding for <b>{selectedListing.crop}</b> ({selectedListing.quantity} Qt) <br />
+                                Asking Price: ₹{selectedListing.pricePerQuintal}/qt
+                            </p>
+                            <form onSubmit={handlePlaceBid} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Your Price (₹/Quintal)</label>
+                                    <input
+                                        type="number"
+                                        name="amount"
+                                        defaultValue={selectedListing.pricePerQuintal}
+                                        min="1"
+                                        className="w-full border rounded p-2 text-lg font-bold text-green-700"
+                                        autoFocus
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Note (Optional)</label>
+                                    <input name="note" placeholder="e.g. Immediate payment" className="w-full border rounded p-2" />
+                                </div>
+                                <div className="flex justify-end gap-2 pt-2">
+                                    <button type="button" onClick={() => setShowBidModal(false)} className="px-4 py-2 border rounded hover:bg-gray-50">Cancel</button>
+                                    <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2">
+                                        Submit Bid <span className="icon-send"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     } catch (error) {

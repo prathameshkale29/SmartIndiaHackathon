@@ -1,38 +1,43 @@
 // import { useSharedData } from '../utils/SharedDataContext.js';
 
 function InventoryManagementPage() {
-    const { userCrops, farmers } = useSharedData(); // Assuming inventory comes from userCrops or similar in shared state
+    const [inventoryItems, setInventoryItems] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
-    // For this demo, let's map userCrops to inventory items if they exist, 
-    // or keep the static structure but populated from context if we add a specific 'inventory' array.
-    // The current context has 'userCrops' which are growing crops, but let's assume 'warehouses' or similar tracks stock.
-    // For now, I'll map the static list to be dynamic if possible, or leave it as a placeholder until we add specific inventory actions.
-    // However, the prompt asked to CONNECT roles. 
-    // Let's make the "Current Stock" reflect what we have. 
-    // We can use a derived state from 'userCrops' where status is 'Harvested' or similar for inventory?
-    // Or just use the 'warehouses' data from context.
+    React.useEffect(() => {
+        loadInventory();
+    }, []);
 
-    // Let's use 'userCrops' to simulate some farm inventory + 'warehouses' for storage capacity.
+    const loadInventory = async () => {
+        setIsLoading(true);
+        try {
+            const data = await window.MockApiService.getInventory();
+            setInventoryItems(data);
+        } catch (error) {
+            console.error("Failed to load inventory", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    const inventoryItems = [
-        { id: 'BAT-001', name: 'Soybean Seeds', cat: 'Raw Material', qty: '450 MT', date: '01 Dec 2024', qual: 'Grade A', loc: 'Warehouse A' },
-        { id: 'BAT-002', name: 'Mustard Oil', cat: 'Processed', qty: '1200 L', date: '03 Dec 2024', qual: 'Premium', loc: 'Silo 2' },
-        // Add dynamic items from userCrops if they are ready?
-        ...userCrops.map((c, i) => ({
-            id: `FARM-${i}`,
-            name: c.name,
-            cat: 'Harvest',
-            qty: `${c.area * 2} MT`, // Est yield
-            date: new Date().toLocaleDateString(),
-            qual: 'Standard',
-            loc: 'Farm Storage'
-        }))
-    ];
+    // Calculate stats
+    const totalQty = inventoryItems.reduce((acc, item) => {
+        // Simple parsing: "120 MT" -> 120
+        const val = parseFloat(item.quantity) || 0;
+        return acc + val;
+    }, 0);
 
     return (
         <div className="animate-circular-reveal" data-name="inventory-page">
-            <h1 className="text-3xl font-bold mb-2">Inventory Management</h1>
-            <p className="text-[var(--text-secondary)] mb-6">Track stock levels and warehouse conditions</p>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-3xl font-bold mb-1">Inventory Management</h1>
+                    <p className="text-[var(--text-secondary)]">Track stock levels and warehouse conditions</p>
+                </div>
+                <button className="btn-secondary" onClick={loadInventory} title="Refresh Inventory">
+                    <div className="icon-refresh-cw"></div>
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div className="card bg-[var(--bg-white)]">
@@ -41,7 +46,7 @@ function InventoryManagementPage() {
                         <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Normal</span>
                     </div>
                     <p className="text-[var(--text-secondary)] text-sm">Total Storage Used</p>
-                    <h3 className="text-2xl font-bold">1,240 MT</h3>
+                    <h3 className="text-2xl font-bold">{totalQty} MT</h3>
                     <p className="text-xs text-[var(--text-secondary)] mt-1">Capacity: 2,000 MT</p>
                 </div>
                 <div className="card bg-[var(--bg-white)]">
@@ -86,23 +91,29 @@ function InventoryManagementPage() {
                                 <th className="py-3 px-4 font-medium">Item Name</th>
                                 <th className="py-3 px-4 font-medium">Category</th>
                                 <th className="py-3 px-4 font-medium">Quantity</th>
-                                <th className="py-3 px-4 font-medium">Arrival Date</th>
-                                <th className="py-3 px-4 font-medium">Quality</th>
+                                <th className="py-3 px-4 font-medium">Type</th>
+                                <th className="py-3 px-4 font-medium">Details</th>
                                 <th className="py-3 px-4 font-medium">Location</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm">
-                            {inventoryItems.map((row, idx) => (
-                                <tr key={idx} className="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--bg-light)]">
-                                    <td className="py-3 px-4 font-medium">{row.id}</td>
-                                    <td className="py-3 px-4">{row.name}</td>
-                                    <td className="py-3 px-4"><span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">{row.cat}</span></td>
-                                    <td className="py-3 px-4 font-semibold">{row.qty}</td>
-                                    <td className="py-3 px-4 text-[var(--text-secondary)]">{row.date}</td>
-                                    <td className="py-3 px-4"><span className="text-green-600 font-medium">{row.qual}</span></td>
-                                    <td className="py-3 px-4 text-[var(--text-secondary)]">{row.loc}</td>
-                                </tr>
-                            ))}
+                            {isLoading ? (
+                                <tr><td colSpan="7" className="p-8 text-center text-gray-500">Loading Inventory...</td></tr>
+                            ) : inventoryItems.length === 0 ? (
+                                <tr><td colSpan="7" className="p-8 text-center text-gray-500">Inventory Empty</td></tr>
+                            ) : (
+                                inventoryItems.map((row, idx) => (
+                                    <tr key={idx} className="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--bg-light)]">
+                                        <td className="py-3 px-4 font-medium">{row.batch || row.id}</td>
+                                        <td className="py-3 px-4">{row.item || row.name}</td>
+                                        <td className="py-3 px-4"><span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">{row.type || row.cat}</span></td>
+                                        <td className="py-3 px-4 font-semibold">{row.quantity} {row.unit}</td>
+                                        <td className="py-3 px-4 text-[var(--text-secondary)]">{row.type}</td>
+                                        <td className="py-3 px-4 text-xs font-mono text-gray-500">{JSON.stringify(row.qualityDetails || {})}</td>
+                                        <td className="py-3 px-4 text-[var(--text-secondary)]">{row.location || row.loc}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

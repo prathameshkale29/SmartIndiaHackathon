@@ -42,6 +42,7 @@ function App() {
     const [showNotifications, setShowNotifications] = React.useState(false);
     const [showSettings, setShowSettings] = React.useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+    const [showAIWidget, setShowAIWidget] = React.useState(false); // Global AI Widget State
 
     React.useEffect(() => {
       initTheme();
@@ -237,6 +238,26 @@ function App() {
           </div>
           {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
           {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+
+          {/* Global AI Advisor Floating Widget */}
+          <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
+            {/* Widget Container */}
+            <div className={`transition-all duration-300 origin-bottom-right pointer-events-auto ${showAIWidget ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-10 pointer-events-none h-0 w-0 overflow-hidden'}`}>
+              <div className="w-[350px] h-[500px] shadow-2xl rounded-2xl">
+                <AIAdvisor variant="widget" activePage={activePage} onClose={() => setShowAIWidget(false)} />
+              </div>
+            </div>
+
+            {/* FAB Button */}
+            <button
+              onClick={() => setShowAIWidget(!showAIWidget)}
+              className={`pointer-events-auto w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 ${showAIWidget ? 'bg-red-500 rotate-45' : 'bg-gradient-to-r from-green-500 to-emerald-600 animate-pulse-slow'}`}
+            >
+              <div className={`text-2xl text-white transition-all ${showAIWidget ? 'icon-plus' : 'icon-message-circle'}`}>
+                {showAIWidget ? '+' : '🤖'}
+              </div>
+            </button>
+          </div>
 
         </div>
       </SharedDataProvider>

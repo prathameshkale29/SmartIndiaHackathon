@@ -1,6 +1,17 @@
 function FarmerDashboard({ setActivePage, user }) {
     const [showAddCropModal, setShowAddCropModal] = React.useState(false);
     const [showListProduceModal, setShowListProduceModal] = React.useState(false);
+    const [showInputMarketModal, setShowInputMarketModal] = React.useState(false);
+
+    // Fertilizer Market & Predictor State
+    const [marketTab, setMarketTab] = React.useState('market'); // 'market' or 'predict'
+    const [inputPrices, setInputPrices] = React.useState([]);
+    const [selectedInputType, setSelectedInputType] = React.useState('Urea (Neem Coated)');
+
+    // Prediction Form State
+    const [predForm, setPredForm] = React.useState({ crop: 'Soybean', soil: 'Black Soil', stage: 'Sowing', acres: 5 });
+    const [prediction, setPrediction] = React.useState(null);
+    const [loadingPred, setLoadingPred] = React.useState(false);
 
     // Use Shared Data Context
     const {
@@ -27,6 +38,13 @@ function FarmerDashboard({ setActivePage, user }) {
             location: 'Nagpur, MH' // Default fallback
         });
     }, []);
+
+    // Load Input Prices when Modal Opens
+    React.useEffect(() => {
+        if (showInputMarketModal && window.MockApiService) {
+            window.MockApiService.getInputPrices().then(data => setInputPrices(data));
+        }
+    }, [showInputMarketModal]);
 
     const handleAddCrop = (e) => {
         e.preventDefault();
@@ -61,6 +79,21 @@ function FarmerDashboard({ setActivePage, user }) {
         addNotification('Produce Sold', 'Congratulations! Your produce has been marked as sold', 'success', 'home');
     };
 
+    // Prediction Handler
+    const handlePredict = async () => {
+        setLoadingPred(true);
+        try {
+            const res = await window.MockApiService.predictFertilizer(predForm);
+            setPrediction(res);
+            toast.success("AI Recommendation Generated! 🤖");
+        } catch (e) {
+            console.error(e);
+            toast.error("Prediction failed");
+        } finally {
+            setLoadingPred(false);
+        }
+    };
+
     const totalCrops = userCrops.length;
     const totalLandArea = userCrops.reduce((acc, crop) => acc + Number(crop.area), 0);
 
@@ -70,6 +103,10 @@ function FarmerDashboard({ setActivePage, user }) {
         { title: t('avgPrice'), value: '₹5,600', change: 3.2, icon: 'indian-rupee', color: 'from-amber-500 to-yellow-500' },
         { title: t('pendingOrders'), value: '2', change: -20, icon: 'package', color: 'from-teal-500 to-cyan-500' }
     ];
+
+    // Filter Logic for Input Market
+    const filteredInputs = inputPrices.filter(item => item.product === selectedInputType);
+    const bestPrice = filteredInputs.length > 0 ? Math.min(...filteredInputs.map(i => i.price)) : 0;
 
     return (
         <div className="animate-circular-reveal">
@@ -151,6 +188,199 @@ function FarmerDashboard({ setActivePage, user }) {
                 onClose={() => setShowListProduceModal(false)}
                 onAdd={handleListProduce}
             />
+
+            {/* FERTILIZER / INPUT MARKET MODAL with PREDICTOR */}
+            <ModalDialog
+                isOpen={showInputMarketModal}
+                onClose={() => setShowInputMarketModal(false)}
+                title="Fertilizer Hub"
+                size="lg"
+                footer={<button onClick={() => setShowInputMarketModal(false)} className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200">Close</button>}
+            >
+                <div>
+                    {/* Tabs */}
+                    <div className="flex gap-4 border-b mb-4">
+                        <button
+                            onClick={() => setMarketTab('market')}
+                            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${marketTab === 'market' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                        >
+                            🛒 Best Market Prices
+                        </button>
+                        <button
+                            onClick={() => setMarketTab('predict')}
+                            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${marketTab === 'predict' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                        >
+                            🤖 AI Predictor <span className="text-[10px] bg-purple-100 text-purple-700 px-1 rounded-full">New</span>
+                        </button>
+                    </div>
+
+                    {marketTab === 'market' ? (
+                        <div className="space-y-4 animate-fade-in">
+                            <div className="flex justify-between items-center bg-green-50 p-3 rounded-lg border border-green-100">
+                                <div className="flex items-center gap-2">
+                                    <div className="icon-search text-green-600"></div>
+                                    <span className="font-semibold text-green-800">Find Best Prices</span>
+                                </div>
+                                <select
+                                    value={selectedInputType}
+                                    onChange={(e) => setSelectedInputType(e.target.value)}
+                                    className="border-green-200 rounded-md px-3 py-1 text-sm bg-white focus:ring-green-500"
+                                >
+                                    <option>Urea (Neem Coated)</option>
+                                    <option>DAP</option>
+                                    <option>NPK 10:26:26</option>
+                                    <option>MOP (Potash)</option>
+                                </select>
+                            </div>
+
+                            <div className="overflow-hidden border rounded-lg">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                                        <tr>
+                                            <th className="px-4 py-3">Vendor</th>
+                                            <th className="px-4 py-3">Product</th>
+                                            <th className="px-4 py-3">Distance</th>
+                                            <th className="px-4 py-3">Rating</th>
+                                            <th className="px-4 py-3 text-right">Price</th>
+                                            <th className="px-4 py-3"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                        {filteredInputs.map((item) => (
+                                            <tr key={item.id} className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${item.price === bestPrice ? 'bg-green-50/50 dark:bg-green-900/10' : ''}`}>
+                                                <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                                    {item.name}
+                                                    {item.price === bestPrice && <span className="ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-bold">BEST PRICE</span>}
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.product} <span className="text-xs text-gray-400">({item.unit})</span></td>
+                                                <td className="px-4 py-3 text-gray-500">{item.dist}</td>
+                                                <td className="px-4 py-3 text-amber-500">★ {item.rating}</td>
+                                                <td className="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">₹{item.price}</td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <button className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">
+                                                        Order
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {filteredInputs.length === 0 && (
+                                            <tr>
+                                                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">Loading market data...</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="animate-fade-in space-y-4">
+                            <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-800">
+                                <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-3 flex items-center gap-2">
+                                    <span className="icon-sliders"></span> Configure Prediction Filters
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase">Crop</label>
+                                        <select
+                                            value={predForm.crop}
+                                            onChange={e => setPredForm({ ...predForm, crop: e.target.value })}
+                                            className="w-full border rounded p-2 text-sm"
+                                        >
+                                            <option>Soybean</option>
+                                            <option>Mustard</option>
+                                            <option>Groundnut</option>
+                                            <option>Cotton</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase">Soil Type</label>
+                                        <select
+                                            value={predForm.soil}
+                                            onChange={e => setPredForm({ ...predForm, soil: e.target.value })}
+                                            className="w-full border rounded p-2 text-sm"
+                                        >
+                                            <option>Black Soil (Regur)</option>
+                                            <option>Red Soil</option>
+                                            <option>Alluvial Soil</option>
+                                            <option>Clay Loam</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase">Growth Stage</label>
+                                        <select
+                                            value={predForm.stage}
+                                            onChange={e => setPredForm({ ...predForm, stage: e.target.value })}
+                                            className="w-full border rounded p-2 text-sm"
+                                        >
+                                            <option>Sowing / Basal</option>
+                                            <option>Vegetative</option>
+                                            <option>Flowering</option>
+                                            <option>Fruiting</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-semibold text-gray-600 uppercase">Farm Size (Acres)</label>
+                                        <input
+                                            type="number"
+                                            value={predForm.acres}
+                                            onChange={e => setPredForm({ ...predForm, acres: e.target.value })}
+                                            className="w-full border rounded p-2 text-sm"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <button
+                                        onClick={handlePredict}
+                                        disabled={loadingPred}
+                                        className="bg-purple-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-purple-700 transition flex items-center gap-2"
+                                    >
+                                        {loadingPred ? <span className="animate-spin">↻</span> : <span className="icon-cpu"></span>}
+                                        Generate AI Plan
+                                    </button>
+                                </div>
+                            </div>
+
+                            {prediction && (
+                                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 overflow-hidden">
+                                    <div className="bg-gray-50 border-b p-3 flex justify-between items-center">
+                                        <h4 className="font-bold">Recommended Dosage</h4>
+                                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200">
+                                            {prediction.confidence} Confidence
+                                        </span>
+                                    </div>
+                                    <div className="p-4">
+                                        <p className="text-sm text-gray-500 mb-4 italic">"{prediction.note}"</p>
+                                        <div className="space-y-3">
+                                            {prediction.recommendation.map((rec, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                    <div>
+                                                        <p className="font-bold text-gray-900">{rec.product}</p>
+                                                        <p className="text-xs text-gray-500">{rec.reason}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-bold text-xl text-purple-600">{rec.quantity} <span className="text-sm text-gray-500">{rec.unit}</span></p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="mt-4 pt-3 border-t text-center">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedInputType(prediction.recommendation[0].product);
+                                                    setMarketTab('market');
+                                                }}
+                                                className="text-blue-600 font-medium hover:underline text-sm"
+                                            >
+                                                Check Prices for {prediction.recommendation[0].product} →
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </ModalDialog>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -271,8 +501,9 @@ function FarmerDashboard({ setActivePage, user }) {
                             <button onClick={() => setActivePage('advisor')} title="AI Advisor" className="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 dark:hover:from-blue-800/30 dark:hover:to-indigo-800/30 border border-blue-100 dark:border-blue-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
                                 <div className="icon-bot text-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform"></div>
                             </button>
-                            <button onClick={() => setActivePage('traceability')} title="Supply Chain" className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 dark:hover:from-purple-800/30 dark:hover:to-pink-800/30 border border-purple-100 dark:border-purple-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
-                                <div className="icon-truck text-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"></div>
+                            <button onClick={() => setShowInputMarketModal(true)} title="Input Market" className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 dark:hover:from-purple-800/30 dark:hover:to-pink-800/30 border border-purple-100 dark:border-purple-800 rounded-xl flex items-center justify-center hover:shadow-md hover:scale-105 transition-all group">
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full animate-pulse">%</span>
+                                <div className="icon-shopping-bag text-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"></div>
                             </button>
                         </div>
                         <div className="mt-6">

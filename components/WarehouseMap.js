@@ -3,33 +3,35 @@ function WarehouseMap() {
     const [selectedWarehouse, setSelectedWarehouse] = React.useState(null);
     const [warehouses, setWarehouses] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
-    const [error, setError] = React.useState(null);
     const user = getCurrentUser();
     const isAdmin = user?.role === 'admin';
 
+    // Mock ISRO Map Markers based on warehouse data
+    const [mapMarkers, setMapMarkers] = React.useState([]);
+
     React.useEffect(() => {
-      fetch('/api/warehouses')
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch warehouses');
-          return res.json();
-        })
-        .then(data => {
-          // Map API response (currentStock) to UI expectation (current)
-          const mapped = data.map(w => ({
-            ...w,
-            current: w.currentStock
-          }));
-          setWarehouses(mapped);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error('Error fetching warehouses:', err);
-          setError(err.message);
-          setLoading(false);
-          // Fallback to mock data if API fails (for demo stability)
-          const mock = isAdmin ? mockData.warehouses : mockData.nearbyWarehouses;
-          setWarehouses(mock);
-        });
+      // Load data (simulated)
+      const data = isAdmin ? window.mockData?.warehouses || [] : window.mockData?.nearbyWarehouses || [];
+      // If mockData isn't loaded yet, fallback to simple array
+      const safeData = data.length ? data : [
+        { id: 1, name: 'Central Warehouse A', location: 'Nashik', capacity: 5000, currentStock: 3200 },
+        { id: 2, name: 'Cold Storage Unit 1', location: 'Pune', capacity: 2000, currentStock: 1800 },
+        { id: 3, name: 'Rural Collection Center', location: 'Aurangabad', capacity: 1000, currentStock: 450 }
+      ];
+
+      setWarehouses(safeData);
+      setLoading(false);
+
+      // Convert to map markers
+      const markers = safeData.map((w, i) => ({
+        label: w.name,
+        sub: `${w.currentStock}/${w.capacity} MT`,
+        x: 20 + (i * 25), // Distribute
+        y: 30 + (i * 10),
+        color: (w.currentStock / w.capacity) > 0.9 ? 'bg-red-500' : 'bg-green-500'
+      }));
+      setMapMarkers(markers);
+
     }, [isAdmin]);
 
     if (loading) {
@@ -41,16 +43,19 @@ function WarehouseMap() {
     }
 
     return (
-      <div className="space-y-6" data-name="warehouse-map" data-file="components/WarehouseMap.js">
+      <div className="space-y-6" data-name="warehouse-map">
+
+        {/* ISRO Map View */}
+        <ISROMap
+          title="Warehouse Network (Geospatial View)"
+          height="350px"
+          markers={mapMarkers}
+        />
+
         <div className="card">
           <h3 className="text-lg font-semibold mb-4">
-            {isAdmin ? t('warehouseLocations') : t('nearbyWarehouses')}
+            {isAdmin ? 'Managed Warehouses' : 'Nearby Storage Facilities'}
           </h3>
-          {!isAdmin && (
-            <p className="text-sm text-[var(--text-secondary)] mb-4">
-              {t('findStorage')}
-            </p>
-          )}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {warehouses.map((wh, idx) => (
               <div
@@ -69,39 +74,19 @@ function WarehouseMap() {
                     <h4 className="font-medium mb-1">{wh.name}</h4>
                     <p className="text-sm text-[var(--text-secondary)] mb-2">{wh.location}</p>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[var(--text-secondary)]">{t('capacity')}</span>
+                      <span className="text-[var(--text-secondary)]">Capacity</span>
                       <span className="font-medium">{wh.capacity} MT</span>
                     </div>
                     <div className="flex items-center justify-between text-xs mt-1">
-                      <span className="text-[var(--text-secondary)]">{t('current')}</span>
-                      <span className="font-medium text-[var(--primary-color)]">{wh.current} MT</span>
+                      <span className="text-[var(--text-secondary)]">Current</span>
+                      <span className="font-medium text-[var(--primary-color)]">{wh.currentStock} MT</span>
                     </div>
                     <div className="mt-2 bg-gray-200 rounded-full h-2 overflow-hidden">
                       <div
                         className="bg-[var(--primary-color)] h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${(wh.current / wh.capacity) * 100}%` }}
+                        style={{ width: `${(wh.currentStock / wh.capacity) * 100}%` }}
                       ></div>
                     </div>
-                    {selectedWarehouse === idx && (
-                      <div className="mt-3 pt-3 border-t border-[var(--border-color)] animate-fade-in">
-                        <div className="text-xs space-y-1">
-                          <p className="flex justify-between">
-                            <span className="text-[var(--text-secondary)]">{t('available')}:</span>
-                            <span className="font-medium text-green-600">{wh.capacity - wh.current} MT</span>
-                          </p>
-                          <p className="flex justify-between">
-                            <span className="text-[var(--text-secondary)]">{t('utilization')}:</span>
-                            <span className="font-medium">{Math.round((wh.current / wh.capacity) * 100)}%</span>
-                          </p>
-                          {wh.manager && (
-                            <p className="flex justify-between mt-2 pt-2 border-t border-dashed border-gray-200">
-                              <span className="text-[var(--text-secondary)]">Manager:</span>
-                              <span className="font-medium">{wh.manager}</span>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
