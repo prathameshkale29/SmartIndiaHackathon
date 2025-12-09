@@ -8,9 +8,8 @@ function Login({ onLogin }) {
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [authMethod, setAuthMethod] = React.useState('email');
-  const [phoneNumber, setPhoneNumber] = React.useState('');
-  const [otp, setOtp] = React.useState('');
-  const [showOtpInput, setShowOtpInput] = React.useState(false);
+  // Removed Phone Auth Logic as per request (Google Auth & Username/Password only)
+
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
@@ -22,92 +21,12 @@ function Login({ onLogin }) {
     { value: 'retailer', label: 'Retailer', icon: 'store', description: 'Retailers and distributors' }
   ];
 
-  const [confirmationResult, setConfirmationResult] = React.useState(null);
-
   // Defensive fallback for i18n functions in case script fails to load
   const t = window.t || ((key) => key);
   const getLanguage = window.getLanguage || (() => 'en');
   const setLanguage = window.setLanguage || (() => { });
 
-  React.useEffect(() => {
-    // Clean up recaptcha on unmount
-    return () => {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-    }
-  }, []);
 
-  // Check for Redirect Login Result
-  React.useEffect(() => {
-    const check = async () => {
-      if (window.checkRedirectResult) {
-        setLoading(true);
-        const res = await window.checkRedirectResult();
-        if (res && res.success) {
-          onLogin(res.user);
-        } else if (res && res.message) {
-          setError(res.message);
-        }
-        setLoading(false);
-      }
-    };
-    check();
-  }, []);
-
-  const handleSendOTP = async () => {
-    if (!phoneNumber) {
-      setError('Please enter your phone number with country code (e.g., +919876543210)');
-      return;
-    }
-    setLoading(true);
-    setError('');
-
-    try {
-      const appVerifier = setupRecaptcha('recaptcha-container');
-      const result = await sendOTP(phoneNumber, appVerifier);
-
-      if (result.success) {
-        setConfirmationResult(result.confirmationResult);
-        setShowOtpInput(true);
-        // alert("OTP Sent!"); // Optional: Remove in productions
-      } else {
-        setError(result.message);
-      }
-    } catch (err) {
-      console.error("OTP Send Error:", err);
-      let msg = err.message || "Failed to send OTP. Try again.";
-      if (err.code === 'auth/billing-not-enabled') {
-        msg = "Free Plan Limit: Please add a 'Test Phone Number' in Firebase Console > Authentication > Sign-in method > Phone > 'Phone numbers for testing' section to test without billing.";
-      }
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    if (!otp) {
-      setError('Please enter the OTP');
-      return;
-    }
-    setLoading(true);
-
-    try {
-      const result = await verifyOTP(confirmationResult, otp, role);
-      if (result.success) {
-        console.log("Phone Login Success:", result.user);
-        onLogin(result.user);
-      } else {
-        setError(result.message);
-      }
-    } catch (err) {
-      console.error("OTP Verify Error:", err);
-      setError("Invalid OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -303,74 +222,7 @@ function Login({ onLogin }) {
               {loading ? 'Please wait...' : (isRegistering ? t('register') : t('login'))}
             </button>
 
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-[var(--bg-white)] text-gray-500">Or continue with</span>
-              </div>
-            </div>
 
-            <div id="google-signin-btn" className="w-full flex justify-center min-h-[44px]">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={async () => {
-                  if (loading) return;
-                  setLoading(true);
-
-                  // Save role for recovery after redirect
-                  localStorage.setItem('pending_role_login', role);
-
-                  // Try Popup first
-                  if (typeof googleLogin === 'function') {
-                    const result = await googleLogin(role);
-                    if (result.success) {
-                      onLogin(result.user);
-                    } else {
-                      console.warn("Popup failed, trying redirect...", result.message);
-                      // If popup fails (e.g. strict blocker), try redirect
-                      if (result.message && (result.message.includes('popup') || result.message.includes('closed') || result.message.includes('cancelled'))) {
-                        if (typeof googleLoginRedirect === 'function') {
-                          await googleLoginRedirect();
-                        } else {
-                          setError('Redirect login not available');
-                          setLoading(false);
-                        }
-                      } else {
-                        setError(result.message);
-                        setLoading(false);
-                      }
-                    }
-                  } else {
-                    setError("Google Login not authorized.");
-                    setLoading(false);
-                  }
-                }}
-                className={`w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-200 font-medium py-2.5 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
-                {isRegistering ? 'Sign up with Google' : 'Sign in with Google'}
-              </button>
-            </div>
-
-            <div className="text-center mt-2">
-              <button
-                type="button"
-                onClick={async () => {
-                  localStorage.setItem('pending_role_login', role);
-                  if (typeof googleLoginRedirect === 'function') {
-                    await googleLoginRedirect();
-                  } else {
-                    setError('Redirect login not available');
-                  }
-                }}
-                className="text-xs text-gray-500 hover:text-primary-600 underline"
-              >
-                Having trouble? Try Alternative Login
-              </button>
-            </div>
 
           </form>
 
