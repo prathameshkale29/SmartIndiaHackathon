@@ -21,6 +21,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'schemes', label: 'Gov Schemes / Agri-Stack', icon: 'landmark', roles: ['admin', 'farmer'] },
       { id: 'traceability', label: 'Shipment Tracking', icon: 'truck', roles: ['admin', 'retailer', 'government'] },
       { id: 'calculator', label: 'Calculator', icon: 'calculator', roles: ['admin', 'farmer'] },
+      { id: 'comparison', label: 'Crop Comparison', icon: 'bar-chart-2', roles: ['admin', 'farmer'] },
 
       // FPO Specific
       { id: 'procurement-mgmt', label: 'Farmer Procurement', icon: 'users', roles: ['admin', 'fpo'] },
@@ -45,7 +46,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'procurement', label: 'Procurement', icon: 'shopping-cart', roles: ['admin', 'government'] },
       { id: 'warehouse', label: 'Warehouse & Logistics', icon: 'map-pin', roles: ['admin'] },
       { id: 'farmers', label: t('farmers'), icon: 'users', roles: ['admin', 'government'] },
-      { id: 'intercropping', label: 'Agri-Twin (Sim)', icon: 'layers', roles: ['admin', 'farmer', 'fpo'] },
+      { id: 'intercropping', label: 'Agri-Twin (Sim)', icon: 'layers', roles: ['admin', 'farmer'] },
       { id: 'bhuvan', label: 'Oil Palm Zone (ISRO)', icon: 'map', roles: ['admin', 'government'] },
     ];
 

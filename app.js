@@ -126,6 +126,8 @@ function App() {
           return <SchemesPage />;
         case 'calculator':
           return <CalculatorPage />;
+        case 'comparison':
+          return <ComparisonPage />;
         case 'procurement':
           return (
             <div className="animate-circular-reveal" data-name="procurement-page" data-file="app.js">
@@ -244,7 +246,7 @@ function App() {
             {/* Widget Container */}
             <div className={`transition-all duration-300 origin-bottom-right pointer-events-auto ${showAIWidget ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-10 pointer-events-none h-0 w-0 overflow-hidden'}`}>
               <div className="w-[350px] h-[500px] shadow-2xl rounded-2xl">
-                <AIAdvisor variant="widget" activePage={activePage} onClose={() => setShowAIWidget(false)} />
+                <AIAdvisor variant="widget" activePage={activePage} onClose={() => setShowAIWidget(false)} isVisible={showAIWidget} />
               </div>
             </div>
 

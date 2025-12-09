@@ -1,4 +1,4 @@
-function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
+function AIAdvisor({ variant = 'full', activePage = 'home', onClose, isVisible = true }) {
   try {
     const t = (typeof window !== 'undefined' && window.t) ? window.t : (key => key);
     const isWidget = variant === 'widget';
@@ -279,8 +279,11 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
     };
 
     React.useEffect(() => {
-      if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, loading]);
+      if (isVisible && messagesEndRef.current) {
+        // Only scroll if visible to prevent page jump on load
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, [messages, loading, isVisible]);
 
     // WIDGET RENDER
     if (isWidget) {

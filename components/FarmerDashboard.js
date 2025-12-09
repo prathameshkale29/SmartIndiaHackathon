@@ -16,10 +16,7 @@ function FarmerDashboard({ setActivePage, user }) {
     // ADVISORY & PROFILE STATE
     const [showProfileModal, setShowProfileModal] = React.useState(false);
 
-    // COMPARISON TOOL STATE
-    const [showCompareModal, setShowCompareModal] = React.useState(false);
-    const [comparisonData, setComparisonData] = React.useState([]);
-    const [calcArea, setCalcArea] = React.useState(1); // Default 1 Acre
+
     const [liveBids, setLiveBids] = React.useState([]); // Smart Bidding State
 
     // Fetch Live Bids
@@ -54,14 +51,7 @@ function FarmerDashboard({ setActivePage, user }) {
         }
     };
 
-    // Fetch Comparison Data
-    React.useEffect(() => {
-        if (showCompareModal) {
-            window.MockApiService.getCropComparisonData().then(data => {
-                setComparisonData(data);
-            });
-        }
-    }, [showCompareModal]);
+
 
 
 
@@ -227,10 +217,7 @@ function FarmerDashboard({ setActivePage, user }) {
                             <span>Advisory</span>
                         </button>
                         <div className="flex gap-2 flex-1 md:flex-none">
-                            <button onClick={() => setShowCompareModal(true)} className="flex-1 md:flex-none bg-blue-100 text-blue-800 hover:bg-blue-200 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold shadow-md transition-all transform hover:-translate-y-0.5 border border-blue-200 text-sm">
-                                <div className="icon-bar-chart text-lg"></div>
-                                <span>Compare</span>
-                            </button>
+
                             <button onClick={() => setShowAddCropModal(true)} className="flex-1 md:flex-none bg-[var(--accent-color)] text-black hover:bg-white flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold shadow-md transition-all transform hover:-translate-y-0.5 border border-transparent hover:border-[var(--accent-color)] text-sm">
                                 <div className="icon-plus text-lg"></div>
                                 <span>{t('addCrop')}</span>
@@ -357,7 +344,7 @@ function FarmerDashboard({ setActivePage, user }) {
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Micronutrient Deficiency (Select if tested Low)</label>
                                 <div className="flex flex-wrap gap-3">
-                                    {['Zinc (Zn)', 'Iron (Fe)', 'Manganese (Mn)', 'Copper (Cu)'].map(micro => (
+                                    {['Zinc (Zn)', 'Iron (Fe)', 'Manganese (Mn)', 'Copper (Cu)', 'Potassium (K)'].map(micro => (
                                         <label key={micro} className="flex items-center gap-2 bg-gray-50 border px-3 py-1 rounded cursor-pointer">
                                             <input
                                                 type="checkbox"
@@ -454,8 +441,11 @@ function FarmerDashboard({ setActivePage, user }) {
                                     {farmerProfile.micronutrients.includes('Iron (Fe)') && (
                                         <li><b>Iron Deficiency:</b> Spray Ferrous Sulphate (0.5%) if yellowing occurs.</li>
                                     )}
+                                    {farmerProfile.micronutrients.includes('Potassium (K)') && (
+                                        <li><b>Potassium Deficiency:</b> Apply MOP (Muriate of Potash) @ 20kg/acre.</li>
+                                    )}
                                     {farmerProfile.micronutrients.map(m => {
-                                        if (m === 'Zinc (Zn)' || m === 'Iron (Fe)') return null; // Handled above
+                                        if (m === 'Zinc (Zn)' || m === 'Iron (Fe)' || m === 'Potassium (K)') return null; // Handled above
                                         return <li key={m}><b>{m.split(' ')[0]} Deficiency:</b> Consult local KVK for specific micronutrient mix.</li>
                                     })}
                                 </ul>
@@ -967,115 +957,7 @@ function FarmerDashboard({ setActivePage, user }) {
                     </div>
                 </div>
             </div>
-            {/* COMPARISON TOOL MODAL */}
-            <ModalDialog
-                isOpen={showCompareModal}
-                onClose={() => setShowCompareModal(false)}
-                title="📊 Oilseed Comparison"
-                size="lg"
-            >
-                <div>
-                    <div className="bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100">
-                        <div className="flex items-start gap-2 mb-3">
-                            <div className="icon-calculator text-lg mt-0.5 text-blue-700"></div>
-                            <p className="text-sm text-blue-900 font-medium">Income Calculator</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                                <label className="block text-xs font-semibold text-blue-800 mb-1">Enter Your Land Area (Acres)</label>
-                                <input
-                                    type="number"
-                                    value={calcArea}
-                                    onChange={(e) => setCalcArea(Math.max(0.1, parseFloat(e.target.value) || 0))}
-                                    className="w-full border border-blue-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs text-blue-700 italic mt-4">
-                                    Calculating: Forecast Price × Avg Yield × {calcArea} Acres
-                                </p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="overflow-x-auto rounded-xl border border-gray-200">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-100 text-gray-700 font-bold uppercase text-xs">
-                                <tr>
-                                    <th className="px-4 py-3">Crop Name</th>
-                                    <th className="px-4 py-3">MSP (₹/Qtl)</th>
-                                    <th className="px-4 py-3 bg-blue-50 text-blue-800">
-                                        Forecast (Harvest)
-                                        <div className="text-[9px] font-normal text-blue-600">Expected in 2-3 Months</div>
-                                    </th>
-                                    <th className="px-4 py-3">Yield</th>
-                                    <th className="px-4 py-3 text-right text-green-700 bg-green-50">Est. Income (₹)</th>
-                                    <th className="px-4 py-3">Logistics</th>
-                                    <th className="px-4 py-3">Demand</th>
-                                    <th className="px-4 py-3">Suitability</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
-                                {[...comparisonData]
-                                    .sort((a, b) => ((b.expected_price || b.msp) * b.yield_avg) - ((a.expected_price || a.msp) * a.yield_avg))
-                                    .map((row, idx) => {
-                                        const priceToUse = row.expected_price || row.msp;
-                                        const estIncome = Math.round(priceToUse * (row.yield_avg || 0) * calcArea);
-                                        // Calculate Trend
-                                        const diff = priceToUse - row.msp;
-                                        const pct = ((diff / row.msp) * 100).toFixed(1);
-                                        const isPositive = diff >= 0;
-
-                                        // Calculate Logistics
-                                        const totalYield = (row.yield_avg || 0) * calcArea;
-                                        let vehicle = { type: 'Truck', icon: '🚚', color: 'bg-gray-100 text-gray-700', cap: '> 25 Qtls' };
-                                        if (totalYield <= 5) vehicle = { type: 'Auto', icon: '🛺', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', cap: '< 5 Qtls' };
-                                        else if (totalYield <= 25) vehicle = { type: 'Tempo', icon: '🚛', color: 'bg-blue-100 text-blue-800 border-blue-200', cap: '5-25 Qtls' };
-
-                                        return (
-                                            <tr key={idx} className={`hover:bg-gray-50 transition-colors ${idx === 0 ? 'bg-green-50/30' : ''}`}>
-                                                <td className="px-4 py-3 font-semibold text-gray-900">
-                                                    {row.crop}
-                                                    {idx === 0 && <span className="ml-2 text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-200 px-1 rounded whitespace-nowrap">BEST RETURN</span>}
-                                                </td>
-                                                <td className="px-4 py-3 font-medium text-gray-700">₹{row.msp}</td>
-                                                <td className="px-4 py-3 bg-blue-50">
-                                                    <div className="font-bold text-blue-700">₹{priceToUse}</div>
-                                                    <div className={`text-[10px] font-medium flex items-center ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {isPositive ? '▲' : '▼'} {Math.abs(pct)}% vs MSP
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 text-gray-600">{row.yield}</td>
-                                                <td className="px-4 py-3 font-bold text-right text-green-700 bg-green-50">
-                                                    ₹{estIncome.toLocaleString()}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <div className="text-xs">
-                                                        <div className="font-semibold text-gray-700">{totalYield.toFixed(1)} Qtls</div>
-                                                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border mt-1 ${vehicle.color} text-[10px]`} title={`Capacity: ${vehicle.cap}`}>
-                                                            <span>{vehicle.icon}</span> {vehicle.type}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${row.demand.includes('High')
-                                                        ? 'bg-green-100 text-green-700 border-green-200'
-                                                        : row.demand === 'Moderate'
-                                                            ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
-                                                            : 'bg-gray-100 text-gray-600 border-gray-200'
-                                                        }`}>
-                                                        {row.demand}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-xs text-gray-500 italic max-w-[150px] truncate" title={row.suitability}>{row.suitability}</td>
-                                            </tr>
-                                        );
-                                    })}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </ModalDialog >
 
         </div >
     );
