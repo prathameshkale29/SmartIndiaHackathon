@@ -66,6 +66,11 @@ function HomePage({ setActivePage }) {
                             <option value="Soybean">Soybean</option>
                             <option value="Groundnut">Groundnut</option>
                             <option value="Sunflower">Sunflower</option>
+                            <option value="Sesame">Sesame (Til)</option>
+                            <option value="Castor">Castor Seed</option>
+                            <option value="Linseed">Linseed (Flax)</option>
+                            <option value="Safflower">Safflower (Kardai)</option>
+                            <option value="Niger">Niger Seed</option>
                         </select>
                     </div>
                     <div>
