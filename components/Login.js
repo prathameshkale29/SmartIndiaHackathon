@@ -46,6 +46,24 @@ function Login({ onLogin }) {
         setLoading(false);
         return;
       }
+
+      // Username Validation: Alphabets & Numbers only, no special characters
+      const usernameRegex = /^[a-zA-Z0-9]+$/;
+      if (!usernameRegex.test(username)) {
+        setError('Username must contain only alphabets and numbers (no special characters)');
+        setLoading(false);
+        return;
+      }
+
+      // Password Validation: 1 Alphabet, 1 Number, 1 Special Character
+      // Using a broad set of special characters
+      const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/;
+      if (!passwordRegex.test(password)) {
+        setError('Password must contain at least one alphabet, one number, and one special character');
+        setLoading(false);
+        return;
+      }
+
       if (password !== confirmPassword) {
         setError('Passwords do not match');
         setLoading(false);
