@@ -28,6 +28,8 @@ function Login({ onLogin }) {
 
 
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -239,6 +241,8 @@ function Login({ onLogin }) {
             >
               {loading ? 'Please wait...' : (isRegistering ? t('register') : t('login'))}
             </button>
+
+
 
 
 
