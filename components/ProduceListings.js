@@ -125,7 +125,7 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
                                             }}
                                             className="flex-1 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-1"
                                         >
-                                            <div className="icon-dollar-sign text-sm"></div>
+                                            <span className="text-sm font-bold">₹</span>
                                             Place Bid
                                         </button>
                                         <button
@@ -153,7 +153,7 @@ function ProduceListings({ listings, onDelete, onMarkSold }) {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate-fade-in">
                         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm m-4 shadow-xl">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <div className="icon-dollar-sign text-green-600"></div> Place Bid
+                                <span className="text-green-600 font-bold">₹</span> Place Bid
                             </h3>
                             <p className="text-sm text-gray-500 mb-4">
                                 Bidding for <b>{selectedListing.crop}</b> ({selectedListing.quantity} Qt) <br />
