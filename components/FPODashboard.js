@@ -98,32 +98,75 @@ function FPODashboard({ setActivePage, user }) {
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="space-y-6">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-bold mb-4">Market Demand</h3>
-                        <DemandSupplyChart />
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                        <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            <button onClick={() => setActivePage('inventory')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                                <div className="icon-package text-2xl text-purple-600 mb-1 mx-auto"></div>
-                                <span className="text-xs font-medium">Inventory</span>
-                            </button>
-                            <button onClick={() => setActivePage('contracts')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                                <div className="icon-file-text text-2xl text-amber-600 mb-1 mx-auto"></div>
-                                <span className="text-xs font-medium">Contracts</span>
-                            </button>
-                            <button onClick={() => setActivePage('finance')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                                <div className="icon-indian-rupee text-2xl text-green-600 mb-1 mx-auto"></div>
-                                <span className="text-xs font-medium">Payments</span>
-                            </button>
-                            <button onClick={() => setActivePage('market')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                                <div className="icon-bar-chart-2 text-2xl text-blue-600 mb-1 mx-auto"></div>
-                                <span className="text-xs font-medium">Trends</span>
-                            </button>
+            {/* Right Column: Live Auctions */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 h-full">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Live Farmer Auctions 🔨</h3>
+                    <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full animate-pulse">Live</span>
+                </div>
+                <div className="space-y-4">
+                    {[
+                        { name: "Ramesh Kumar", crop: "Soybean", qty: "50 Qtls", base: 4500, time: "2m left" },
+                        { name: "Suresh Patil", crop: "Mustard", qty: "20 Qtls", base: 6100, time: "15m left" },
+                        { name: "Anita Devi", crop: "Groundnut", qty: "15 Qtls", base: 6400, time: "5m left" }
+                    ].map((auction, i) => (
+                        <div key={i} className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 className="font-bold text-gray-800 dark:text-white text-sm">{auction.name}</h4>
+                                    <div className="text-xs text-gray-500">{auction.crop} ({auction.qty})</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-xs font-bold text-red-500">{auction.time}</div>
+                                    <div className="text-[10px] text-gray-400">Ends soon</div>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between mt-3 bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-100 dark:border-gray-700">
+                                <div className="text-xs">
+                                    <span className="text-gray-400 block">Base Price</span>
+                                    <span className="font-bold">₹{auction.base}</span>
+                                </div>
+                                <button
+                                    onClick={() => window.toast && window.toast.success(`Bid sent to ${auction.name}!`)}
+                                    className="bg-black hover:bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                                >
+                                    Place Bid
+                                </button>
+                            </div>
                         </div>
+                    ))}
+                </div>
+                <button className="w-full mt-4 text-center text-sm text-blue-600 hover:text-blue-700 font-medium py-2">
+                    View All Auctions →
+                </button>
+            </div>
+
+            <div className="space-y-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-bold mb-4">Market Demand</h3>
+                    <DemandSupplyChart />
+                </div>
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button onClick={() => setActivePage('inventory')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <div className="icon-package text-2xl text-purple-600 mb-1 mx-auto"></div>
+                            <span className="text-xs font-medium">Inventory</span>
+                        </button>
+                        <button onClick={() => setActivePage('contracts')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <div className="icon-file-text text-2xl text-amber-600 mb-1 mx-auto"></div>
+                            <span className="text-xs font-medium">Contracts</span>
+                        </button>
+                        <button onClick={() => setActivePage('finance')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <div className="icon-indian-rupee text-2xl text-green-600 mb-1 mx-auto"></div>
+                            <span className="text-xs font-medium">Payments</span>
+                        </button>
+                        <button onClick={() => setActivePage('market')} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <div className="icon-bar-chart-2 text-2xl text-blue-600 mb-1 mx-auto"></div>
+                            <span className="text-xs font-medium">Trends</span>
+                        </button>
                     </div>
                 </div>
             </div>

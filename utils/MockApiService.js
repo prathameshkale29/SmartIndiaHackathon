@@ -71,7 +71,7 @@ class MockApiService {
                 "Delhi": ["Azadpur", "Okhla", "Ghazipur"]
             };
 
-            const crops = ["Rice", "Wheat", "Soybean", "Cotton", "Maize", "Mustard", "Sugarcane", "Gram", "Groundnut", "Turmeric"];
+            const crops = ["Rice", "Wheat", "Soybean", "Cotton", "Maize", "Mustard", "Sugarcane", "Gram", "Groundnut", "Turmeric", "Sesame", "Castor", "Linseed", "Safflower", "Niger"];
 
             // Generate valid data for ALL states
             const marketData = states.flatMap((state, index) => {
@@ -81,13 +81,24 @@ class MockApiService {
                 // Generate 2-3 entries per state
                 return [1, 2].map(i => {
                     const city = updateCities[Math.floor(Math.random() * updateCities.length)];
+                    const crop = crops[Math.floor(Math.random() * crops.length)];
+
+                    // Simple MSP Lookup (Mock Database)
+                    const mspDb = {
+                        "Rice": 2183, "Wheat": 2275, "Soybean": 4600, "Cotton": 6620, "Maize": 2090,
+                        "Mustard": 5650, "Sugarcane": 315, "Gram": 5440, "Groundnut": 6377, "Turmeric": 7000,
+                        "Sesame": 7830, "Castor": 5800, "Linseed": 5200, "Safflower": 5650, "Niger": 7280
+                    };
+                    const msp = mspDb[crop] || 3000;
+
                     return {
                         id: `MD-${index}-${i}`,
                         state: state,
                         district: city, // Use City as District
                         region: city,   // Use City as Region
-                        crop: crops[Math.floor(Math.random() * crops.length)],
-                        price: 2000 + Math.floor(Math.random() * 5000),
+                        crop: crop,
+                        msp: msp, // Added MSP
+                        price: Math.floor(msp * (0.85 + Math.random() * 0.4)), // Price varies around MSP (85% to 125%)
                         change: parseFloat((Math.random() * 10 - 5).toFixed(1)),
                         trend: Math.random() > 0.5 ? "up" : "down",
                         last_updated: new Date().toISOString()
@@ -210,11 +221,24 @@ class MockApiService {
 
         // Fallback to Mock Data
         const data = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.MARKET) || '[]');
-        // Simulate live fluctuation
-        const fluctuated = data.map(item => ({
-            ...item,
-            price: Math.floor(item.price * (1 + (Math.random() * 0.02 - 0.01))) // +/- 1%
-        }));
+
+        // Simulate live fluctuation & Backfill MSP if missing
+        const fluctuated = data.map(item => {
+            // Backfill MSP if missing (for existing localStorage data)
+            if (!item.msp) {
+                const mspDb = {
+                    "Rice": 2183, "Wheat": 2275, "Soybean": 4600, "Cotton": 6620, "Maize": 2090,
+                    "Mustard": 5650, "Sugarcane": 315, "Gram": 5440, "Groundnut": 6377, "Turmeric": 7000,
+                    "Sesame": 7830, "Castor": 5800, "Linseed": 5200, "Safflower": 5650, "Niger": 7280
+                };
+                item.msp = mspDb[item.crop] || 3000;
+            }
+
+            return {
+                ...item,
+                price: Math.floor(item.price * (1 + (Math.random() * 0.02 - 0.01))) // +/- 1%
+            };
+        });
         return this._delay(fluctuated);
     }
 
@@ -405,6 +429,31 @@ class MockApiService {
                 msp: 5450,
                 potential_yield: "5-7 Quintals/acre"
             });
+            recommendations.push({
+                crop: "Sesame",
+                suitability: "Medium",
+                reason: "Short duration crop suitable for semi-arid regions.",
+                msp: 7830,
+                potential_yield: "2-3 Quintals/acre"
+            });
+            recommendations.push({
+                crop: "Castor",
+                suitability: "High",
+                reason: "Deep root system, drought tolerant.",
+                msp: 5800,
+                potential_yield: "4-6 Quintals/acre"
+            });
+        }
+
+        // General additions for any soil if list is short
+        if (recommendations.length < 2) {
+            recommendations.push({
+                crop: "Linseed",
+                suitability: "Medium",
+                reason: "Hardy crop, good for mixed cropping.",
+                msp: 5200,
+                potential_yield: "3-4 Quintals/acre"
+            });
         }
 
         if (recommendations.length === 0) {
@@ -423,9 +472,14 @@ class MockApiService {
         // Mock Data Database
         const marketDb = {
             "Soybean": { msp: 4600, demand: "High" },
-            "Mustard": { msp: 5450, demand: "Very High" },
+            "Mustard": { msp: 5650, demand: "Very High" },
             "Groundnut": { msp: 6377, demand: "Moderate" },
-            "Sunflower": { msp: 6400, demand: "High" }
+            "Sunflower": { msp: 6400, demand: "High" },
+            "Sesame": { msp: 7830, demand: "High" },
+            "Castor": { msp: 5800, demand: "Moderate" },
+            "Linseed": { msp: 5200, demand: "Stable" },
+            "Safflower": { msp: 5650, demand: "Low" },
+            "Niger": { msp: 7280, demand: "Moderate" }
         };
 
         const data = marketDb[crop] || { msp: 4000, demand: "Unknown" };
@@ -616,6 +670,33 @@ class MockApiService {
     async getRetailerStock() {
         const retKey = 'agrisync_retailer_stock';
         return this._delay(JSON.parse(localStorage.getItem(retKey) || '[]'));
+    }
+
+    async getCropComparisonData() {
+        // Consolidated Data for Comparison Table
+        const comparisonData = [
+            { crop: "Soybean", msp: 4600, expected_price: 4850, yield: "6-8 Qtls/acre", yield_avg: 7, demand: "High", suitability: "Black Soil" },
+            { crop: "Mustard", msp: 5650, expected_price: 6100, yield: "5-7 Qtls/acre", yield_avg: 6, demand: "Very High", suitability: "Loam/Sandy" },
+            { crop: "Groundnut", msp: 6377, expected_price: 6500, yield: "8-10 Qtls/acre", yield_avg: 9, demand: "Moderate", suitability: "Sandy Loam" },
+            { crop: "Sunflower", msp: 6400, expected_price: 6600, yield: "5-6 Qtls/acre", yield_avg: 5.5, demand: "High", suitability: "Black/Loam" },
+            { crop: "Sesame (Til)", msp: 7830, expected_price: 8200, yield: "2-3 Qtls/acre", yield_avg: 2.5, demand: "High", suitability: "Well-drained" },
+            { crop: "Castor Seed", msp: 5800, expected_price: 5950, yield: "4-6 Qtls/acre", yield_avg: 5, demand: "Moderate", suitability: "Deep Soil" },
+            { crop: "Linseed (Flax)", msp: 5200, expected_price: 5300, yield: "3-4 Qtls/acre", yield_avg: 3.5, demand: "Stable", suitability: "Clay/Loam" },
+            { crop: "Safflower", msp: 5650, expected_price: 5500, yield: "4-5 Qtls/acre", yield_avg: 4.5, demand: "Low", suitability: "Dry/Saline" },
+            { crop: "Niger Seed", msp: 7280, expected_price: 7400, yield: "1.5-2 Qtls/acre", yield_avg: 1.75, demand: "Moderate", suitability: "Low fertility" }
+        ];
+        return this._delay(comparisonData);
+    }
+
+    // 15. Live Bids API (Smart Bidding)
+    async getLiveBids() {
+        // Mock Bids: Some good, some bad vs Expected Price
+        const bids = [
+            { id: 101, buyer: "Agro Corp", crop: "Soybean", quantity: "50 Qtls", price: 4500, expected: 4850, time: "2h ago" },
+            { id: 102, buyer: "Fresh Foods Ltd", crop: "Mustard", quantity: "20 Qtls", price: 6150, expected: 6100, time: "30m ago" },
+            { id: 103, buyer: "Local Mandi Agent", crop: "Groundnut", quantity: "15 Qtls", price: 6200, expected: 6500, time: "5m ago" }
+        ];
+        return this._delay(bids);
     }
 
 }

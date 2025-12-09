@@ -28,13 +28,13 @@ function ModalDialog({ isOpen, onClose, title, children, footer, size = 'md' }) 
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in"
             onClick={onClose}
             data-name="modal-dialog"
             data-file="components/ModalDialog.js"
         >
             <div
-                className={`bg-[var(--bg-white)] rounded-xl shadow-2xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden flex flex-col`}
+                className={`bg-[var(--bg-white)] rounded-xl shadow-2xl w-full ${sizeClasses[size]} max-h-[85vh] overflow-hidden flex flex-col`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

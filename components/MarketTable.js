@@ -152,13 +152,14 @@ function MarketTable() {
                   <tr className="border-b border-[var(--border-color)]">
                     <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-secondary)]">{t('region')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-secondary)]">{t('crop')}</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-secondary)]">MSP</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-secondary)]">{t('price')}</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-[var(--text-secondary)]">{t('change')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {marketData.length === 0 ? (
-                    <tr><td colSpan="4" className="p-4 text-center">No data found</td></tr>
+                    <tr><td colSpan="5" className="p-4 text-center">No data found</td></tr>
                   ) : (
                     marketData.map((item, idx) => (
                       <tr key={idx} className="border-b border-[var(--border-color)] hover:bg-[var(--bg-light)] transition-all duration-300">
@@ -166,10 +167,15 @@ function MarketTable() {
                           <p className="font-medium">{item.region}</p>
                           <p className="text-xs text-gray-500">{item.district}, {item.state}</p>
                         </td>
-                        <td className="py-3 px-4">{item.crop}</td>
-                        <td className="py-3 px-4 font-medium">₹{item.price}</td>
+                        <td className="py-3 px-4 font-medium text-gray-900">{item.crop}</td>
+                        <td className="py-3 px-4 text-gray-500">₹{item.msp}</td>
+                        <td className="py-3 px-4 font-bold">
+                          <span className={`${item.price >= item.msp ? 'text-green-600' : 'text-red-600'}`}>
+                            ₹{item.price}
+                          </span>
+                        </td>
                         <td className="py-3 px-4">
-                          <span className={`${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <span className={`flex items-center gap-1 ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {item.change >= 0 ? '↑' : '↓'} {Math.abs(item.change)}%
                           </span>
                         </td>
