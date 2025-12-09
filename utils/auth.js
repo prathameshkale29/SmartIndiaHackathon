@@ -30,6 +30,14 @@ function saveMockUser(userWithPassword) {
   localStorage.setItem(MOCK_DB_KEY, JSON.stringify(users));
 }
 
+// Helper to remove a mock user
+function removeMockUser(email) {
+  const users = getMockUsers();
+  const updatedUsers = users.filter(u => u.email !== email);
+  localStorage.setItem(MOCK_DB_KEY, JSON.stringify(updatedUsers));
+  return updatedUsers;
+}
+
 async function register(email, password, fullName, role) {
   try {
     // Check if user already exists in Demo or Mock DB
@@ -143,3 +151,14 @@ function getCurrentUser() {
 function isAdmin(user) {
   return user?.role === 'admin';
 }
+
+// Expose to window for app-wide access
+window.saveUserToLocal = saveUserToLocal;
+window.getMockUsers = getMockUsers;
+window.saveMockUser = saveMockUser;
+window.removeMockUser = removeMockUser;
+window.register = register;
+window.login = login;
+window.logout = logout;
+window.getCurrentUser = getCurrentUser;
+window.isAdmin = isAdmin;

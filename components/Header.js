@@ -94,6 +94,26 @@ function UserProfileDropdown({ user }) {
                     </p>
                     <p className="text-xs text-gray-500 capitalize">{acc.role}</p>
                   </div>
+
+                  {/* Remove Account Action */}
+                  {acc.email !== user?.email && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Remove account ${acc.name}?`)) {
+                          if (typeof removeMockUser === 'function') {
+                            removeMockUser(acc.email);
+                            setOtherAccounts(getMockUsers()); // Refresh list
+                          }
+                        }
+                      }}
+                      className="p-1 hover:bg-red-100 rounded-full text-gray-400 hover:text-red-500 transition-colors"
+                      title="Remove Account"
+                    >
+                      <div className="icon-trash-2 text-xs"></div>
+                    </button>
+                  )}
+
                   {acc.email === user?.email && <div className="icon-check text-green-600"></div>}
                 </div>
               ))
