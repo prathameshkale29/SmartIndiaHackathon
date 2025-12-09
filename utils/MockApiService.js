@@ -291,6 +291,21 @@ class MockApiService {
         return this._delay(data);
     }
 
+    async dispatchShipment(shipmentData) {
+        const shipments = JSON.parse(localStorage.getItem('agrisync_logistics') || '[]');
+        const newShipment = {
+            id: `TRK-${Math.floor(1000 + Math.random() * 9000)}`,
+            status: 'In Transit',
+            eta: 'Calculating...',
+            progress: 0,
+            origin: 'Central Warehouse', // Default origin
+            ...shipmentData
+        };
+        shipments.push(newShipment);
+        localStorage.setItem('agrisync_logistics', JSON.stringify(shipments));
+        return this._delay({ success: true, data: newShipment });
+    }
+
     // ... (Logistics methods)
 
     // 8. Bidding API

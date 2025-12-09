@@ -50,6 +50,28 @@ function RetailerDashboard({ setActivePage, user }) {
         { title: 'Customer Footfall', value: '145', change: 10, icon: 'users', color: 'from-teal-500 to-cyan-500' }
     ];
 
+
+    const [traceData, setTraceData] = React.useState(null);
+    const [traceLoading, setTraceLoading] = React.useState(false);
+
+    const handleTrace = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const batchId = formData.get('batchId');
+        if (!batchId) return;
+
+        setTraceLoading(true);
+        try {
+            const data = await window.MockApiService.getTraceabilityData(batchId);
+            setTraceData(data);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch traceability data");
+        } finally {
+            setTraceLoading(false);
+        }
+    };
+
     return (
         <div className="animate-circular-reveal">
             {/* Retailer Hero Section */}
@@ -73,6 +95,9 @@ function RetailerDashboard({ setActivePage, user }) {
                             </button>
                             <button onClick={() => setActiveTab('inventory')} className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors ${activeTab === 'inventory' ? 'bg-white text-emerald-900' : 'bg-emerald-700 text-white hover:bg-emerald-600'}`}>
                                 <div className="icon-package"></div> My Inventory
+                            </button>
+                            <button onClick={() => setActiveTab('traceability')} className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors ${activeTab === 'traceability' ? 'bg-white text-emerald-900' : 'bg-emerald-700 text-white hover:bg-emerald-600'}`}>
+                                <div className="icon-search"></div> Traceability
                             </button>
                         </div>
                     </div>
@@ -218,6 +243,68 @@ function RetailerDashboard({ setActivePage, user }) {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {/* TRACEABILITY TAB */}
+            {activeTab === 'traceability' && (
+                <div className="space-y-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 text-center">
+                        <h2 className="text-2xl font-bold mb-4">Blockchain Product Verification</h2>
+                        <p className="text-gray-500 mb-6 max-w-md mx-auto">Verify the complete journey of your products from farm to store. Enter the Batch ID found on the product packaging.</p>
+
+                        <form onSubmit={handleTrace} className="max-w-md mx-auto flex gap-2 mb-8">
+                            <input
+                                name="batchId"
+                                placeholder="Enter Batch ID (e.g., BATCH-XYZ-123)"
+                                className="flex-1 p-3 border rounded-lg bg-gray-50 dark:bg-gray-900 dark:border-gray-700"
+                                required
+                            />
+                            <button type="submit" className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors flex items-center gap-2">
+                                {traceLoading ? <span className="animate-spin icon-loader"></span> : <div className="icon-search"></div>}
+                                Verify
+                            </button>
+                        </form>
+
+                        {traceData && (
+                            <div className="text-left animate-fade-in">
+                                <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl p-6 mb-8">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-bold text-xl text-emerald-800 dark:text-emerald-400">{traceData.product}</h3>
+                                            <p className="text-sm text-emerald-600 dark:text-emerald-500">Origin: {traceData.origin}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs text-gray-500">Batch ID</div>
+                                            <div className="font-mono font-bold">{traceData.batchId}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="relative border-l-2 border-emerald-200 dark:border-emerald-800 ml-4 space-y-8 pb-4">
+                                    {traceData.stages.map((stage, idx) => (
+                                        <div key={idx} className="relative pl-8">
+                                            <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white dark:border-gray-800"></div>
+                                            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h4 className="font-bold">{stage.stage}</h4>
+                                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{stage.status}</span>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                                    <div><span className="icon-calendar mr-1"></span> {stage.date}</div>
+                                                    {stage.location && <div><span className="icon-map-pin mr-1"></span> {stage.location}</div>}
+                                                    {stage.result && <div><span className="icon-check-circle mr-1"></span> {stage.result}</div>}
+                                                </div>
+                                                <div className="text-xs font-mono text-gray-400 truncate bg-gray-50 dark:bg-gray-900 p-1.5 rounded">
+                                                    Hash: {stage.hash}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

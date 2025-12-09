@@ -262,10 +262,21 @@ function LogisticsPage() {
         };
 
         setIsLoading(true);
-        await window.MockApiService.dispatchShipment(newShipment);
-        toast.success("Shipment Dispatched! 🚚");
-        setShowDispatchModal(false);
-        loadShipments();
+        try {
+            if (window.MockApiService && window.MockApiService.dispatchShipment) {
+                await window.MockApiService.dispatchShipment(newShipment);
+                toast.success("Shipment Dispatched! 🚚");
+                setShowDispatchModal(false);
+                loadShipments();
+            } else {
+                throw new Error("Dispatch service not available");
+            }
+        } catch (error) {
+            console.error("Dispatch failed:", error);
+            toast.error("Failed to dispatch: " + error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleUpdateStatus = async (id, status) => {

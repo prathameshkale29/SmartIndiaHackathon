@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSync Traceability Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .trace-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Section */
+        .trace-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 24px;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trace-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .trace-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .trace-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .batch-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Verification Panel */
+        .verification-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 6px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+        
+        .verification-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .verification-status h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verify-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verify-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 19px; /* Center of the 40px circle */
+            top: 20px;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .timeline-event {
+            position: relative;
+            margin-bottom: 3rem;
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInUp 0.6s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .event-icon-wrapper {
+            position: absolute;
+            left: -3rem;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 2;
+            box-shadow: 0 0 0 4px var(--bg-color);
+        }
+        
+        .timeline-event.milestone .event-icon-wrapper {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 0 4px var(--bg-color), 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .event-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 1rem;
+        }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .event-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .event-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-blockchain {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #dbeafe;
+        }
+        
+        .badge-verified {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #d1fae5;
+        }
+
+        .event-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-group span {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .hash-section {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hash-section::before {
+            content: '🔒 SECURE HASH';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            font-size: 0.6rem;
+            border-bottom-left-radius: 4px;
+            font-weight: bold;
+        }
+
+        .hash-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .hash-label {
+            color: var(--primary);
+            font-weight: bold;
+            min-width: 40px;
+        }
+        
+        .hash-value {
+            word-break: break-all;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .verifying .event-icon-wrapper {
+            animation: pulse 1.5s infinite;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="trace-container">
+        <!-- Header -->
+        <div class="trace-header">
+            <div class="header-content">
+                <h1>🌱 Premium Soybeans</h1>
+                <p>Batch #BTC-2024-001 • Farm to Fork Traceability</p>
+                <div class="batch-badges">
+                    <div class="header-badge">📦 5 Events</div>
+                    <div class="header-badge">⚖️ 500 KG</div>
+                    <div class="header-badge">📍 Maharashtra, IN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Panel -->
+        <div class="verification-panel">
+            <div class="verification-status">
+                <h3 id="verifyStatusText">🛡️ Blockchain Secured</h3>
+                <p id="verifyStatusSub">Data integrity protected by Ethereum Smart Contract</p>
+            </div>
+            <button class="verify-btn" onclick="runVerification()">
+                <span id="verifyBtnIcon">🔍</span> <span id="verifyBtnText">Verify Chain</span>
+            </button>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline" id="timeline">
+            <!-- Events will be injected here by JS -->
+        </div>
+    </div>
+
+    <script>
+        // Mock Data
+        const events = [
+            {
+                type: 'PLANTED',
+                title: 'Crop Planted',
+                time: '2024-06-15 08:30 AM',
+                icon: '🌱',
+                actor: 'Rajesh Kumar (Farmer)',
+                location: 'Nashik, Maharashtra',
+                details: { 'Seed Variety': 'JS-335', 'Area': '2.5 Acres' },
+                hash: '0x8f43...a1b2',
+                prevHash: '0x0000...0000',
+                milestone: false
+            },
+            {
+                type: 'HARVESTED',
+                title: 'Harvested',
+                time: '2024-09-20 10:15 AM',
+                icon: '🌾',
+                actor: 'Rajesh Kumar (Farmer)',
+                location: 'Nashik, Maharashtra',
+                details: { 'Yield': '520 KG', 'Quality': 'Grade A' },
+                hash: '0x7e21...c3d4',
+                prevHash: '0x8f43...a1b2',
+                milestone: true,
+                txHash: '0x1234...abcd'
+            },
+            {
+                type: 'PROCURED',
+                title: 'Procured by Processor',
+                time: '2024-09-22 02:00 PM',
+                icon: '🏭',
+                actor: 'GreenAgro Processing',
+                location: 'Pune, Maharashtra',
+                details: { 'Weight Received': '515 KG', 'Moisture': '12%' },
+                hash: '0x6d10...e5f6',
+                prevHash: '0x7e21...c3d4',
+                milestone: true,
+                txHash: '0x5678...efgh'
+            },
+            {
+                type: 'PROCESSED',
+                title: 'Processed & Packed',
+                time: '2024-09-25 11:45 AM',
+                icon: '📦',
+                actor: 'GreenAgro Processing',
+                location: 'Pune, Maharashtra',
+                details: { 'Product': 'Soybean Oil', 'Batch Size': '500 Units' },
+                hash: '0x5c99...g7h8',
+                prevHash: '0x6d10...e5f6',
+                milestone: true,
+                txHash: '0x9012...ijkl'
+            },
+            {
+                type: 'DELIVERED',
+                title: 'Delivered to Retailer',
+                time: '2024-09-28 09:30 AM',
+                icon: '🏪',
+                actor: 'FreshMart Store',
+                location: 'Mumbai, Maharashtra',
+                details: { 'Received': '500 Units', 'Condition': 'Good' },
+                hash: '0x4b88...i9j0',
+                prevHash: '0x5c99...g7h8',
+                milestone: false
+            }
+        ];
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            let html = '';
+
+            events.forEach((event, index) => {
+                const delay = index * 0.2; // Staggered animation
+                html += `
+                    <div class="timeline-event ${event.milestone ? 'milestone' : ''}" style="animation-delay: ${delay}s" id="event-${index}">
+                        <div class="event-icon-wrapper">
+                            ${event.icon}
+                        </div>
+                        <div class="event-card">
+                            <div class="event-header">
+                                <div>
+                                    <div class="event-title">${event.title}</div>
+                                    <div class="event-time">📅 ${event.time}</div>
+                                    <div class="event-badges">
+                                        ${event.milestone ? '<span class="badge badge-blockchain">🔗 On-Chain</span>' : ''}
+                                        <span class="badge badge-verified" id="badge-${index}" style="display:none">✅ Verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="event-body">
+                                <div class="detail-group">
+                                    <label>Actor</label>
+                                    <span>${event.actor}</span>
+                                </div>
+                                <div class="detail-group">
+                                    <label>Location</label>
+                                    <span>${event.location}</span>
+                                </div>
+                                ${Object.entries(event.details).map(([k, v]) => `
+                                    <div class="detail-group">
+                                        <label>${k}</label>
+                                        <span>${v}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="hash-section">
+                                <div class="hash-row">
+                                    <span class="hash-label">PREV:</span>
+                                    <span class="hash-value">${event.prevHash}</span>
+                                </div>
+                                <div class="hash-row">
+                                    <span class="hash-label">CURR:</span>
+                                    <span class="hash-value">${event.hash}</span>
+                                </div>
+                                ${event.txHash ? `
+                                <div class="hash-row" style="color: var(--accent)">
+                                    <span class="hash-label">TX:</span>
+                                    <span class="hash-value">${event.txHash}</span>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function runVerification() {
+            const btn = document.querySelector('.verify-btn');
+            const statusText = document.getElementById('verifyStatusText');
+            const statusSub = document.getElementById('verifyStatusSub');
+            
+            if(btn.disabled) return;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin">↻</span> Verifying...';
+            statusText.innerText = '⏳ Verifying Hash Chain...';
+            
+            let currentEvent = 0;
+            
+            const interval = setInterval(() => {
+                if(currentEvent >= events.length) {
+                    clearInterval(interval);
+                    finishVerification();
+                    return;
+                }
+
+                // Highlight current event
+                const eventEl = document.getElementById(`event-${currentEvent}`);
+                eventEl.classList.add('verifying');
+                
+                // Show verified badge
+                document.getElementById(`badge-${currentEvent}`).style.display = 'inline-block';
+                
+                // Scroll to event
+                eventEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    eventEl.classList.remove('verifying');
+                }, 800);
+
+                currentEvent++;
+            }, 1000);
+        }
+
+        function finishVerification() {
+            const btn = document.querySelector('.verify-btn');
+            const statusText = document.getElementById('verifyStatusText');
+            const statusSub = document.getElementById('verifyStatusSub');
+            const panel = document.querySelector('.verification-panel');
+
+            btn.innerHTML = '✅ Verified';
+            btn.style.background = '#059669';
+            statusText.innerText = '✅ All Records Verified';
+            statusText.style.color = '#059669';
+            statusSub.innerText = 'Cryptographic hash chain is intact and matches blockchain anchors.';
+            panel.style.borderLeftColor = '#059669';
+            panel.style.background = '#ecfdf5';
+            
+            // Scroll back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        renderTimeline();
+
+    </script>
+</body>
+</html>

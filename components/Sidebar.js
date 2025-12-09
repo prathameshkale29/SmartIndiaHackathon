@@ -39,7 +39,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'demand-forecast-retailer', label: 'Demand & Sales Forecast', icon: 'bar-chart-2', roles: ['admin', 'retailer'] },
       { id: 'verified_batches', label: 'Verified Batches', icon: 'package-check', roles: ['admin', 'retailer'] },
       { id: 'procurement_orders', label: 'Procurement Orders', icon: 'shopping-bag', roles: ['admin', 'retailer'] },
-      { id: 'traceability_viewer', label: 'Traceability Viewer', icon: 'scan-line', roles: ['admin', 'retailer'] },
+
       { id: 'supply_chain', label: 'Supply Chain', icon: 'share-2', roles: ['admin', 'retailer'] },
 
       // Other/Utility
