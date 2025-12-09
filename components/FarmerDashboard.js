@@ -278,7 +278,14 @@ function FarmerDashboard({ setActivePage, user }) {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">Sowing Date</label>
-                        <input name="sowingDate" type="date" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                        <input
+                            name="sowingDate"
+                            type="date"
+                            required
+                            max={new Date().toISOString().split('T')[0]}
+                            onClick={(e) => e.target.showPicker()}
+                            className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] bg-[var(--bg-white)] text-[var(--text-primary)] no-calendar-icon cursor-pointer"
+                        />
                     </div>
                 </form>
             </ModalDialog>
