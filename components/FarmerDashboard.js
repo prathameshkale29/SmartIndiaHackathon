@@ -350,7 +350,7 @@ function FarmerDashboard({ setActivePage, user }) {
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Micronutrient Deficiency (Select if tested Low)</label>
                                 <div className="flex flex-wrap gap-3">
-                                    {['Zinc (Zn)', 'Iron (Fe)', 'Manganese (Mn)', 'Copper (Cu)'].map(micro => (
+                                    {['Zinc (Zn)', 'Iron (Fe)', 'Manganese (Mn)', 'Copper (Cu)', 'Potassium (K)'].map(micro => (
                                         <label key={micro} className="flex items-center gap-2 bg-gray-50 border px-3 py-1 rounded cursor-pointer">
                                             <input
                                                 type="checkbox"
@@ -447,8 +447,11 @@ function FarmerDashboard({ setActivePage, user }) {
                                     {farmerProfile.micronutrients.includes('Iron (Fe)') && (
                                         <li><b>Iron Deficiency:</b> Spray Ferrous Sulphate (0.5%) if yellowing occurs.</li>
                                     )}
+                                    {farmerProfile.micronutrients.includes('Potassium (K)') && (
+                                        <li><b>Potassium Deficiency:</b> Apply MOP (Muriate of Potash) @ 20kg/acre.</li>
+                                    )}
                                     {farmerProfile.micronutrients.map(m => {
-                                        if (m === 'Zinc (Zn)' || m === 'Iron (Fe)') return null; // Handled above
+                                        if (m === 'Zinc (Zn)' || m === 'Iron (Fe)' || m === 'Potassium (K)') return null; // Handled above
                                         return <li key={m}><b>{m.split(' ')[0]} Deficiency:</b> Consult local KVK for specific micronutrient mix.</li>
                                     })}
                                 </ul>
@@ -980,7 +983,7 @@ function FarmerDashboard({ setActivePage, user }) {
                                     type="number"
                                     value={calcArea}
                                     onChange={(e) => setCalcArea(Math.max(0.1, parseFloat(e.target.value) || 0))}
-                                    className="w-full border border-blue-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border border-blue-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                             </div>
                             <div className="flex-1">
