@@ -13,9 +13,17 @@ function ComparisonPage() {
     return (
         <div className="animate-circular-reveal" data-name="comparison-page" data-file="components/ComparisonPage.js">
             <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                {/* Logo with explicit path */}
+                <img
+                    src="./agrisync-logo.jpg"
+                    alt="AgriSync Logo"
+                    className="w-12 h-12 rounded-full border-2 border-green-500 shadow-md object-cover"
+                />
+
+                {/* Fallback Icon (Visible only if image fails to load - handled by CSS in production, but for now enforcing image) */}
+                {/* <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
                     <div className="icon-bar-chart text-2xl"></div>
-                </div>
+                </div> */}
                 Crop Comparison Tool
             </h1>
 

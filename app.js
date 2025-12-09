@@ -242,10 +242,10 @@ function App() {
           {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
           {/* Global AI Advisor Floating Widget */}
-          <div className="fixed bottom-24 md:bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
-            {/* Widget Container */}
-            <div className={`transition-all duration-300 origin-bottom-right pointer-events-auto ${showAIWidget ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-10 pointer-events-none h-0 w-0 overflow-hidden'}`}>
-              <div className="w-[350px] h-[500px] shadow-2xl rounded-2xl">
+          <div className="fixed bottom-24 md:bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+            {/* Widget Container - Absolute Positioned to avoid layout shifts */}
+            <div className={`absolute bottom-16 right-0 transition-all duration-300 origin-bottom-right pointer-events-auto ${showAIWidget ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-4 pointer-events-none'}`}>
+              <div className="w-[350px] h-[500px] shadow-2xl rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <AIAdvisor variant="widget" activePage={activePage} onClose={() => setShowAIWidget(false)} isVisible={showAIWidget} />
               </div>
             </div>
