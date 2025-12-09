@@ -72,9 +72,7 @@ function SchemesList() {
 
     return (
       <div className="space-y-4" data-name="schemes-list" data-file="components/SchemesList.js">
-        <h1 className="text-3xl font-bold mb-4 text-[var(--text-primary)]">
-          {t ? t('governmentSchemes') || 'Government Schemes' : 'Government Schemes'}
-        </h1>
+
         {schemes.map((scheme, idx) => (
           <div key={idx} className="card hover:shadow-lg transition-all">
             <div className="flex items-start justify-between mb-3">
