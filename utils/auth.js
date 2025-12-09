@@ -118,13 +118,30 @@ function getCurrentUser() {
   return userData ? JSON.parse(userData) : null;
 }
 
-function isAdmin(user) {
-  return user?.role === 'admin';
+// Helper to get all available accounts (Demo + Local)
+function getAvailableAccounts() {
+  const mockUsers = getMockUsers();
+  const demoUsers = Object.values(DEMO_ACCOUNTS).map(u => ({
+    ...u,
+    uid: 'demo_' + u.role,
+    authProvider: 'demo'
+  }));
+
+  // Filter out duplicates if any (by email)
+  const allUsers = [...demoUsers];
+  mockUsers.forEach(mUser => {
+    if (!allUsers.find(u => u.email === mUser.email)) {
+      allUsers.push(mUser);
+    }
+  });
+
+  return allUsers;
 }
 
 // Expose Globals
 window.saveUserToLocal = saveUserToLocal;
 window.getMockUsers = getMockUsers;
+window.getAvailableAccounts = getAvailableAccounts; // NEW
 window.saveMockUser = saveMockUser;
 window.removeMockUser = removeMockUser;
 window.register = register;

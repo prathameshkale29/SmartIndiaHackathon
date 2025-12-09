@@ -40,9 +40,12 @@ function UserProfileDropdown({ user }) {
   const [otherAccounts, setOtherAccounts] = React.useState([]);
 
   React.useEffect(() => {
-    if (typeof getMockUsers === 'function') {
-      const allUsers = getMockUsers();
-      setOtherAccounts(allUsers);
+    // Try to get available accounts (Demo + Local)
+    if (typeof getAvailableAccounts === 'function') {
+      setOtherAccounts(getAvailableAccounts());
+    } else if (typeof getMockUsers === 'function') {
+      // Fallback
+      setOtherAccounts(getMockUsers());
     }
   }, [user]);
 
