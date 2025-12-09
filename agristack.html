@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +17,13 @@
     <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <style type="text/tailwindcss">
-    @layer theme {
+        @layer theme {
         :root {
             --primary-color: #047857;
             --secondary-color: #d1fae5;
@@ -43,13 +48,16 @@
     }
     </style>
 </head>
+
 <body class="bg-[var(--bg-light)]">
     <div id="root"></div>
     <script type="text/babel" src="components/AgriStackDashboard.js"></script>
+    <script type="text/babel" src="components/WeatherAdvisory.js"></script>
     <script type="text/babel" src="utils/agristack.js"></script>
     <script type="text/babel" src="utils/auth.js"></script>
     <script type="text/babel" src="utils/theme.js"></script>
     <script type="text/babel" src="utils/i18n.js"></script>
     <script type="text/babel" src="agristack-app.js"></script>
 </body>
+
 </html>

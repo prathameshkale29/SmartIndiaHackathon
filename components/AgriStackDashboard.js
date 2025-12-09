@@ -93,6 +93,7 @@ function AgriStackDashboard({ user }) {
             <button onClick={() => setActiveTab('land')} className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'land' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-white dark:hover:bg-gray-800'}`}>Land Records</button>
             <button onClick={() => setActiveTab('pmkisan')} className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'pmkisan' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-white dark:hover:bg-gray-800'}`}>PM-Kisan</button>
             <button onClick={() => setActiveTab('soil')} className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'soil' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-white dark:hover:bg-gray-800'}`}>Soil Health</button>
+            <button onClick={() => setActiveTab('weather')} className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'weather' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-white dark:hover:bg-gray-800'}`}>Weather</button>
             <button onClick={() => setActiveTab('kcc')} className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'kcc' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg' : 'text-[var(--text-secondary)] hover:bg-white dark:hover:bg-gray-800'}`}>KCC</button>
           </div>
 
@@ -244,6 +245,10 @@ function AgriStackDashboard({ user }) {
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === 'weather' && (
+            <WeatherAdvisory />
           )}
         </div>
 
