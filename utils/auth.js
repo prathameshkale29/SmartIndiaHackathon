@@ -1,4 +1,5 @@
 const AUTH_KEY = 'agrisync_user';
+const MOCK_DB_KEY = 'agrisync_mock_users'; // Key to store registered users
 
 // Firebase Access Removed
 // Using Local Mock Authentication system
@@ -12,19 +13,53 @@ function saveUserToLocal(user) {
   localStorage.setItem(AUTH_KEY, JSON.stringify(user));
 }
 
+// Helper to get registered users
+function getMockUsers() {
+  try {
+    const users = localStorage.getItem(MOCK_DB_KEY);
+    return users ? JSON.parse(users) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+// Helper to save a new user
+function saveMockUser(userWithPassword) {
+  const users = getMockUsers();
+  users.push(userWithPassword);
+  localStorage.setItem(MOCK_DB_KEY, JSON.stringify(users));
+}
+
 async function register(email, password, fullName, role) {
   try {
+    // Check if user already exists in Demo or Mock DB
+    const users = getMockUsers();
+    const demoExists = Object.values(DEMO_ACCOUNTS).some(u => u.email === email || u.role === email); // check against demo
+    const mockExists = users.some(u => u.email === email);
+
+    if (demoExists || mockExists) {
+      return { success: false, message: 'User already exists. Please login.' };
+    }
+
     // SIMULATED REGISTRATION
-    const userData = {
+    const newUser = {
       uid: 'local_' + Date.now(),
       email: email,
       name: fullName,
       role: role,
-      authProvider: 'local'
+      authProvider: 'local',
+      password: password // Storing password for mock auth validation
     };
 
-    saveUserToLocal(userData);
-    return { success: true, user: userData };
+    saveMockUser(newUser);
+
+    // Auto Login after register
+    // Remove password from session data
+    const sessionUser = { ...newUser };
+    delete sessionUser.password;
+
+    saveUserToLocal(sessionUser);
+    return { success: true, user: sessionUser };
 
   } catch (error) {
     console.error('Registration error:', error);
@@ -34,18 +69,21 @@ async function register(email, password, fullName, role) {
 
 // Demo Accounts Configuration
 const DEMO_ACCOUNTS = {
-  'farmer': { email: 'farmer@agrisync.com', password: 'demo', name: 'Ramesh Kumar', role: 'farmer' },
-  'fpo': { email: 'fpo@agrisync.com', password: 'demo', name: 'Green Valley FPO', role: 'fpo' },
-  'processor': { email: 'processor@agrisync.com', password: 'demo', name: 'AgriGold Processors', role: 'processor' },
-  'retailer': { email: 'retailer@agrisync.com', password: 'demo', name: 'Fresh Mart', role: 'retailer' },
-  'admin': { email: 'admin@agrisync.com', password: 'demo', name: 'System Admin', role: 'admin' }
+  'farmer': { email: 'farmer@agrisync.com', password: 'farmer123', name: 'Ramesh Kumar', role: 'farmer' },
+  'fpo': { email: 'fpo@agrisync.com', password: 'fpo123', name: 'Green Valley FPO', role: 'fpo' },
+  'processor': { email: 'processor@agrisync.com', password: 'processor123', name: 'AgriGold Processors', role: 'processor' },
+  'retailer': { email: 'retailer@agrisync.com', password: 'retailer123', name: 'Fresh Mart', role: 'retailer' },
+  'admin': { email: 'admin@agrisync.com', password: 'admin123', name: 'System Admin', role: 'admin' }
 };
 
 async function login(email, password, role) {
   try {
     // 1. Check for Demo Accounts first (Bypass Firebase)
     // Support both full email AND short username (e.g. 'farmer')
-    const demoUser = Object.values(DEMO_ACCOUNTS).find(u => (u.email === email || u.role === email) && u.password === password);
+    // email input here can be the username
+    const demoUser = Object.values(DEMO_ACCOUNTS).find(u =>
+      (u.email === email || u.role === email) && u.password === password
+    );
 
     if (demoUser) {
       console.log("Using Demo Account:", demoUser.role);
@@ -60,21 +98,23 @@ async function login(email, password, role) {
       return { success: true, user: userData };
     }
 
-    // If not a demo account, simulate a generic login or fail
-    // For this 'remove firebase' request, we'll allow any login as a mock user for testing purposes
-    // UNLESS we want to be strict. Let's be helpful and mock it.
+    // 2. Check Mock Database (Registered Users)
+    const mockUsers = getMockUsers();
+    // Match email OR username (assuming email field holds username in registration if provided that way)
+    // But registration field is 'username' in UI passed as 'email' arg to register.
+    const registeredUser = mockUsers.find(u => u.email === email && u.password === password);
 
-    console.log("Simulating Login for:", email);
-    const userData = {
-      uid: 'mock_' + Date.now(),
-      email: email,
-      name: email.split('@')[0],
-      role: role,
-      authProvider: 'mock'
-    };
+    if (registeredUser) {
+      console.log("Using Registered Mock Account:", registeredUser.email);
+      const sessionUser = { ...registeredUser };
+      delete sessionUser.password; // Don't keep pass in session
 
-    saveUserToLocal(userData);
-    return { success: true, user: userData };
+      saveUserToLocal(sessionUser);
+      return { success: true, user: sessionUser };
+    }
+
+    // 3. Fallback: Fail if not found
+    return { success: false, message: 'Invalid username or password. Please register if you are new.' };
 
   } catch (error) {
     console.error('Login error:', error);
