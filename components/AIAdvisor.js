@@ -281,7 +281,7 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose, isVisible =
     React.useEffect(() => {
       if (isVisible && messagesEndRef.current) {
         // Only scroll if visible to prevent page jump on load
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, [messages, loading, isVisible]);
 
