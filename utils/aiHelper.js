@@ -270,7 +270,48 @@ async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
       return `✨ **AI Insight:**\n${aiResponse}`;
     }
 
-    // 1. Check General Chit-Chat (High Priority for natural feel)
+    // 1. INTENT RECOGNITION (Live Data)
+
+    // Intent: Market Price "price of X", "rate of X"
+    if (lowerQ.includes('price') || lowerQ.includes('rate') || lowerQ.includes('market')) {
+      if (window.MockApiService) {
+        const marketData = await window.MockApiService.getMarketPrices();
+        // Extract crop name from query
+        const crops = ["Soybean", "Mustard", "Groundnut", "Cotton", "Wheat", "Rice", "Gram", "Turmeric", "Sesame", "Castor"];
+        const foundCrop = crops.find(c => lowerQ.includes(c.toLowerCase()));
+
+        if (foundCrop) {
+          const record = marketData.find(item => item.crop.toLowerCase() === foundCrop.toLowerCase());
+          if (record) {
+            return `💰 **Market Price for ${foundCrop}:**\nCurrently trading at approx **₹${record.price}/qtl** in ${record.region} (${record.state}).\nMSP is ₹${record.msp}. The trend is ${record.trend === 'up' ? '📈 Rising' : '📉 Falling'}.`;
+          } else {
+            return `I couldn't find exact live data for **${foundCrop}** right now. However, most oilseeds are trading near their MSP. Please check the Market Market tab.`;
+          }
+        } else {
+          // General market info
+          return "You can check live prices for Soybean, Mustard, Groundnut, and more in the 'Market' tab. If you ask about a specific crop (e.g., 'price of Soybean'), I can give you the details!";
+        }
+      }
+    }
+
+    // Intent: MSP "msp of X"
+    if (lowerQ.includes('msp')) {
+      const mspDb = {
+        "soybean": 4600, "mustard": 5650, "groundnut": 6377, "cotton": 6620, "wheat": 2275, "rice": 2183, "gram": 5440
+      };
+      const foundKey = Object.keys(mspDb).find(k => lowerQ.includes(k));
+      if (foundKey) {
+        return `🛡️ **MSP Information:**\nThe Minimum Support Price (MSP) for **${foundKey.charAt(0).toUpperCase() + foundKey.slice(1)}** for the current season is **₹${mspDb[foundKey]}/qtl**.\nMake sure you don't sell below this rate at APMC mandis.`;
+      }
+    }
+
+    // Intent: Crop Recommendation "best crop for X soil"
+    if (lowerQ.includes('best crop') || lowerQ.includes('suggest crop') || lowerQ.includes('grow')) {
+      if (lowerQ.includes('black')) return "🌱 **Recommendation:** For **Black Soil** (Regur), **Soybean** and **Cotton** are excellent choices as they thrive in moisture-retentive soil. If you have irrigation, **Sugarcane** is also an option.";
+      if (lowerQ.includes('red') || lowerQ.includes('sandy') || lowerQ.includes('loam')) return "🌱 **Recommendation:** For **Red/Sandy/Loamy Soil**, **Groundnut** and **Mustard** are great options. Groundnut pegs penetrate easily in loose soil, and Mustard requires less water.";
+    }
+
+    // 2. Check General Chit-Chat (High Priority for natural feel)
     for (const entry of GENERAL_KB) {
       if (entry.keywords.some(k => lowerQ.includes(k))) {
         // Add minimal randomization for "chatbot" feel
@@ -280,17 +321,16 @@ async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
       }
     }
 
-    // 2. Exact/Strong Role-Based Context
+    // 3. Exact/Strong Role-Based Context
     if (ROLE_KB[currentRole]) {
       for (const entry of ROLE_KB[currentRole]) {
-        // Improved matching: requires correlation of at least one keyword if query is short, or more if long
         if (entry.keywords.some(k => lowerQ.includes(k))) {
           return `🤖 **Advisor (${currentRole.toUpperCase()}):** ${entry.answer}`;
         }
       }
     }
 
-    // 3. Special Modules (Satellite, Weather) - Keep existing logic
+    // 4. Special Modules (Satellite, Weather) - Keep existing logic
     if (lowerQ.includes('satellite') || lowerQ.includes('ndvi') || lowerQ.includes('health')) {
       const satData = getSatelliteAnalysis();
       return `🛰️ **Satellite Insight:**\nVegetation Index (NDVI): ${satData.ndvi} (${satData.healthStatus}).\nMoisture: ${satData.moisture}%.\n${satData.healthStatus === 'Excellent' ? 'Crop is looking great!' : 'Attention required: Potential stress detected.'}`;
@@ -300,15 +340,13 @@ async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
       return alert ? `⚠️ **Weather Alert:** ${alert}` : `✅ No severe weather alerts. Good conditions for field work.`;
     }
 
-    // 4. Detailed Knowledge Base Search (Oilseeds + Expanded Agri)
+    // 5. Detailed Knowledge Base Search (Oilseeds + Expanded Agri)
     let bestEntry = null;
     let maxScore = 0;
 
     const allKnowledge = [...OILSEED_KB, ...AGRI_EXPANSION_KB.map(k => ({ ...k, question: k.keywords.join(' '), tags: k.keywords }))];
 
     allKnowledge.forEach(entry => {
-      // Improved scoring: weighted by token length and exact phrase matching?
-      // Keeping it simple but effective: overlap count
       const score = scoreEntry(qTokens, entry);
       if (score > maxScore) {
         maxScore = score;
@@ -320,7 +358,7 @@ async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
       return bestEntry.answer;
     }
 
-    // 5. "Smart Fallback" (The "Act like any other chatbot" part)
+    // 6. "Smart Fallback" (The "Act like any other chatbot" part)
     // Instead of saying "I don't know", we construct a helpful response based on the topic.
 
     // Attempt to identify the noun/topic

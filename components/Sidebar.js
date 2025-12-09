@@ -18,7 +18,7 @@ function Sidebar({ activePage, setActivePage, user, isOpen }) {
       { id: 'logistics', label: 'Logistics', icon: 'truck', roles: ['admin', 'fpo', 'processor', 'retailer'] },
 
       { id: 'schemes', label: 'Gov Schemes / Agri-Stack', icon: 'landmark', roles: ['admin', 'farmer'] },
-      { id: 'traceability', label: 'Shipment Tracking', icon: 'truck', roles: ['admin', 'farmer', 'retailer', 'government'] },
+      { id: 'traceability', label: 'Shipment Tracking', icon: 'truck', roles: ['admin', 'retailer', 'government'] },
       { id: 'calculator', label: 'Calculator', icon: 'calculator', roles: ['admin', 'farmer'] },
 
       // FPO Specific

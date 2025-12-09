@@ -689,14 +689,56 @@ class MockApiService {
     }
 
     // 15. Live Bids API (Smart Bidding)
+    // 15. Live Bids API (Smart Bidding)
     async getLiveBids() {
-        // Mock Bids: Some good, some bad vs Expected Price
-        const bids = [
-            { id: 101, buyer: "Agro Corp", crop: "Soybean", quantity: "50 Qtls", price: 4500, expected: 4850, time: "2h ago" },
-            { id: 102, buyer: "Fresh Foods Ltd", crop: "Mustard", quantity: "20 Qtls", price: 6150, expected: 6100, time: "30m ago" },
-            { id: 103, buyer: "Local Mandi Agent", crop: "Groundnut", quantity: "15 Qtls", price: 6200, expected: 6500, time: "5m ago" }
-        ];
-        return this._delay(bids);
+        // Initialize if empty (Self-healing)
+        if (!localStorage.getItem('agrisync_live_bids')) {
+            const initialBids = [
+                { id: 101, buyer: "Agro Corp", crop: "Soybean", quantity: "50 Qtls", price: 6100, expected: 4850, msp: 4600, time: "2h ago", status: 'Pending' }, // HIGH BID
+                { id: 102, buyer: "Fresh Foods Ltd", crop: "Mustard", quantity: "20 Qtls", price: 6150, expected: 6100, msp: 5650, time: "30m ago", status: 'Pending' },
+                { id: 103, buyer: "Local Mandi Agent", crop: "Groundnut", quantity: "15 Qtls", price: 6200, expected: 6500, msp: 6377, time: "5m ago", status: 'Pending' }
+            ];
+            localStorage.setItem('agrisync_live_bids', JSON.stringify(initialBids));
+        }
+
+        const bids = JSON.parse(localStorage.getItem('agrisync_live_bids') || '[]');
+        return this._delay(bids.filter(b => b.status === 'Pending')); // Only show pending bids
+    }
+
+    // FPO: Place a new bid
+    async submitLiveBid(bidData) {
+        let bids = JSON.parse(localStorage.getItem('agrisync_live_bids') || '[]');
+        const newBid = {
+            id: Date.now(),
+            buyer: bidData.buyer || "FPO User",
+            crop: bidData.crop,
+            quantity: bidData.quantity,
+            price: parseFloat(bidData.price),
+            expected: parseFloat(bidData.price) * 0.9, // Mock expected logic
+            msp: bidData.msp || 4000,
+            time: "Just now",
+            status: 'Pending'
+        };
+        bids.unshift(newBid); // Add to top
+        localStorage.setItem('agrisync_live_bids', JSON.stringify(bids));
+        return this._delay({ success: true, data: newBid });
+    }
+
+    // Farmer: Accept/Reject Bid
+    async updateBidStatus(id, action) {
+        let bids = JSON.parse(localStorage.getItem('agrisync_live_bids') || '[]');
+        let updatedBid = null;
+
+        bids = bids.map(bid => {
+            if (String(bid.id) === String(id)) { // Loose equality for ID safety
+                updatedBid = { ...bid, status: action === 'accept' ? 'Accepted' : 'Rejected' };
+                return updatedBid;
+            }
+            return bid;
+        });
+
+        localStorage.setItem('agrisync_live_bids', JSON.stringify(bids));
+        return this._delay({ success: true, data: updatedBid });
     }
 
 }

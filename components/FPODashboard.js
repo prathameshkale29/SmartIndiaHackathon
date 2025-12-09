@@ -13,6 +13,25 @@ function FPODashboard({ setActivePage, user }) {
         { title: 'Logistics Active', value: '8 Trucks', change: 0, icon: 'truck', color: 'from-purple-500 to-pink-500' }
     ];
 
+    const handlePlaceBid = async (auction) => {
+        const price = prompt(`Enter bid amount for ${auction.crop} (Base: ₹${auction.base}):`);
+        if (!price) return;
+
+        try {
+            await window.MockApiService.submitLiveBid({
+                crop: auction.crop,
+                quantity: auction.qty,
+                price: price,
+                buyer: 'FPO User',
+                msp: auction.base
+            });
+            alert(`Bid of ₹${price} placed successfully!`);
+        } catch (e) {
+            console.error(e);
+            alert("Failed to place bid");
+        }
+    };
+
     return (
         <div className="animate-circular-reveal">
             {/* FPO Hero Section */}
@@ -28,7 +47,7 @@ function FPODashboard({ setActivePage, user }) {
                             <p className="text-blue-200 max-w-xl">Manage farmer collections, quality checks, and logistics efficiency from a single command center.</p>
                         </div>
                         <div className="flex flex-wrap gap-2 md:gap-3">
-                            <button onClick={() => setActivePage('procurement-mgmt')} className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center gap-2">
+                            <button onClick={() => setActivePage('procurement_orders')} className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center gap-2">
                                 <div className="icon-clipboard-list"></div> Procurement
                             </button>
                             <button onClick={() => setActivePage('logistics')} className="bg-blue-800 text-white border border-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
@@ -64,7 +83,7 @@ function FPODashboard({ setActivePage, user }) {
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 h-full">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-lg font-bold">Recent Inflows</h3>
-                            <button onClick={() => setActivePage('procurement-mgmt')} className="text-sm text-blue-600 hover:underline">View All</button>
+                            <button onClick={() => setActivePage('procurement_orders')} className="text-sm text-blue-600 hover:underline">View All</button>
                         </div>
                         {/* Reuse snippets from ProcurementManagementPage table concept */}
                         <div className="overflow-x-auto">
@@ -129,7 +148,7 @@ function FPODashboard({ setActivePage, user }) {
                                     <span className="font-bold">₹{auction.base}</span>
                                 </div>
                                 <button
-                                    onClick={() => window.toast && window.toast.success(`Bid sent to ${auction.name}!`)}
+                                    onClick={() => handlePlaceBid(auction)}
                                     className="bg-black hover:bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg transition-colors shadow-sm"
                                 >
                                     Place Bid

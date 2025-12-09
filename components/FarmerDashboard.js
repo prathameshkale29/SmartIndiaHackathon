@@ -23,9 +23,36 @@ function FarmerDashboard({ setActivePage, user }) {
     const [liveBids, setLiveBids] = React.useState([]); // Smart Bidding State
 
     // Fetch Live Bids
+    // Fetch Live Bids (Polling for Real-time feel)
     React.useEffect(() => {
-        window.MockApiService.getLiveBids().then(data => setLiveBids(data));
+        const fetchBids = async () => {
+            const data = await window.MockApiService.getLiveBids();
+            setLiveBids(data);
+        };
+        fetchBids();
+        const interval = setInterval(fetchBids, 3000); // Poll every 3s
+        return () => clearInterval(interval);
     }, []);
+
+    const handleBidAction = async (id, action) => {
+        if (!window.MockApiService) return;
+
+        // Optimistic update
+        setLiveBids(prev => prev.filter(b => b.id !== id));
+
+        try {
+            await window.MockApiService.updateBidStatus(id, action);
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 ${action === 'accept' ? 'bg-green-600' : 'bg-red-600'} text-white px-6 py-3 rounded-lg shadow-xl animate-fade-in z-50 font-bold flex items-center gap-2`;
+            toast.innerHTML = action === 'accept'
+                ? '<div class="icon-check-circle"></div> Bid Accepted! Buyer notified.'
+                : '<div class="icon-x-circle"></div> Bid Rejected.';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        } catch (e) {
+            console.error("Bid action failed", e);
+        }
+    };
 
     // Fetch Comparison Data
     React.useEffect(() => {
@@ -838,8 +865,8 @@ function FarmerDashboard({ setActivePage, user }) {
                                         </div>
 
                                         <div className="flex gap-2">
-                                            <button className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1.5 rounded-lg text-sm font-medium transition-colors">Reject</button>
-                                            <button className="flex-1 bg-black hover:bg-gray-800 text-white py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">Accept Bid</button>
+                                            <button onClick={() => handleBidAction(bid.id, 'reject')} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1.5 rounded-lg text-sm font-medium transition-colors">Reject</button>
+                                            <button onClick={() => handleBidAction(bid.id, 'accept')} className={`flex-1 ${isGood ? 'bg-black hover:bg-gray-800' : 'bg-black hover:bg-gray-800'} text-white py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm`}>Accept Bid</button>
                                         </div>
                                     </div>
                                 );

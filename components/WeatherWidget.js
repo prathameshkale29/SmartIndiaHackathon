@@ -38,20 +38,33 @@ function WeatherWidget({ location }) {
         console.warn('Weather API unavailable, using demo data');
 
         // Fallback mock data - silently switch to demo mode
+        // Fallback mock data - Dynamic based on location
+        // Generate pseudo-random values based on location string hash to be consistent
+        const seed = activeLocation.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const pseudoRandom = (offset) => {
+          const x = Math.sin(seed + offset) * 10000;
+          return x - Math.floor(x);
+        };
+
+        const baseTemp = 25 + (pseudoRandom(1) * 15); // 25 to 40 degree range
+        const conditionIndex = Math.floor(pseudoRandom(2) * 5);
+        const conditions = ['Clear', 'Clouds', 'Rain', 'Drizzle', 'Thunderstorm'];
+        const descriptions = ['Sunny', 'Partly Cloudy', 'Light Rain', 'Drizzle', 'Thunderstorm'];
+
         setWeatherData({
           current: {
-            temp: 28,
-            humidity: 65,
-            wind_speed: 12,
-            weather: [{ main: 'Clouds', description: 'Partly Cloudy' }]
+            temp: baseTemp,
+            humidity: 40 + (pseudoRandom(3) * 50),
+            wind_speed: 5 + (pseudoRandom(4) * 20),
+            weather: [{ main: conditions[conditionIndex], description: descriptions[conditionIndex] }]
           },
           alerts: [
             { severity: 'low', type: 'normal', message: 'Normal field operations can continue', icon: '✅' }
           ],
           forecast: [
-            { date: 'Tomorrow', temp_max: 32, temp_min: 24, rain_probability: 20, condition: 'Clouds' },
-            { date: 'Day 3', temp_max: 31, temp_min: 23, rain_probability: 10, condition: 'Clear' },
-            { date: 'Day 4', temp_max: 33, temp_min: 25, rain_probability: 0, condition: 'Clear' }
+            { date: 'Tomorrow', temp_max: baseTemp + 2, temp_min: baseTemp - 5, rain_probability: Math.floor(pseudoRandom(5) * 100), condition: conditions[Math.floor(pseudoRandom(6) * 5)] },
+            { date: 'Day 3', temp_max: baseTemp + 1, temp_min: baseTemp - 6, rain_probability: Math.floor(pseudoRandom(7) * 50), condition: 'Clear' },
+            { date: 'Day 4', temp_max: baseTemp + 3, temp_min: baseTemp - 4, rain_probability: 0, condition: 'Clear' }
           ]
         });
       } finally {

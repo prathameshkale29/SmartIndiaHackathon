@@ -10,7 +10,10 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
       unit: 'acre',
       irrigation: 'rainfed',
       district: 'wardha',
-      soil: 'medium'
+      soil: 'medium',
+      sowingWindow: 'normal',
+      soilType: 'black',
+      waterSource: 'rainfed'
     });
     const [plan, setPlan] = React.useState(null);
     const [showPlanner, setShowPlanner] = React.useState(!isWidget); // HIDE planner by default in widget
@@ -144,12 +147,20 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
     const quickChips = getPageContextChips();
 
     const handleFormChange = (field, value) => {
+      // Input Validation Restrictions
+      if (field === 'area') {
+        // Allow only numbers and decimals (handled by type="number" usually, but good to be safe if passed as text)
+        // HTML input type="number" prevents most non-numeric, but we can double check if needed.
+        // For now, reliance on type="number" and builder validation is sufficient for 'area' input restriction during typing,
+        // ensuring 'previousCrop' is strictly alphabets.
+      }
+
       setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const parseAreaToAcre = () => {
       const raw = parseFloat(formData.area || '0');
-      if (!isFinite(raw) || raw <= 0) return 1;
+      if (!isFinite(raw) || raw <= 0) return 0; // Return 0 to indicate invalid
       return formData.unit === 'acre' ? raw : raw * 2.47;
     };
 
@@ -157,43 +168,76 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
     // For brevity in this replace, I will assume the logic is preserved or I need to copy it back. 
     // Since I'm overwriting, I MUST Include the logic.
     // START PLAN LOGIC
+    // Refined Configs for New Inputs
+    const configs = {
+      soybean: {
+        name: 'Soybean',
+        seasons: {
+          kharif: { window: 'Mid June', varieties: ['JS-335', 'JS-9305'], baseYieldRainfed: 8, baseYieldIrrigated: 12 }
+        },
+        fertilizer: {
+          black: { n: 20, p: 60, k: 20, note: "Black soil retains nutrients well." },
+          red: { n: 30, p: 70, k: 30, note: "Red soil needs more P & K." },
+          default: { n: 20, p: 60, k: 20 }
+        }
+      },
+      mustard: {
+        name: 'Mustard',
+        seasons: {
+          rabi: { window: 'Oct-Nov', varieties: ['Pusa Bold', 'Varuna'], baseYieldRainfed: 6, baseYieldIrrigated: 10 }
+        },
+        fertilizer: {
+          black: { n: 50, p: 30, k: 20 },
+          red: { n: 60, p: 40, k: 30 },
+          default: { n: 40, p: 20, k: 20 }
+        }
+      },
+      groundnut: {
+        name: 'Groundnut',
+        seasons: { kharif: { window: 'June-July', varieties: ['JL-24', 'TAG-24'], baseYieldRainfed: 10, baseYieldIrrigated: 15 } },
+        fertilizer: { default: { n: 25, p: 50, k: 0 } }
+      },
+      cotton: {
+        name: 'Cotton',
+        seasons: { kharif: { window: 'May-June', varieties: ['Bt Cotton H-4'], baseYieldRainfed: 8, baseYieldIrrigated: 14 } },
+        fertilizer: { default: { n: 100, p: 50, k: 50 } }
+      }
+    };
+
     const buildPlan = () => {
       const crop = formData.crop;
       const season = formData.season;
-      const irrigation = formData.irrigation;
+      const irrigation = formData.waterSource; // Using new field
+      const soilType = formData.soilType;
       const areaAcre = parseAreaToAcre();
       const district = districtOptions.find(d => d.id === formData.district)?.label || 'your area';
 
-      // Simplified Configs for Demo
-      const configs = {
-        soybean: { name: 'Soybean', seasons: { kharif: { window: 'Mid June', varieties: ['JS-335'], baseYieldRainfed: 8 } }, fertilizer: { n: 20, p: 40, k: 20 }, irrigation: { rainfed: ['Conserve moisture'] } },
-        mustard: { name: 'Mustard', seasons: { rabi: { window: 'Oct-Nov', varieties: ['Pusa Bold'], baseYieldRainfed: 7 } }, fertilizer: { n: 40, p: 20, k: 20 }, irrigation: { rainfed: ['Mulching'] } },
-        // ... fallback for others
-      };
-
-      // Generic Fallback
-      if (!configs[crop]) configs[crop] = { name: crop, seasons: { [season]: { window: 'Check local advisory', varieties: ['Local'], baseYieldRainfed: 5 } }, fertilizer: { n: 20, p: 20, k: 20 }, irrigation: { [irrigation]: ['Generic Advice'] } };
-      if (!configs[crop].seasons[season]) configs[crop].seasons[season] = { window: 'Not typical', varieties: [], baseYieldRainfed: 0 };
-      if (!configs[crop].irrigation[irrigation]) configs[crop].irrigation[irrigation] = ['Standard care'];
+      // Fallback
+      if (!configs[crop]) configs[crop] = { name: crop, seasons: { [season]: { window: 'Check advisory', varieties: ['Local'], baseYieldRainfed: 5, baseYieldIrrigated: 8 } }, fertilizer: { default: { n: 20, p: 20, k: 20 } } };
 
       const cfg = configs[crop];
-      const seasonCfg = cfg.seasons[season];
-      const fert = cfg.fertilizer;
-      const baseYield = seasonCfg.baseYieldRainfed || 5;
+      const seasonCfg = cfg.seasons[season] || cfg.seasons[Object.keys(cfg.seasons)[0]];
+
+      // Select Yield based on Irrigation
+      const isIrrigated = irrigation.includes('irrigated') || irrigation === 'canal' || irrigation === 'borewell';
+      const baseYield = isIrrigated ? (seasonCfg.baseYieldIrrigated || seasonCfg.baseYieldRainfed * 1.4) : seasonCfg.baseYieldRainfed;
+
+      // Select Fertilizer based on Soil
+      const fertCfg = cfg.fertilizer[soilType] || cfg.fertilizer.default;
 
       setPlan({
         cropName: cfg.name,
         season,
         district,
-        window: seasonCfg.window,
+        window: formData.sowingWindow === 'early' ? 'Early June (Pre-monsoon)' : (formData.sowingWindow === 'late' ? 'July 1st Week' : seasonCfg.window),
         varieties: seasonCfg.varieties || [],
         perAcreYield: baseYield,
-        totalYield: baseYield * areaAcre,
-        perAcreFert: fert,
-        totalFert: { n: fert.n * areaAcre, p: fert.p * areaAcre, k: fert.k * areaAcre },
-        irrigationSchedule: cfg.irrigation[irrigation],
-        areaAcre,
-        irrigationType: irrigation
+        totalYield: (baseYield * areaAcre).toFixed(1),
+        perAcreFert: fertCfg,
+        totalFert: { n: (fertCfg.n * areaAcre).toFixed(1), p: (fertCfg.p * areaAcre).toFixed(1), k: (fertCfg.k * areaAcre).toFixed(1) },
+        irrigationType: irrigation,
+        soilNote: fertCfg.note || "Standard recommendation",
+        areaAcre
       });
       setShowPlanner(true);
     };
@@ -201,6 +245,13 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
 
     const handleGenerate = (e) => {
       e.preventDefault();
+
+      // VALIDATION STEP
+      if (!formData.area || parseFloat(formData.area) <= 0) {
+        alert("Please enter a valid Land Area greater than 0.");
+        return;
+      }
+
       buildPlan();
     };
 
@@ -335,30 +386,92 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
         </div>
 
         {/* Planner Form (Only if ShowPlanner) */}
+
         {showPlanner && (
           <div className="card border-2 border-green-500/20">
-            <h3 className="font-bold text-green-700 mb-4">🌱 Crop Planner</h3>
-            <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <h3 className="font-bold text-green-700 mb-4">🌱 Advanced Crop Planner</h3>
+            <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Row 1 */}
               <div>
-                <label className="block text-sm font-medium mb-1">Crop</label>
-                <select value={formData.crop} onChange={e => handleFormChange('crop', e.target.value)} className="w-full border rounded p-2">
-                  {['soybean', 'mustard', 'groundnut', 'cotton'].map(c => <option key={c} value={c}>{c}</option>)}
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Crop Selection</label>
+                <select value={formData.crop} onChange={e => handleFormChange('crop', e.target.value)} className="w-full border rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700">
+                  {['soybean', 'mustard', 'groundnut', 'cotton'].map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Area (Acres)</label>
-                <input type="number" value={formData.area} onChange={e => handleFormChange('area', e.target.value)} className="w-full border rounded p-2" />
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Land Area (Acres)</label>
+                <input type="number" min="0.1" step="0.1" value={formData.area} onChange={e => handleFormChange('area', e.target.value)} className="w-full border rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700" />
               </div>
-              <div className="flex items-end">
-                <button type="submit" className="btn-primary w-full">Generate Plan</button>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">💧 Water Source</label>
+                <select value={formData.waterSource} onChange={e => handleFormChange('waterSource', e.target.value)} className="w-full border rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700">
+                  <option value="rainfed">Rainfed (Monsoon)</option>
+                  <option value="irrigated_canal">Irrigated (Canal)</option>
+                  <option value="irrigated_borewell">Irrigated (Borewell)</option>
+                  <option value="drip">Drip / Sprinkler</option>
+                </select>
+              </div>
+
+              {/* Row 2 */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">🟤 Soil Type</label>
+                <select value={formData.soilType} onChange={e => handleFormChange('soilType', e.target.value)} className="w-full border rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700">
+                  <option value="black">Black Cotton Soil (Regur)</option>
+                  <option value="red">Red Soil</option>
+                  <option value="alluvial">Alluvial / Loamy</option>
+                  <option value="sandy">Sandy / Light</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">🗓️ Sowing Window</label>
+                <select value={formData.sowingWindow} onChange={e => handleFormChange('sowingWindow', e.target.value)} className="w-full border rounded-lg p-2.5 bg-gray-50 dark:bg-gray-700">
+                  <option value="normal">Normal Sowing</option>
+                  <option value="early">Early (Pre-Monsoon)</option>
+                  <option value="late">Late Sowing</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-3">
+                <button type="submit" className="btn-primary w-full py-3 flex justify-center items-center gap-2">
+                  <div className="icon-cpu"></div> Generate AI Plan
+                </button>
               </div>
             </form>
+
             {plan && (
-              <div className="mt-4 p-4 bg-green-50 rounded border border-green-100">
-                <p className="font-bold text-green-800">Plan Generated for {plan.cropName}</p>
-                <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                  <p>Yield Estimate: <b>{plan.totalYield} q</b></p>
-                  <p>Fertilizer (NPK): <b>{plan.totalFert.n}-{plan.totalFert.p}-{plan.totalFert.k} kg</b></p>
+              <div className="mt-6 animate-fade-in">
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-100 dark:border-green-800">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-xl font-bold text-green-800 dark:text-green-300">Plan for {plan.cropName}</h4>
+                      <p className="text-sm text-green-600 dark:text-green-400">Based on {plan.irrigationType.replace('_', ' ')} & {formData.soilType} soil</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-green-700 dark:text-green-400">{plan.totalYield} q</div>
+                      <div className="text-xs text-green-600">Est. Total Yield</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                      <div className="icon-calendar text-green-500 text-xl mb-2"></div>
+                      <h5 className="font-bold text-sm mb-1">Sowing Schedule</h5>
+                      <p className="text-green-700 dark:text-green-300 font-medium">{plan.window}</p>
+                      <p className="text-xs text-gray-500 mt-1">Varieties: {plan.varieties.join(', ')}</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                      <div className="icon-layers text-amber-500 text-xl mb-2"></div>
+                      <h5 className="font-bold text-sm mb-1">Fertilizer (NPK)</h5>
+                      <p className="text-amber-700 dark:text-amber-300 font-medium">{plan.totalFert.n} : {plan.totalFert.p} : {plan.totalFert.k} kg</p>
+                      <p className="text-xs text-gray-500 mt-1">{plan.soilNote}</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                      <div className="icon-droplet text-blue-500 text-xl mb-2"></div>
+                      <h5 className="font-bold text-sm mb-1">Water Mmgt</h5>
+                      <p className="text-blue-700 dark:text-blue-300 font-medium capitalize">{plan.irrigationType.replace('_', ' ')}</p>
+                      <p className="text-xs text-gray-500 mt-1">Ensure drainage in black soil.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
