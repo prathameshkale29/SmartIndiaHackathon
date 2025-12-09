@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 function DemandSupplyChart() {
   const chartRef = React.useRef(null);
   const chartInstance = React.useRef(null);

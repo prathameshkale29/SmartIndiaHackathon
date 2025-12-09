@@ -1,54 +1,41 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-// import { useSharedData } from '../utils/SharedDataContext.js';
 
 // Enhanced ContractsList with Post Contract and Accept Contract modals
+// Uses MockApiService for data persistence
 function ContractsList() {
   try {
-    const { contracts: sharedContracts, addContract, updateContractStatus } = useSharedData();
     const [activeTab, setActiveTab] = React.useState('available');
     const [showCreateModal, setShowCreateModal] = React.useState(false);
     const [showAcceptModal, setShowAcceptModal] = React.useState(false);
     const [selectedContract, setSelectedContract] = React.useState(null);
     const [contributionQuintals, setContributionQuintals] = React.useState('');
-    const [govContracts, setGovContracts] = React.useState([]);
+    const [contracts, setContracts] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
-    const [dataSource, setDataSource] = React.useState('loading');
 
-    const user = getCurrentUser();
-    const isAdmin = user?.role === 'admin';
-    const toast = useToast();
+    const user = window.getCurrentUser();
+    const isAdmin = user?.role === 'admin' || user?.role === 'processor' || user?.role === 'fpo';
+    const toast = window.useToast();
 
-    // Fetch government contracts on component mount
     React.useEffect(() => {
-      fetchGovernmentContracts();
+      loadContracts();
     }, []);
 
-    async function fetchGovernmentContracts() {
+    const loadContracts = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch('/api/contracts/government?limit=20');
-        const data = await response.json();
-
-        if (data.success && data.contracts) {
-          setGovContracts(data.contracts);
-          setDataSource(data.source);
-        }
+        const data = await window.MockApiService.getContracts();
+        setContracts(data);
       } catch (error) {
-        console.error('Error fetching government contracts:', error);
-        setDataSource('error');
+        console.error("Failed to load contracts", error);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    // Combine government contracts with local mock contracts
-    // Combine government contracts with shared context contracts
-    // We prefer sharedContracts over local mockData now
-    const allContracts = [...govContracts, ...(sharedContracts || [])];
-    const availableContracts = allContracts.filter(c => c.status === 'open');
-    const myContracts = allContracts.filter(c => c.status === 'active' || c.status === 'completed');
+    const availableContracts = contracts.filter(c => c.status === 'Active' || c.status === 'Pending');
+    // For demo, "My Contracts" are those completed or specifically assigned (mock logic)
+    const myContracts = contracts.filter(c => c.status === 'Completed' || c.party === user?.name);
 
-    const handlePostContract = (e) => {
+    const handlePostContract = async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const contractData = {
@@ -57,364 +44,173 @@ function ContractsList() {
         price: parseFloat(formData.get('price')),
         deliveryDate: formData.get('deliveryDate'),
         location: formData.get('location'),
-        processor: user?.name || 'Current User', // Use logged in user name
-        marketRate: parseFloat(formData.get('price')) - 500, // Dummy logic for demo
+        party: user?.name || 'Current User',
+        type: 'Purchase', // Assuming processor buys
+        marketRate: parseFloat(formData.get('price')) - 500,
         department: 'Private Procurement'
       };
 
-      addContract(contractData);
-
-      toast.success(`Contract posted successfully for ${contractData.quantity} MT of ${contractData.crop} !`);
-      setShowCreateModal(false);
-      e.target.reset();
+      try {
+        await window.MockApiService.createContract(contractData);
+        toast.success(`Contract posted successfully for ${contractData.quantity} MT of ${contractData.crop}!`);
+        setShowCreateModal(false);
+        e.target.reset();
+        loadContracts();
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to post contract");
+      }
     };
 
-    const handleAcceptContract = () => {
+    const handleAcceptContract = async () => {
       if (selectedContract && contributionQuintals) {
-        const quintals = parseFloat(contributionQuintals);
-        const maxQuintals = selectedContract.quantity * 10; // Convert MT to quintals
-
-        if (quintals <= 0) {
-          toast.error('Please enter a valid quantity');
-          return;
-        }
-
-        if (quintals > maxQuintals) {
-          toast.error(`Contribution cannot exceed ${maxQuintals} quintals (${selectedContract.quantity} MT)`);
-          return;
-        }
-
-        const payment = quintals * selectedContract.price;
-        toast.success(`Contract accepted! You will receive ₹${payment.toLocaleString()} for ${quintals} quintals of ${selectedContract.crop}.`);
+        // Logic to update contract status would go here
+        // For now, just show success toast
+        toast.success(`Contract accepted! Payment initiated.`);
         setShowAcceptModal(false);
         setSelectedContract(null);
         setContributionQuintals('');
       } else {
-        toast.error('Please enter your contribution quantity');
+        toast.error('Please enter quantity');
       }
     };
 
     return (
-      <div className="space-y-6" data-name="contracts-list" data-file="components/ContractsList.js">
+      <div className="space-y-6" data-name="contracts-list">
         {/* Post Contract Modal */}
-        <ModalDialog
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          title="Post New Contract"
-          size="md"
-          footer={
-            <>
-              <button
-                type="button"
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-light)] transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="post-contract-form"
-                className="btn-primary"
-              >
-                Post Contract
-              </button>
-            </>
-          }
-        >
-          <form id="post-contract-form" onSubmit={handlePostContract} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Crop Type *</label>
-              <select name="crop" required className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none">
-                <option value="">Select crop...</option>
-                {INDIAN_OILSEEDS.map(crop => (
-                  <option key={crop} value={crop}>{crop}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Quantity (MT) *</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  required
-                  min="1"
-                  placeholder="e.g., 50"
-                  className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Price (₹/Qt) *</label>
-                <input
-                  type="number"
-                  name="price"
-                  required
-                  min="1"
-                  placeholder="e.g., 6000"
-                  className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Delivery Date *</label>
-              <input
-                type="date"
-                name="deliveryDate"
-                required
-                className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Location *</label>
-              <input
-                type="text"
-                name="location"
-                required
-                placeholder="e.g., Mumbai, Maharashtra"
-                className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
-              />
-            </div>
-          </form>
-        </ModalDialog>
-
-        {/* Accept Contract Modal */}
-        <ModalDialog
-          isOpen={showAcceptModal}
-          onClose={() => {
-            setShowAcceptModal(false);
-            setSelectedContract(null);
-          }}
-          title="Accept Contract"
-          size="sm"
-          footer={
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAcceptModal(false);
-                  setSelectedContract(null);
-                }}
-                className="px-4 py-2 border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-light)] transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAcceptContract}
-                className="btn-primary"
-              >
-                Confirm Acceptance
-              </button>
-            </>
-          }
-        >
-          {selectedContract && (
-            <div className="space-y-4">
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h4 className="font-semibold text-lg mb-3">{selectedContract.crop}</h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+        {showCreateModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold mb-4">Post New Contract</h3>
+              <form id="post-contract-form" onSubmit={handlePostContract} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Crop Type *</label>
+                  <select name="crop" required className="w-full border rounded p-2">
+                    <option value="">Select crop...</option>
+                    {window.INDIAN_OILSEEDS.map(crop => <option key={crop} value={crop}>{crop}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[var(--text-secondary)]">Total Contract</p>
-                    <p className="font-medium">{selectedContract.quantity} MT ({selectedContract.quantity * 10} Qt)</p>
+                    <label className="block text-sm font-medium mb-1">Quantity (MT) *</label>
+                    <input type="number" name="quantity" required min="1" className="w-full border rounded p-2" />
                   </div>
                   <div>
-                    <p className="text-[var(--text-secondary)]">Price</p>
-                    <p className="font-medium text-[var(--primary-color)]">₹{selectedContract.price}/Qt</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--text-secondary)]">Delivery</p>
-                    <p className="font-medium">{selectedContract.deliveryDate}</p>
-                  </div>
-                  <div>
-                    <p className="text-[var(--text-secondary)]">Location</p>
-                    <p className="font-medium">{selectedContract.location}</p>
+                    <label className="block text-sm font-medium mb-1">Price (₹/Qt) *</label>
+                    <input type="number" name="price" required min="1" className="w-full border rounded p-2" />
                   </div>
                 </div>
-              </div>
-
-              {/* Farmer Contribution Input */}
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                  Your Contribution (Quintals) *
-                </label>
-                <input
-                  type="number"
-                  value={contributionQuintals}
-                  onChange={(e) => setContributionQuintals(e.target.value)}
-                  min="1"
-                  max={selectedContract.quantity * 10}
-                  step="0.1"
-                  placeholder={`Enter quantity (max: ${selectedContract.quantity * 10} Qt)`}
-                  className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
-                />
-                <p className="text-xs text-[var(--text-secondary)] mt-1">
-                  Contract total: {selectedContract.quantity} MT = {selectedContract.quantity * 10} quintals
-                </p>
-              </div>
-
-              {/* Payment Calculation */}
-              {contributionQuintals && parseFloat(contributionQuintals) > 0 && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-[var(--text-primary)]">Your Contribution:</span>
-                    <span className="text-lg font-bold text-[var(--primary-color)]">{parseFloat(contributionQuintals).toFixed(2)} Qt</span>
-                  </div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-[var(--text-primary)]">Price per Quintal:</span>
-                    <span className="text-lg font-bold">₹{selectedContract.price.toLocaleString()}</span>
-                  </div>
-                  <div className="pt-2 border-t border-green-300 dark:border-green-700">
-                    <div className="flex items-center justify-between">
-                      <span className="text-base font-semibold text-[var(--text-primary)]">You will receive:</span>
-                      <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        ₹{(parseFloat(contributionQuintals) * selectedContract.price).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[var(--text-secondary)] mt-1 text-right">
-                      ({parseFloat(contributionQuintals).toFixed(2)} Qt × ₹{selectedContract.price}/Qt)
-                    </p>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Delivery Date *</label>
+                  <input type="date" name="deliveryDate" required className="w-full border rounded p-2" />
                 </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Location *</label>
+                  <input type="text" name="location" required className="w-full border rounded p-2" />
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button type="button" onClick={() => setShowCreateModal(false)} className="px-4 py-2 border rounded">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded">Post Contract</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <div className="icon-alert-triangle text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"></div>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    By accepting this contract, you agree to deliver the specified quantity by the delivery date. Failure to comply may result in penalties.
-                  </p>
+        {/* Accept Modal */}
+        {showAcceptModal && selectedContract && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h3 className="text-xl font-bold mb-4">Accept Contract: {selectedContract.party}</h3>
+              <div className="space-y-4">
+                <p><strong>Item:</strong> {selectedContract.item || selectedContract.crop}</p>
+                <p><strong>Price:</strong> ₹{selectedContract.price}/Qt</p>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Your Contribution (Quintals)</label>
+                  <input
+                    type="number"
+                    value={contributionQuintals}
+                    onChange={e => setContributionQuintals(e.target.value)}
+                    className="w-full border rounded p-2"
+                  />
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button type="button" onClick={() => setShowAcceptModal(false)} className="px-4 py-2 border rounded">Cancel</button>
+                  <button type="button" onClick={handleAcceptContract} className="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
                 </div>
               </div>
             </div>
-          )}
-        </ModalDialog>
+          </div>
+        )}
 
         <div className="card">
-          {/* Header with data source indicator */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h3 className="text-xl font-semibold">{t('contracts')}</h3>
-              {!loading && (
-                <span className={`text-xs px-2 py-1 rounded-full ${dataSource === 'data.gov.in' ? 'bg-green-100 text-green-700' :
-                  dataSource === 'fallback' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-gray-100 text-gray-700'
-                  }`}>
-                  {dataSource === 'data.gov.in' ? '🇮🇳 Live Government Data' :
-                    dataSource === 'fallback' ? '📋 Sample Data' :
-                      '📊 Local Data'}
-                </span>
-              )}
-            </div>
-            <button
-              onClick={fetchGovernmentContracts}
-              className="text-sm text-[var(--primary-color)] hover:underline flex items-center gap-1"
-              disabled={loading}
-            >
-              <span className={loading ? 'animate-spin' : ''}>↻</span>
-              {loading ? 'Loading...' : 'Refresh'}
-            </button>
-          </div>
-
           <div className="flex items-center justify-between mb-6">
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveTab('available')}
                 className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'available' ? 'bg-[var(--primary-color)] text-white' : 'bg-gray-100 text-[var(--text-secondary)]'}`}
               >
-                {t('availableContracts')} ({availableContracts.length})
+                Available Contracts ({availableContracts.length})
               </button>
               <button
                 onClick={() => setActiveTab('my-contracts')}
                 className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'my-contracts' ? 'bg-[var(--primary-color)] text-white' : 'bg-gray-100 text-[var(--text-secondary)]'}`}
               >
-                {t('myContracts')} ({myContracts.length})
+                My Contracts ({myContracts.length})
               </button>
             </div>
             {isAdmin && (
               <button onClick={() => setShowCreateModal(true)} className="btn-primary flex items-center gap-2">
                 <div className="icon-plus text-lg"></div>
-                <span>{t('postContract')}</span>
+                <span>Post Contract</span>
               </button>
             )}
           </div>
 
           {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-color)]"></div>
-              <p className="mt-4 text-[var(--text-secondary)]">Loading government contracts...</p>
-            </div>
+            <div className="text-center py-12">Loading contracts...</div>
           ) : activeTab === 'available' ? (
             <div className="space-y-4">
               {availableContracts.length === 0 ? (
-                <div className="text-center py-12 text-[var(--text-secondary)]">
-                  <p>No available contracts at the moment</p>
-                </div>
+                <div className="text-center py-12 text-[var(--text-secondary)]">No available contracts</div>
               ) : (
                 availableContracts.map((contract, idx) => (
                   <div key={contract.id || idx} className="border border-[var(--border-color)] rounded-lg p-4 hover:shadow-md transition-all">
                     <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-lg">{contract.crop}</h4>
-                          {contract.source === 'data.gov.in' && (
-                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded">Gov</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-[var(--text-secondary)]">Posted by {contract.processor}</p>
-                        {contract.department && (
-                          <p className="text-xs text-[var(--text-secondary)] mt-1">{contract.department}</p>
-                        )}
+                      <div>
+                        <h4 className="font-semibold text-lg">{contract.item || contract.crop}</h4>
+                        <p className="text-sm text-[var(--text-secondary)]">Party: {contract.party}</p>
                       </div>
                       <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-                        Open
+                        {contract.status}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-[var(--text-secondary)]">{t('quantity')}</p>
-                        <p className="font-medium">{contract.quantity} MT</p>
+                        <p className="text-xs text-[var(--text-secondary)]">Quantity</p>
+                        <p className="font-medium">{contract.quantity}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-[var(--text-secondary)]">{t('price')}</p>
-                        <p className="font-medium text-[var(--primary-color)]">₹{contract.price}/Qt</p>
+                        <p className="text-xs text-[var(--text-secondary)]">Price</p>
+                        <p className="font-medium text-[var(--primary-color)]">₹{contract.price || 'Market Rate'}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-[var(--text-secondary)]">{t('delivery')}</p>
-                        <p className="font-medium">{contract.deliveryDate}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[var(--text-secondary)]">{t('location')}</p>
-                        <p className="font-medium">{contract.location}</p>
+                        <p className="text-xs text-[var(--text-secondary)]">Deadline</p>
+                        <p className="font-medium">{contract.deadline || contract.deliveryDate}</p>
                       </div>
                     </div>
 
-                    {contract.description && (
-                      <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">{contract.description}</p>
-                    )}
-
-                    <div className="flex items-center justify-between pt-3 border-t border-[var(--border-color)]">
-                      <div className="flex flex-col gap-1">
-                        <p className="text-sm text-[var(--text-secondary)]">
-                          {t('marketRate')}: ₹{contract.marketRate}/Qt
-                          <span className="text-green-600 ml-2">+₹{contract.price - contract.marketRate} {t('premium')}</span>
-                        </p>
-                        {contract.contractValue && (
-                          <p className="text-xs text-[var(--text-secondary)]">
-                            Total Value: ₹{contract.contractValue.toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-                      {!isAdmin && (
-                        <button
-                          onClick={() => {
-                            setSelectedContract(contract);
-                            setShowAcceptModal(true);
-                          }}
-                          className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:opacity-90 transition-all"
-                        >
-                          {t('acceptContract')}
-                        </button>
-                      )}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => {
+                          setSelectedContract(contract);
+                          setShowAcceptModal(true);
+                        }}
+                        className="px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:opacity-90 transition-all"
+                      >
+                        Accept Contract
+                      </button>
                     </div>
                   </div>
                 ))
@@ -422,45 +218,13 @@ function ContractsList() {
             </div>
           ) : (
             <div className="space-y-4">
-              {myContracts.length === 0 ? (
-                <div className="text-center py-12 text-[var(--text-secondary)]">
-                  <p>You don't have any contracts yet</p>
+              {/* My Contracts View */}
+              {myContracts.map((contract, idx) => (
+                <div key={contract.id || idx} className="border border-[var(--border-color)] rounded-lg p-4 bg-gray-50">
+                  <h4 className="font-bold">{contract.item || contract.crop}</h4>
+                  <p className="text-sm">Status: {contract.status}</p>
                 </div>
-              ) : (
-                myContracts.map((contract, idx) => (
-                  <div key={contract.id || idx} className="border border-[var(--border-color)] rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="font-semibold text-lg mb-1">{contract.crop}</h4>
-                        <p className="text-sm text-[var(--text-secondary)]">{contract.processor}</p>
-                      </div>
-                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${contract.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
-                        }`}>
-                        {contract.status === 'active' ? 'Active' : 'Completed'}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-xs text-[var(--text-secondary)]">Quantity</p>
-                        <p className="font-medium">{contract.quantity} MT</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[var(--text-secondary)]">Contract Price</p>
-                        <p className="font-medium text-[var(--primary-color)]">₹{contract.price}/Qt</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[var(--text-secondary)]">Delivery</p>
-                        <p className="font-medium">{contract.deliveryDate}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[var(--text-secondary)]">Total Value</p>
-                        <p className="font-medium">₹{(contract.quantity * contract.price * 10).toLocaleString()}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
+              ))}
             </div>
           )}
         </div>

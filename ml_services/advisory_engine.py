@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import joblib
 import os
+import random
 
 MODEL_PATH = "models/pest_risk_model.pkl"
 
@@ -132,3 +133,155 @@ def pest_risk(crop, crop_stage, humidity, temp, rain_7d, ndvi_anomaly, pest_hist
         recommendations.append("Stay prepared with recommended control measures and consult local extension workers.")
 
     return level, reasons, recommendations
+
+# ---------------------------------------------------------
+# NEW FEATURES: Oilseed Advisory, Price Prediction & Logistics
+# ---------------------------------------------------------
+
+def recommend_oilseeds(region, soil_type):
+    """
+    Identifies suitable oilseeds based on region and soil type.
+    """
+    recommendations = []
+    soil_type = soil_type.lower()
+    
+    # Logic for Central India (Maharashtra/MP based on typical hackathon context)
+    if "black" in soil_type or "clay" in soil_type:
+        recommendations.append({
+            "crop": "Soybean",
+            "suitability": "High",
+            "reason": "Black soil retains moisture well, ideal for Soybean."
+        })
+        recommendations.append({
+             "crop": "Sunflower",
+             "suitability": "Medium",
+             "reason": "Good option but requires well-drained soil."
+        })
+    
+    if "loam" in soil_type or "sandy" in soil_type or "red" in soil_type:
+        recommendations.append({
+            "crop": "Groundnut",
+            "suitability": "High",
+            "reason": "Loose soil allows peg penetration for pod formation."
+        })
+        recommendations.append({
+            "crop": "Mustard",
+            "suitability": "High",
+            "reason": "Thrives in loamy soil with less water requirement."
+        })
+        
+    # Fallback / Generic
+    if not recommendations:
+         recommendations.append({
+            "crop": "Soybean",
+            "suitability": "Medium",
+            "reason": "General recommendation for your region."
+        })
+
+    return recommendations
+
+def get_market_analysis(crop):
+    """
+    Returns MSP, Production trends, and basic market demand stats.
+    Mock data simluating government open data API.
+    Step 4, 5, 6
+    """
+    market_db = {
+        "Soybean": {
+            "msp": 4600,
+            "production_trend": "Stable",
+            "demand": "High (Edible Oil Industry)",
+            "avg_yield_per_acre": 6  # Quintals
+        },
+        "Mustard": {
+            "msp": 5450,
+            "production_trend": "Increasing",
+            "demand": "Very High (Winter Demand)",
+             "avg_yield_per_acre": 5
+        },
+        "Groundnut": {
+            "msp": 6377,
+             "production_trend": "Volatile",
+            "demand": "Moderate",
+             "avg_yield_per_acre": 8
+        },
+        "Sunflower": {
+             "msp": 6400,
+             "production_trend": "Decreasing",
+             "demand": "High",
+             "avg_yield_per_acre": 5
+        }
+    }
+    
+    return market_db.get(crop, {
+        "msp": 0,
+        "production_trend": "Unknown",
+        "demand": "Unknown",
+        "avg_yield_per_acre": 0
+    })
+
+def predict_expected_price(crop):
+    """
+    Step 7, 9, 10
+    Simulates AI Model predicting future price based on market factor.
+    Returns: Expected Price, Confidence Range, and Trend Analysis.
+    """
+    base_data = get_market_analysis(crop)
+    msp = base_data['msp']
+    if msp == 0: return None
+    
+    # Simulate AI fluctuation
+    volatility = random.uniform(-0.05, 0.15) # -5% to +15% over MSP
+    expected_price = int(msp * (1 + volatility))
+    
+    # 2-3 months forecast
+    future_trend = []
+    current_month = datetime.now()
+    for i in range(1, 4):
+        month_name = (current_month + timedelta(days=30*i)).strftime("%b")
+        trend_factor = random.uniform(0.98, 1.05)
+        future_trend.append({
+            "month": month_name,
+            "price": int(expected_price * trend_factor)
+        })
+        
+    return {
+        "current_msp": msp,
+        "expected_price": expected_price,
+        "range_low": int(expected_price * 0.95),
+        "range_high": int(expected_price * 1.05),
+        "recommendation": "Hold" if expected_price > msp * 1.1 else "Sell",
+        "future_trend": future_trend,
+        "demand_factors": ["International Price Hike", "Festival Demand"] if volatility > 0 else ["Surplus Production"]
+    }
+
+def calculate_logistics_cost(quantity_quintal, distance_km):
+    """
+    Step 12, 13
+    Auto vs Tempo logic.
+    """
+    quantity_quintal = float(quantity_quintal)
+    distance_km = float(distance_km)
+    
+    vehicle_type = "Tempo (Small Truck)" if quantity_quintal >= 10 else "Auto (3-Wheeler)"
+    
+    # Rates
+    if vehicle_type == "Auto (3-Wheeler)":
+        base_charge = 200
+        per_km = 15
+        capacity_charge = 0 # Included for small load
+    else:
+        base_charge = 500
+        per_km = 25
+        capacity_charge = (quantity_quintal - 10) * 20 # Extra charge per quintal over 10
+        
+    total_cost = base_charge + (distance_km * per_km) + capacity_charge
+    
+    return {
+        "vehicle": vehicle_type,
+        "base_charge": base_charge,
+        "distance_cost": distance_km * per_km,
+        "capacity_surcharge": capacity_charge,
+        "total_cost": int(total_cost),
+        "per_quintal_cost": int(total_cost / quantity_quintal)
+    }

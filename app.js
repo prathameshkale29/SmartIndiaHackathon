@@ -42,6 +42,7 @@ function App() {
     const [showNotifications, setShowNotifications] = React.useState(false);
     const [showSettings, setShowSettings] = React.useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+    const [showAIWidget, setShowAIWidget] = React.useState(false); // Global AI Widget State
 
     React.useEffect(() => {
       initTheme();
@@ -94,6 +95,18 @@ function App() {
           return <CreditPage />;
         case 'advisor':
           return <AdvisorPage />;
+        case 'intercropping':
+          return (
+            <div className="animate-circular-reveal" data-name="intercropping-page" data-file="app.js">
+              <IntercroppingSimulator />
+            </div>
+          );
+        case 'bhuvan':
+          return (
+            <div className="animate-circular-reveal" data-name="bhuvan-page" data-file="app.js">
+              <OilPalmZoningMap />
+            </div>
+          );
         case 'policy':
           return <PolicyPage />;
         case 'contracts':
@@ -122,7 +135,7 @@ function App() {
         case 'finance':
           return <FinancePage />;
         case 'procurement-mgmt':
-          return <ProcurementManagementPage />;
+          return <ProcurementManagementPage initialTab="procurement" />;
         case 'production':
           return <ProductionSchedulingPage />;
         case 'inventory':
@@ -131,6 +144,77 @@ function App() {
           return <DemandForecastPage />;
         case 'logistics':
           return <LogisticsPage />;
+        case 'quality':
+          return <ProcurementManagementPage initialTab="quality" />;
+        case 'batches':
+          return (
+            <div className="animate-circular-reveal" data-name="batch-creation-page" data-file="app.js">
+              <BlockchainTracker user={user} />
+            </div>
+          );
+
+        // Processor Aliases
+        case 'procurement_raw':
+          return <ProcurementPage />;
+        case 'production_batch':
+          return <ProductionSchedulingPage />;
+        case 'dashboard_processor':
+          return <ProcessorDashboard setActivePage={setActivePage} user={user} />;
+        case 'compliance':
+          return (
+            <div className="animate-circular-reveal" data-name="compliance-page" data-file="app.js">
+              {/* Wrapped ComplianceStatus in a page-like container */}
+              <h1 className="text-3xl font-bold mb-6">Quality & Compliance</h1>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ComplianceStatus />
+                <div className="card">
+                  <h3 className="text-lg font-semibold mb-4">Certifications</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
+                      <div><p className="font-bold text-green-800">FSSAI License</p><p className="text-xs text-green-600">Valid till 2028</p></div>
+                      <div className="icon-check-circle text-green-600 text-xl"></div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <div><p className="font-bold text-blue-800">Organic Certificate</p><p className="text-xs text-blue-600">Renewed: Dec 2024</p></div>
+                      <div className="icon-shield text-blue-600 text-xl"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        // contracts, inventory, logistics, market handled by main cases above
+
+        // Retailer Aliases
+        case 'my-produce':
+          return <MyProducePage user={user} setActivePage={setActivePage} />;
+        case 'verified_batches':
+          return (
+            <div className="animate-circular-reveal" data-name="verified-batches-page" data-file="app.js">
+              {/* Could pass a specific filter prop if component supported it, for now reusing BlockchainTracker */}
+              <BlockchainTracker user={user} />
+            </div>
+          );
+        // inventory handled by main case
+        case 'procurement_orders':
+          return <ProcurementPage />;
+        case 'traceability_viewer':
+          return (
+            <div className="animate-circular-reveal" data-name="traceability-viewer-page" data-file="app.js">
+              {/* Emulate focusing on tracking */}
+              <h1 className="text-3xl font-bold mb-6">Traceability Viewer</h1>
+              <QRScanner />
+              <div className="mt-8">
+                <BlockchainTracker user={user} />
+              </div>
+            </div>
+          );
+        case 'supply_chain':
+          return <LogisticsPage />;
+        // demand-forecast-retailer maps to DemandForecastPage if needed, or we can alias it:
+        case 'demand-forecast-retailer':
+          return <DemandForecastPage />;
+
         default:
           return <HomePage />;
       }
@@ -154,6 +238,26 @@ function App() {
           </div>
           {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} onNavigate={setActivePage} />}
           {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+
+          {/* Global AI Advisor Floating Widget */}
+          <div className="fixed bottom-24 md:bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
+            {/* Widget Container */}
+            <div className={`transition-all duration-300 origin-bottom-right pointer-events-auto ${showAIWidget ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-10 pointer-events-none h-0 w-0 overflow-hidden'}`}>
+              <div className="w-[350px] h-[500px] shadow-2xl rounded-2xl">
+                <AIAdvisor variant="widget" activePage={activePage} onClose={() => setShowAIWidget(false)} />
+              </div>
+            </div>
+
+            {/* FAB Button */}
+            <button
+              onClick={() => setShowAIWidget(!showAIWidget)}
+              className={`pointer-events-auto w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 ${showAIWidget ? 'bg-red-500 rotate-45' : 'bg-gradient-to-r from-green-500 to-emerald-600 animate-pulse-slow'}`}
+            >
+              <div className={`text-2xl text-white transition-all ${showAIWidget ? 'icon-plus' : 'icon-message-circle'}`}>
+                {showAIWidget ? '+' : '🤖'}
+              </div>
+            </button>
+          </div>
 
         </div>
       </SharedDataProvider>

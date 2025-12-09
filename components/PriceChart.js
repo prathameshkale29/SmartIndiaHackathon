@@ -1,4 +1,5 @@
 function PriceChart() {
+  const t = (typeof window !== 'undefined' && window.t) ? window.t : (key => key);
   const chartRef = React.useRef(null);
   const chartInstance = React.useRef(null);
 

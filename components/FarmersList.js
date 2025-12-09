@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 // Enhanced FarmersList with Add Farmer/Connect modal
 function FarmersList() {
   try {

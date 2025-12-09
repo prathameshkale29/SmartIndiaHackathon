@@ -456,3 +456,6 @@ function t(key) {
     // We still use the dictionary for English text
     return translations['en']?.[key] || key;
 }
+
+window.t = t;
+window.translations = translations;

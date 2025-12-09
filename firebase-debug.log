@@ -1,0 +1,23 @@
+[debug] [2025-12-08T21:33:57.165Z] ----------------------------------------------------------------------
+[debug] [2025-12-08T21:33:57.167Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Manthan\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js login
+[debug] [2025-12-08T21:33:57.167Z] CLI Version:   14.27.0
+[debug] [2025-12-08T21:33:57.167Z] Platform:      win32
+[debug] [2025-12-08T21:33:57.167Z] Node Version:  v25.2.1
+[debug] [2025-12-08T21:33:57.167Z] Time:          Tue Dec 09 2025 03:03:57 GMT+0530 (India Standard Time)
+[debug] [2025-12-08T21:33:57.167Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-12-08T21:33:57.169Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data 
+[debug] [2025-12-08T21:33:57.898Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-12-08T21:33:57.898Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[info] 
+[info] i  Firebase optionally collects CLI and Emulator Suite usage and error reporting information to help improve our products. Data is collected in accordance with Google's privacy policy (https://policies.google.com/privacy) and is not used to identify you. 
+[debug] [2025-12-08T21:36:01.407Z] ----------------------------------------------------------------------
+[debug] [2025-12-08T21:36:01.411Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Manthan\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js login
+[debug] [2025-12-08T21:36:01.412Z] CLI Version:   14.27.0
+[debug] [2025-12-08T21:36:01.412Z] Platform:      win32
+[debug] [2025-12-08T21:36:01.412Z] Node Version:  v25.2.1
+[debug] [2025-12-08T21:36:01.412Z] Time:          Tue Dec 09 2025 03:06:01 GMT+0530 (India Standard Time)
+[debug] [2025-12-08T21:36:01.412Z] ----------------------------------------------------------------------
+[debug] 
+[info] i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data 

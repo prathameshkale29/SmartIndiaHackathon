@@ -108,3 +108,6 @@ function useToast() {
     }
     return context;
 }
+
+window.ToastProvider = ToastProvider;
+window.useToast = useToast;

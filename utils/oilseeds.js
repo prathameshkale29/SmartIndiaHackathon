@@ -1,5 +1,5 @@
 // List of major Indian oilseeds for the application
-export const INDIAN_OILSEEDS = [
+window.INDIAN_OILSEEDS = [
     'Mustard',
     'Soybean',
     'Groundnut',
@@ -13,4 +13,3 @@ export const INDIAN_OILSEEDS = [
     'Coconut'
 ];
 
-export default INDIAN_OILSEEDS;

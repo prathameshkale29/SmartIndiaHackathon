@@ -1,5 +1,3 @@
-import { INDIAN_OILSEEDS } from '../utils/oilseeds.js';
-
 function FinancialCalculator() {
   try {
     const [cropType, setCropType] = React.useState('mustard');
@@ -11,16 +9,27 @@ function FinancialCalculator() {
     const [expectedYield, setExpectedYield] = React.useState(15);
     const [marketPrice, setMarketPrice] = React.useState(6000);
 
-    const totalCost = seedCost + fertilizerCost + laborCost + otherCost;
-    const costPerAcre = (totalCost / landArea).toFixed(0);
-    const totalRevenue = expectedYield * marketPrice;
+    // Inputs are now interpreted as "Per Acre"
+    const totalCostPerAcre = seedCost + fertilizerCost + laborCost + otherCost;
+    const totalCost = totalCostPerAcre * landArea;
+    const costPerAcre = totalCostPerAcre.toFixed(0);
+
+    // Individual Totals for display
+    const totalSeedCost = seedCost * landArea;
+    const totalFertilizerCost = fertilizerCost * landArea;
+    const totalLaborCost = laborCost * landArea;
+    const totalOtherCost = otherCost * landArea;
+
+    const yieldPerAcre = expectedYield; // Input is now Qt/Acre
+    const totalYield = yieldPerAcre * landArea;
+    const totalRevenue = totalYield * marketPrice;
+
     const revenuePerAcre = (totalRevenue / landArea).toFixed(0);
     const netProfit = totalRevenue - totalCost;
     const profitPerAcre = (netProfit / landArea).toFixed(0);
-    const roi = ((netProfit / totalCost) * 100).toFixed(1);
-    const profitMargin = ((netProfit / totalRevenue) * 100).toFixed(1);
-    const breakEvenPrice = (totalCost / expectedYield).toFixed(0);
-    const yieldPerAcre = (expectedYield / landArea).toFixed(2);
+    const roi = totalCost > 0 ? ((netProfit / totalCost) * 100).toFixed(1) : 0;
+    const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
+    const breakEvenPrice = yieldPerAcre > 0 ? (totalCostPerAcre / yieldPerAcre).toFixed(0) : 0;
 
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-name="financial-calculator" data-file="components/FinancialCalculator.js">
@@ -39,38 +48,47 @@ function FinancialCalculator() {
 
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('landArea')} ({t('acres')}): {landArea}</label>
-              <input type="range" min="1" max="50" value={landArea} onChange={(e) => setLandArea(e.target.value)} className="w-full" />
+              <input type="range" min="1" max="50" value={landArea} onChange={(e) => setLandArea(Number(e.target.value))} className="w-full accent-[var(--primary-color)]" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('seedCost')}</label>
-                <input type="number" value={seedCost} onChange={(e) => setSeedCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('seedCost')} (Per Acre)</label>
+                <div className="flex gap-2 items-center">
+                  <input type="number" value={seedCost} onChange={(e) => setSeedCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                  <span className="text-xs text-[var(--text-secondary)] whitespace-nowrap w-24">Total: ₹{totalSeedCost.toLocaleString()}</span>
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('fertilizer')}</label>
-                <input type="number" value={fertilizerCost} onChange={(e) => setFertilizerCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('fertilizer')} (Per Acre)</label>
+                <div className="flex gap-2 items-center">
+                  <input type="number" value={fertilizerCost} onChange={(e) => setFertilizerCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                  <span className="text-xs text-[var(--text-secondary)] whitespace-nowrap w-24">Total: ₹{totalFertilizerCost.toLocaleString()}</span>
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('laborCost')}</label>
-                <input type="number" value={laborCost} onChange={(e) => setLaborCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('laborCost')} (Per Acre)</label>
+                <div className="flex gap-2 items-center">
+                  <input type="number" value={laborCost} onChange={(e) => setLaborCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
+                  <span className="text-xs text-[var(--text-secondary)] whitespace-nowrap w-24">Total: ₹{totalLaborCost.toLocaleString()}</span>
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('otherCosts')}</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('otherCosts')} (Per Acre)</label>
                 <input type="number" value={otherCost} onChange={(e) => setOtherCost(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('expectedYield')}</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('expectedYield')} (Qt/Acre)</label>
                 <input type="number" value={expectedYield} onChange={(e) => setExpectedYield(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('price')}</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">{t('price')} (₹/Qt)</label>
                 <input type="number" value={marketPrice} onChange={(e) => setMarketPrice(Number(e.target.value))} className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-white)] text-[var(--text-primary)]" />
               </div>
             </div>
@@ -83,19 +101,19 @@ function FinancialCalculator() {
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Seeds</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{seedCost.toLocaleString()} ({((seedCost / totalCost) * 100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{(seedCost * landArea).toLocaleString()} ({totalCost > 0 ? ((seedCost * landArea / totalCost) * 100).toFixed(1) : 0}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Fertilizer</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{fertilizerCost.toLocaleString()} ({((fertilizerCost / totalCost) * 100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{(fertilizerCost * landArea).toLocaleString()} ({totalCost > 0 ? ((fertilizerCost * landArea / totalCost) * 100).toFixed(1) : 0}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Labor</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{laborCost.toLocaleString()} ({((laborCost / totalCost) * 100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{(laborCost * landArea).toLocaleString()} ({totalCost > 0 ? ((laborCost * landArea / totalCost) * 100).toFixed(1) : 0}%)</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--text-secondary)]">Other Costs</span>
-                <span className="font-medium text-[var(--text-primary)]">₹{otherCost.toLocaleString()} ({((otherCost / totalCost) * 100).toFixed(1)}%)</span>
+                <span className="font-medium text-[var(--text-primary)]">₹{(otherCost * landArea).toLocaleString()} ({totalCost > 0 ? ((otherCost * landArea / totalCost) * 100).toFixed(1) : 0}%)</span>
               </div>
               <div className="pt-3 border-t border-[var(--border-color)] flex justify-between">
                 <span className="font-semibold text-[var(--text-primary)]">{t('totalInvestment')}</span>

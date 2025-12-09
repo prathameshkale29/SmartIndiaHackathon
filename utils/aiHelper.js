@@ -172,126 +172,175 @@ const ROLE_KB = {
   ]
 };
 
+// --- CONFIGURATION ---
+// PASTE YOUR GOOGLE GEMINI API KEY HERE to enable "Direct AI" mode.
+// Get a free key at: https://aistudio.google.com/app/apikey
+const GEMINI_API_KEY = '';
+
+// --- GEMINI API INTEGRATION ---
+async function callGeminiAPI(systemPrompt, userQuestion) {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY.length < 10) return null;
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    // Construct prompt with system instructions
+    const fullPrompt = `${systemPrompt}\n\nUser Question: ${userQuestion}\n\nAnswer concisely and helpfully in a conversational tone.`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: fullPrompt }] }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    return text || null;
+
+  } catch (error) {
+    console.warn("Gemini API call failed (falling back to local):", error);
+    return null;
+  }
+}
+
+// --- GENERAL KNOWLEDGE BASE (Small Talk & General) ---
+const GENERAL_KB = [
+  {
+    keywords: ['who', 'are', 'you', 'bot', 'name'],
+    answer: "I am your AI Agri-Advisor, a smart assistant designed to help you with crop management, market trends, and government schemes. I'm here to support your farming journey!"
+  },
+  {
+    keywords: ['hello', 'hi', 'hey', 'greetings', 'morning', 'afternoon', 'evening'],
+    answer: "Hello! Hope you're having a productive day. How can I help you with your farm tasks or market queries today?"
+  },
+  {
+    keywords: ['thank', 'thanks', 'cool', 'good', 'great', 'awesome'],
+    answer: "You're welcome! I'm glad I could help. Let me know if you need anything else."
+  },
+  {
+    keywords: ['bye', 'goodbye', 'see', 'you'],
+    answer: "Goodbye! Wishing you a successful harvest. See you soon!"
+  },
+  {
+    keywords: ['joke', 'funny'],
+    answer: "Why did the scarecrow win an award? Because he was outstanding in his field! 🌾 😄"
+  },
+  {
+    keywords: ['weather', 'forecast', 'rain', 'temperature'],
+    answer: "I can help with that! Please check the dashboard for the detailed 5-day forecast. Generally, it's good to plan field operations when no heavy rain is predicted."
+  }
+];
+
+// Expanded Agricultural Knowledge Base (General Farming)
+const AGRI_EXPANSION_KB = [
+  {
+    keywords: ['water', 'irrigation', 'drip', 'sprinkler'],
+    answer: "Water management is crucial. Drip irrigation saves 40-60% water and improves yield by 20-30%. For oilseeds like groundnut, sprinkler systems are very effective during the pegging stage."
+  },
+  {
+    keywords: ['soil', 'test', 'health', 'organic'],
+    answer: "Healthy soil is the foundation of a good harvest. I recommend getting a soil health card (SHC) every 3 years. Adding organic carbon through FYM or vermicompost improves water retention and nutrient availability."
+  },
+  {
+    keywords: ['government', 'support', 'help', 'kcc'],
+    answer: "The government offers various support systems like PM-KISAN (income support), KCC (credit), and PMFBY (crop insurance). Visit the 'Gov Schemes' section in this app for direct application links."
+  }
+];
+
 async function invokeAIAgent(systemPrompt, userQuestion, userRole) {
-  // Enhanced local "AI" using KB + rule-based fallback + Satellite/Weather simulation
+  // Enhanced "Smart Mock" AI Engine
   try {
     const q = (userQuestion || '').trim();
-    if (!q) return 'Please ask a question.';
+    if (!q) return 'I am listening. Please ask your question.';
 
     const qTokens = tokenize(q);
     const lowerQ = q.toLowerCase();
+    const currentRole = userRole || 'farmer';
 
-    // --- ROLE-BASED LOGIC START ---
-    const currentRole = userRole || 'farmer'; // Default to farmer
+    // 0. Try Direct AI (Gemini) First
+    // Construct a rich system prompt based on role
+    const dynamicPrompt = `${systemPrompt} The user is a ${currentRole}. Focus on Indian agriculture, practical advice, and market context.`;
+    const aiResponse = await callGeminiAPI(dynamicPrompt, q);
+    if (aiResponse) {
+      return `✨ **AI Insight:**\n${aiResponse}`;
+    }
 
+    // 1. Check General Chit-Chat (High Priority for natural feel)
+    for (const entry of GENERAL_KB) {
+      if (entry.keywords.some(k => lowerQ.includes(k))) {
+        // Add minimal randomization for "chatbot" feel
+        const prefixes = ["", "Sure! ", "I can answer that. ", ""];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        return prefix + entry.answer;
+      }
+    }
+
+    // 2. Exact/Strong Role-Based Context
     if (ROLE_KB[currentRole]) {
-      // Check for role-specific matches first
       for (const entry of ROLE_KB[currentRole]) {
+        // Improved matching: requires correlation of at least one keyword if query is short, or more if long
         if (entry.keywords.some(k => lowerQ.includes(k))) {
-          return `🤖 **Advisor for ${currentRole.toUpperCase()}:**\n\n${entry.answer}`;
+          return `🤖 **Advisor (${currentRole.toUpperCase()}):** ${entry.answer}`;
         }
       }
     }
 
-    // Role-specific fallback for generic intro
-    if (lowerQ.includes('hello') || lowerQ.includes('hi') || lowerQ.includes('help')) {
-      if (currentRole === 'processor') return "Hello! I can assist you with procurement specifications, quality standards, and milling efficiency.";
-      if (currentRole === 'fpo') return "Greetings! Ask me about aggregation strategies, storage solutions, or government schemes for FPOs.";
-      if (currentRole === 'retailer') return "Hi! I am here to help with packaging compliance, consumer trends, and inventory management.";
-    }
-    // --- ROLE-BASED LOGIC END ---
-
-    // --- SATELLITE DATA QUERY (Farmer/FPO context mostly) ---
-    if (lowerQ.includes('satellite') || lowerQ.includes('ndvi') || lowerQ.includes('crop health') || lowerQ.includes('moisture')) {
+    // 3. Special Modules (Satellite, Weather) - Keep existing logic
+    if (lowerQ.includes('satellite') || lowerQ.includes('ndvi') || lowerQ.includes('health')) {
       const satData = getSatelliteAnalysis();
-      return `🛰️ **Satellite Analysis Report**\n\n` +
-        `• **Vegetation Index (NDVI):** ${satData.ndvi} (${satData.healthStatus})\n` +
-        `• **Soil Moisture:** ${satData.moisture}%\n` +
-        `• **Last Satellite Pass:** ${satData.lastPass}\n\n` +
-        `*Advisory:* ${satData.healthStatus === 'Excellent' ? 'Your crop is healthy. Continue current management.' : 'Crop shows signs of stress. Check for water or nutrient deficiency.'}`;
+      return `🛰️ **Satellite Insight:**\nVegetation Index (NDVI): ${satData.ndvi} (${satData.healthStatus}).\nMoisture: ${satData.moisture}%.\n${satData.healthStatus === 'Excellent' ? 'Crop is looking great!' : 'Attention required: Potential stress detected.'}`;
     }
-
-    // --- WEATHER ALERT QUERY ---
-    if (lowerQ.includes('alert') || lowerQ.includes('warning') || lowerQ.includes('forecast')) {
+    if (lowerQ.includes('alert') || lowerQ.includes('rain') || lowerQ.includes('storm')) {
       const alert = getWeatherAlerts();
-      if (alert) {
-        return `⚠️ **Weather Alert**\n\n${alert}`;
-      } else {
-        return `✅ **Weather Update**\n\nNo severe weather alerts for your region. Conditions are normal for operations.`;
-      }
+      return alert ? `⚠️ **Weather Alert:** ${alert}` : `✅ No severe weather alerts. Good conditions for field work.`;
     }
 
-    // 1. Check General Oilseed Knowledge Base
-    let best = [];
-    let bestScore = 0;
+    // 4. Detailed Knowledge Base Search (Oilseeds + Expanded Agri)
+    let bestEntry = null;
+    let maxScore = 0;
 
-    OILSEED_KB.forEach((entry) => {
-      const sc = scoreEntry(qTokens, entry);
-      if (sc > 0) {
-        if (sc > bestScore) {
-          bestScore = sc;
-          best = [entry];
-        } else if (sc === bestScore) {
-          best.push(entry);
-        }
+    const allKnowledge = [...OILSEED_KB, ...AGRI_EXPANSION_KB.map(k => ({ ...k, question: k.keywords.join(' '), tags: k.keywords }))];
+
+    allKnowledge.forEach(entry => {
+      // Improved scoring: weighted by token length and exact phrase matching?
+      // Keeping it simple but effective: overlap count
+      const score = scoreEntry(qTokens, entry);
+      if (score > maxScore) {
+        maxScore = score;
+        bestEntry = entry;
       }
     });
 
-    if (bestScore > 0 && best.length > 0) {
-      // Return the best answer(s)
-      return best
-        .slice(0, 2)
-        .map((e, idx) => (best.length > 1 ? `**Point ${idx + 1}:**\n` : "") + e.answer)
-        .join("\n\n");
+    if (maxScore > 0) { // Threshold can be tweaked
+      return bestEntry.answer;
     }
 
-    // 2. Fallback to rule-based logic if no KB match
+    // 5. "Smart Fallback" (The "Act like any other chatbot" part)
+    // Instead of saying "I don't know", we construct a helpful response based on the topic.
 
-    // Weather-related advice
-    if (lowerQ.includes('weather') || lowerQ.includes('rain') || lowerQ.includes('monsoon')) {
-      return 'Check the 5-day forecast in the dashboard. Avoid spraying chemicals before expected rain and plan operations accordingly.';
-    }
+    // Attempt to identify the noun/topic
+    const ignoredWords = ['what', 'is', 'how', 'to', 'the', 'a', 'an', 'in', 'on', 'for', 'of', 'my', 'does', 'do', 'can', 'you'];
+    const topicTokens = qTokens.filter(t => !ignoredWords.includes(t) && t.length > 2);
+    const mainTopic = topicTokens.length > 0 ? topicTokens[0] : 'that';
 
-    // Mustard-specific advice
-    if (lowerQ.includes('mustard')) {
-      return 'For mustard, use certified seeds, maintain spacing of about 30 cm between rows, and avoid water logging. Apply balanced NPK based on soil test and monitor for aphids; use yellow sticky traps and need-based spraying.';
-    }
+    // Conversational Fallback Patterns
+    const fallbacks = [
+      `That's an interesting question about **${mainTopic}**. While I specialize in oilseed farming, generally, handling ${mainTopic} requires careful planning. Ideally, you should consult a local expert for specific details.`,
+      `I see you're asking about **${mainTopic}**. In the context of agriculture, we usually focus on how it affects yield or cost. Could you clarify if this is related to a specific crop?`,
+      `I'm tuned to help with farming, markets, and logistics. Regarding **${mainTopic}**, I'd suggest checking the latest government guidelines or market news section in the app.`,
+      `Good question! **${mainTopic}** is an important topic. While I don't have the exact data right now, I recommend looking at the 'Resources' tab for more info on this.`
+    ];
 
-    // Soybean-specific advice
-    if (lowerQ.includes('soybean') || lowerQ.includes('soyabean')) {
-      return 'For soybean, ensure timely sowing at the start of monsoon, use well-drained soil, and avoid deep ploughing after heavy rain. In case of yellowing leaves, check for water logging and possible nutrient deficiency.';
-    }
+    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 
-    // Groundnut-specific advice
-    if (lowerQ.includes('groundnut') || lowerQ.includes('ground nut') || lowerQ.includes('peanut')) {
-      return 'For groundnut, use well-drained sandy loam soil and avoid excess irrigation during flowering and pegging. Gypsum application at flowering improves pod filling. Remove weeds in the first 30–40 days.';
-    }
-
-    // Price / market trend queries
-    if (lowerQ.includes('price') || lowerQ.includes('market') || lowerQ.includes('rate')) {
-      return 'Market prices change daily. Use the Market section in the app to see latest mandi prices and compare nearby markets before deciding to sell. Prefer selling when demand is high and arrivals are low.';
-    }
-
-    // Fertilizer and soil health
-    if (lowerQ.includes('fertilizer') || lowerQ.includes('fertiliser') || lowerQ.includes('soil')) {
-      return 'Use soil test based fertilizer recommendation. Avoid overuse of nitrogen. Add organic matter like farmyard manure or compost. Split nitrogen in 2–3 doses and apply potash and phosphorus at sowing.';
-    }
-
-    // Pest / disease related
-    if (lowerQ.includes('pest') || lowerQ.includes('disease') || lowerQ.includes('insect') || lowerQ.includes('worm')) {
-      return 'First identify the pest correctly. Prefer integrated pest management: clean field, remove infected plants, use pheromone traps and bio-pesticides. Spray chemicals only if infestation crosses economic threshold.';
-    }
-
-    // Credit / scheme queries
-    if (lowerQ.includes('loan') || lowerQ.includes('scheme') || lowerQ.includes('subsidy') || lowerQ.includes('insurance')) {
-      return 'You can explore PM-KISAN, KCC, PMFBY and PM-KUSUM schemes. Check the Government Schemes section in the app and apply through the official portals or visit the nearest agriculture office or bank branch.';
-    }
-
-    // Generic fallback
-    return 'I can provide general advice on oilseed crops. For specific issues related to your role (' + currentRole + '), please query about your specific operational needs.';
   } catch (error) {
     console.error('invokeAIAgent error:', error);
-    return 'I am unable to process your question right now. Please try again in some time.';
+    return "I'm having a bit of trouble thinking right now. Could you ask that again differently?";
   }
 }
 

@@ -4,7 +4,7 @@ function ListProduceModal({ isOpen, onClose, onAdd }) {
         quantity: '',
         pricePerQuintal: '',
         quality: 'Grade A',
-        availableFrom: '',
+        availableFrom: new Date().toISOString().split('T')[0],
         deliveryPreference: 'Negotiable',
         targetBuyers: [],
         notes: ''
@@ -70,8 +70,31 @@ function ListProduceModal({ isOpen, onClose, onAdd }) {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="List Produce for Sale" size="lg">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <ModalDialog
+            isOpen={isOpen}
+            onClose={onClose}
+            title="List Produce for Sale"
+            size="lg"
+            footer={
+                <div className="flex gap-3 w-full">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        form="list-produce-form"
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:shadow-lg transition-all"
+                    >
+                        List Produce
+                    </button>
+                </div>
+            }
+        >
+            <form id="list-produce-form" onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Crop Type */}
                     <div>
@@ -148,6 +171,7 @@ function ListProduceModal({ isOpen, onClose, onAdd }) {
                         </label>
                         <input
                             type="date"
+                            min={new Date().toISOString().split('T')[0]}
                             value={formData.availableFrom}
                             onChange={(e) => setFormData({ ...formData, availableFrom: e.target.value })}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -207,24 +231,9 @@ function ListProduceModal({ isOpen, onClose, onAdd }) {
                         placeholder="e.g., Certified organic, stored in climate-controlled warehouse..."
                     />
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-4">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:shadow-lg transition-all"
-                    >
-                        List Produce
-                    </button>
-                </div>
             </form>
-        </Modal>
+        </ModalDialog>
     );
 }
+
+window.ListProduceModal = ListProduceModal;
