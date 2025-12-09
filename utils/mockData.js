@@ -229,58 +229,94 @@ const mockData = {
 
   tenders: [
     {
-      id: 'T-2024-001',
-      title: 'Procurement of Grade A Soybean',
-      organization: 'National Agricultural Cooperative Marketing Federation (NAFED)',
-      description: 'Request for supply of 5000 MT of Grade A Soybean for central pool.',
+      id: 'T-2025-089',
+      title: 'Emergency Procurement: Soybean (Grade A)',
+      organization: 'NAFED (Central Pool)',
+      description: 'Urgent procurement for buffer stock maintenance. Immediate delivery required.',
       quantity: 5000,
       unit: 'MT',
-      estimatedValue: 30000000,
-      openingDate: '2024-12-01',
-      closingDate: '2024-12-15',
+      estimatedValue: 32000000,
+      openingDate: '2025-12-08',
+      closingDate: '2025-12-12',
       location: 'Nagpur, Maharashtra',
       status: 'Open',
-      bidCount: 12,
+      bidCount: 45,
       specifications: {
         'Moisture': 'Max 10%',
-        'Foreign Matter': 'Max 2%',
+        'Foreign Matter': 'Max 1%',
         'Oil Content': 'Min 18%'
       }
     },
     {
-      id: 'T-2024-002',
-      title: 'Mustard Seeds Supply for Oil Extraction',
-      organization: 'State Oil Federation',
-      description: 'Annual procurement of Mustard seeds for state-run oil mills.',
-      quantity: 2000,
+      id: 'T-2025-092',
+      title: 'Mustard Seeds for State Oil Mills',
+      organization: 'Rajasthan State Oil Federation',
+      description: 'Annual contract for supply of high-oil content mustard seeds.',
+      quantity: 2500,
       unit: 'MT',
-      estimatedValue: 12000000,
-      openingDate: '2024-12-05',
-      closingDate: '2024-12-20',
+      estimatedValue: 15500000,
+      openingDate: '2025-12-09',
+      closingDate: '2025-12-25',
       location: 'Jaipur, Rajasthan',
       status: 'Open',
-      bidCount: 8,
+      bidCount: 12,
       specifications: {
         'Moisture': 'Max 8%',
-        'Oil Content': 'Min 40%'
+        'Oil Content': 'Min 42%'
       }
     },
     {
-      id: 'T-2024-003',
-      title: 'Groundnut Procurement - Kharif Season',
-      organization: 'Gujarat State Seeds Corporation',
-      description: 'Procurement of high-quality groundnut pods.',
-      quantity: 3500,
+      id: 'T-2025-075',
+      title: 'Groundnut Pods Procurement (Khrif-25)',
+      organization: 'Gujarat State Seeds Corp',
+      description: 'Procurement of certified groundnut pods for seed processing.',
+      quantity: 4000,
       unit: 'MT',
-      estimatedValue: 22750000,
-      openingDate: '2024-11-20',
-      closingDate: '2024-12-10',
+      estimatedValue: 26000000,
+      openingDate: '2025-11-20',
+      closingDate: '2025-12-10',
       location: 'Rajkot, Gujarat',
       status: 'Closing Soon',
-      bidCount: 25,
+      bidCount: 88,
       specifications: {
-        'Shelling Percentage': 'Min 70%',
+        'Shelling %': 'Min 70%',
         'Moisture': 'Max 9%'
+      }
+    },
+    {
+      id: 'T-2025-101',
+      title: 'Sunflower Seeds: Oil Extraction Unit',
+      organization: 'Karnataka Oil Federation',
+      description: 'Supply of Sunflower seeds for Chitradurga extraction plant.',
+      quantity: 1200,
+      unit: 'MT',
+      estimatedValue: 8400000,
+      openingDate: '2025-12-07',
+      closingDate: '2025-12-21',
+      location: 'Chitradurga, Karnataka',
+      status: 'Open',
+      bidCount: 5,
+      specifications: {
+        'Moisture': 'Max 9%',
+        'Admixture': 'Max 2%'
+      }
+    },
+    {
+      id: 'T-2025-112',
+      title: 'Sesame (White) Export Grade',
+      organization: 'APEDA Export Hub',
+      description: 'Premium white sesame for export consignment to EU.',
+      quantity: 500,
+      unit: 'MT',
+      estimatedValue: 6500000,
+      openingDate: '2025-12-09',
+      closingDate: '2025-12-15',
+      location: 'Unjha, Gujarat',
+      status: 'Open',
+      bidCount: 2,
+      specifications: {
+        'Purity': '99.95%',
+        'Moisture': 'Max 5%'
       }
     }
   ]

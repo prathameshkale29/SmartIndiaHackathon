@@ -271,12 +271,21 @@ function ProcurementPage() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h3 className="text-xl font-bold text-[var(--text-primary)]">{tender.title}</h3>
-                                                <span className={`px-3 py-1 text-xs font-bold rounded-full ${tender.status === 'Open' ? 'bg-green-100 text-green-700' :
-                                                    tender.status === 'Closing Soon' ? 'bg-amber-100 text-amber-700' :
+
+                                                {/* Status Badge */}
+                                                <span className={`px-3 py-1 text-xs font-bold rounded-full border ${tender.status === 'Open' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                    tender.status === 'Closing Soon' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                                                         'bg-gray-100 text-gray-700'
                                                     }`}>
                                                     {tender.status}
                                                 </span>
+
+                                                {/* NEW Badge for recent tenders (opened in last 2 days) */}
+                                                {new Date(tender.openingDate) >= new Date(Date.now() - 172800000) && (
+                                                    <span className="px-2 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded animate-pulse">
+                                                        NEW
+                                                    </span>
+                                                )}
                                             </div>
                                             <p className="text-sm text-[var(--text-secondary)] mb-1">
                                                 <span className="font-medium">Organization:</span> {tender.organization}
@@ -284,7 +293,10 @@ function ProcurementPage() {
                                             <p className="text-sm text-[var(--text-secondary)]">{tender.description}</p>
                                         </div>
                                         <div className="text-right ml-4">
-                                            <p className="text-2xl font-bold text-[var(--primary-color)]">{formatCurrency(tender.estimatedValue)}</p>
+                                            <p className="text-2xl font-bold text-[var(--primary-color)] flex items-center justify-end gap-2">
+                                                {tender.status === 'Open' && <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>}
+                                                {formatCurrency(tender.estimatedValue)}
+                                            </p>
                                             <p className="text-xs text-[var(--text-secondary)]">Estimated Value</p>
                                         </div>
                                     </div>
