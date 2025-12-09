@@ -1,16 +1,17 @@
 const AUTH_KEY = 'agrisync_user';
-const MOCK_DB_KEY = 'agrisync_mock_users'; // Key to store registered users
-
-// Firebase Access Removed
-// Using Local Mock Authentication system
-
-const auth = null;
-const analytics = null;
-console.log("Running in Local/Mock Mode (Firebase Removed)");
+const MOCK_DB_KEY = 'agrisync_mock_users';
 
 // Helper to save user to local storage for persistence across apps
 function saveUserToLocal(user) {
   localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+}
+
+// ---------------------------------------------------------
+// Auth Function: Login with Google (REMOVED)
+// ---------------------------------------------------------
+function loginWithGoogle() {
+  console.warn("Google Auth has been removed.");
+  return Promise.resolve({ success: false, message: "Google Authentication is disabled." });
 }
 
 // Helper to get registered users
@@ -38,39 +39,30 @@ function removeMockUser(email) {
   return updatedUsers;
 }
 
+// MOCK REGISTER
 async function register(email, password, fullName, role) {
   try {
-    // Check if user already exists in Demo or Mock DB
     const users = getMockUsers();
-    const demoExists = Object.values(DEMO_ACCOUNTS).some(u => u.email === email || u.role === email); // check against demo
-    const mockExists = users.some(u => u.email === email);
-
-    if (demoExists || mockExists) {
-      return { success: false, message: 'User already exists. Please login.' };
+    if (users.some(u => u.email === email)) {
+      return { success: false, message: 'User already exists.' };
     }
 
-    // SIMULATED REGISTRATION
     const newUser = {
       uid: 'local_' + Date.now(),
       email: email,
       name: fullName,
       role: role,
       authProvider: 'local',
-      password: password // Storing password for mock auth validation
+      password: password
     };
 
     saveMockUser(newUser);
 
-    // Auto Login after register
-    // Remove password from session data
     const sessionUser = { ...newUser };
     delete sessionUser.password;
-
     saveUserToLocal(sessionUser);
     return { success: true, user: sessionUser };
-
   } catch (error) {
-    console.error('Registration error:', error);
     return { success: false, message: error.message };
   }
 }
@@ -84,81 +76,60 @@ const DEMO_ACCOUNTS = {
   'admin': { email: 'admin@agrisync.com', password: 'admin123', name: 'System Admin', role: 'admin' }
 };
 
+// MOCK LOGIN
 async function login(email, password, role) {
   try {
-    // 1. Check for Demo Accounts first (Bypass Firebase)
-    // Support both full email AND short username (e.g. 'farmer')
-    // email input here can be the username
+    // 1. Check Demo Accounts
     const demoUser = Object.values(DEMO_ACCOUNTS).find(u =>
       (u.email === email || u.role === email) && u.password === password
     );
 
     if (demoUser) {
-      console.log("Using Demo Account:", demoUser.role);
-      const userData = {
-        uid: 'demo_' + demoUser.role + '_123',
-        email: demoUser.email,
-        name: demoUser.name,
-        role: demoUser.role, // Force role from demo config
-        authProvider: 'demo'
-      };
+      const userData = { ...demoUser, uid: 'demo_' + demoUser.role, authProvider: 'demo' };
+      delete userData.password;
       saveUserToLocal(userData);
       return { success: true, user: userData };
     }
 
-    // 2. Check Mock Database (Registered Users)
+    // 2. Check Mock DB
     const mockUsers = getMockUsers();
-    // Match email OR username (assuming email field holds username in registration if provided that way)
-    // But registration field is 'username' in UI passed as 'email' arg to register.
     const registeredUser = mockUsers.find(u => u.email === email && u.password === password);
 
     if (registeredUser) {
-      console.log("Using Registered Mock Account:", registeredUser.email);
       const sessionUser = { ...registeredUser };
-      delete sessionUser.password; // Don't keep pass in session
-
+      delete sessionUser.password;
       saveUserToLocal(sessionUser);
       return { success: true, user: sessionUser };
     }
 
-    // 3. Fallback: Fail if not found
-    return { success: false, message: 'Invalid username or password. Please register if you are new.' };
-
+    return { success: false, message: 'Invalid credentials.' };
   } catch (error) {
-    console.error('Login error:', error);
     return { success: false, message: error.message };
   }
 }
 
-
-
 function logout() {
-  if (auth) {
-    auth.signOut();
-  }
   localStorage.removeItem(AUTH_KEY);
+  window.location.reload();
 }
 
 function getCurrentUser() {
-  try {
-    const userData = localStorage.getItem(AUTH_KEY);
-    return userData ? JSON.parse(userData) : null;
-  } catch (error) {
-    return null;
-  }
+  const userData = localStorage.getItem(AUTH_KEY);
+  return userData ? JSON.parse(userData) : null;
 }
 
 function isAdmin(user) {
   return user?.role === 'admin';
 }
 
-// Expose to window for app-wide access
+// Expose Globals
 window.saveUserToLocal = saveUserToLocal;
 window.getMockUsers = getMockUsers;
 window.saveMockUser = saveMockUser;
 window.removeMockUser = removeMockUser;
 window.register = register;
 window.login = login;
+window.loginWithGoogle = loginWithGoogle;
 window.logout = logout;
 window.getCurrentUser = getCurrentUser;
 window.isAdmin = isAdmin;
