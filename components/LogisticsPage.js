@@ -2,34 +2,37 @@
 function RouteOptimizer({ onRouteCalculated }) {
     const [from, setFrom] = React.useState('Nagpur');
     const [to, setTo] = React.useState('Mumbai');
+    const [quantity, setQuantity] = React.useState(10); // Quintals
     const [result, setResult] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
 
-    const handleCalculate = (e) => {
+    const handleCalculate = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        // Simulate API Calculation
-        setTimeout(() => {
-            const dist = Math.floor(Math.random() * 300) + 400; // 400-700km
-            const speed = 55; // avg truck speed
-            const time = (dist / speed).toFixed(1);
-            const fuel = (dist / 3.5).toFixed(0); // 3.5 km/l mileage
-            const cost = (fuel * 95).toLocaleString(); // ₹95/l diesel
+        try {
+            // Mock Distance (since we don't have real Maps API)
+            const dist = Math.floor(Math.random() * 300) + 50;
 
-            const data = {
+            // Call New API
+            const costData = await window.MockApiService.calculateLogisticsCost(quantity, dist);
+
+            const time = (dist / 50).toFixed(1);
+
+            setResult({
+                ...costData,
                 distance: dist,
                 duration: `${Math.floor(time)}h ${Math.round((time % 1) * 60)}m`,
-                fuel: `${fuel} L`,
-                cost: `₹${cost}`,
                 traffic: Math.random() > 0.5 ? 'Heavy' : 'Clear',
-                savings: `₹${(Math.random() * 500 + 200).toFixed(0)}`
-            };
+                savings: `₹${Math.round(costData.total_cost * 0.15)}` // 15% saving mock
+            });
 
-            setResult(data);
+            if (onRouteCalculated) onRouteCalculated(costData);
+        } catch (error) {
+            console.error(error);
+        } finally {
             setLoading(false);
-            if (onRouteCalculated) onRouteCalculated(data);
-        }, 1500);
+        }
     };
 
     return (
@@ -85,22 +88,23 @@ function RouteOptimizer({ onRouteCalculated }) {
                             <p className="font-bold text-gray-900 dark:text-white">{result.distance} km</p>
                         </div>
                         <div>
-                            <p className="text-xs text-indigo-500">Est. Time</p>
-                            <p className="font-bold text-gray-900 dark:text-white">{result.duration}</p>
+                            <p className="text-xs text-indigo-500">Vehicle Type</p>
+                            <p className="font-bold text-gray-900 dark:text-white text-xs">{result.vehicle}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-indigo-500">Fuel Est.</p>
-                            <p className="font-bold text-gray-900 dark:text-white">{result.fuel}</p>
+                            <p className="text-xs text-indigo-500">Base + Dist</p>
+                            <p className="font-bold text-gray-900 dark:text-white">₹{result.base_charge + result.distance_cost}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-indigo-500">Cost</p>
-                            <p className="font-bold text-gray-900 dark:text-white">{result.cost}</p>
+                            <p className="text-xs text-indigo-500">Total Cost</p>
+                            <p className="font-bold text-lg text-[var(--primary-color)]">₹{result.total_cost}</p>
                         </div>
                     </div>
 
                     <div className="pt-2 border-t border-indigo-200 dark:border-indigo-700">
-                        <p className="text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
-                            <span className="icon-trending-up"></span> Saving <b>{result.savings}</b> vs avg. route.
+                        <p className="text-xs text-indigo-700 dark:text-indigo-300 flex items-center justify-between">
+                            <span>APO Price: <b>₹{result.apo_price}/Q</b></span>
+                            <span className="bg-indigo-200 text-indigo-800 px-1 rounded">Save {result.savings}</span>
                         </p>
                     </div>
                 </div>

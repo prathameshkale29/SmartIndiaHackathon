@@ -1,4 +1,5 @@
 function MarketTable() {
+  const t = (typeof window !== 'undefined' && window.t) ? window.t : (key => key);
   try {
     const [marketData, setMarketData] = React.useState([]);
     const [allMarketData, setAllMarketData] = React.useState([]);

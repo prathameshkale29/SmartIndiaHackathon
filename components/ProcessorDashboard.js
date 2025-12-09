@@ -14,7 +14,7 @@ function ProcessorDashboard({ setActivePage, user }) {
                     <div className="icon-factory text-9xl"></div>
                 </div>
                 <div className="relative z-10">
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                         <div>
                             <span className="bg-slate-700 border border-slate-600 text-slate-200 px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Processor Dashboard</span>
                             <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}</h1>

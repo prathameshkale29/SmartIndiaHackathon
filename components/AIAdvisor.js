@@ -21,18 +21,27 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
     const [loading, setLoading] = React.useState(false);
     const [isListening, setIsListening] = React.useState(false); // Voice State
     const messagesEndRef = React.useRef(null);
+    const recognitionRef = React.useRef(null); // Store instance
 
     // VOICE RECOGNITION SETUP
     const handleVoiceStart = () => {
+      if (isListening) {
+        // Allow manual stop
+        if (recognitionRef.current) recognitionRef.current.stop();
+        setIsListening(false);
+        return;
+      }
+
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Your browser does not support voice input. Please use Chrome.");
+        alert("Voice input is not supported in this browser. Try Chrome on Android or Safari on iOS.");
         return;
       }
 
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
 
-      recognition.lang = 'en-US'; // Can be dynamic based on i18n
+      recognition.lang = 'en-IN'; // Better for Indian accents
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
 
@@ -43,7 +52,7 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
-        handleSend(transcript); // Auto-send
+        handleSend(transcript);
       };
 
       recognition.onend = () => {
@@ -53,9 +62,29 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
       recognition.onerror = (event) => {
         console.error("Speech recognition error", event.error);
         setIsListening(false);
+        if (event.error === 'not-allowed') {
+          alert("Microphone blocked. Go to Settings > Site Settings > Microphone and allow access.");
+        } else if (event.error === 'no-speech') {
+          // Silent fail
+        } else if (event.error === 'network') {
+          alert("Voice input requires a stable internet connection.");
+        } else {
+          alert("Voice Error: " + event.error);
+        }
       };
 
-      recognition.start();
+      recognition.onnomatch = () => {
+        setIsListening(false);
+        alert("Sorry, I didn't catch that. Please try again or type.");
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error("Start error", e);
+        setIsListening(false);
+        alert("Could not start microphone. Refresh page.");
+      }
     };
 
     const districtOptions = [
@@ -265,10 +294,10 @@ function AIAdvisor({ variant = 'full', activePage = 'home', onClose }) {
           <div className="p-3 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 flex gap-2 items-center">
             <button
               onClick={handleVoiceStart}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'}`}
-              title="Speak to AI"
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'}`}
+              title={isListening ? "Stop Listening" : "Start Voice Input"}
             >
-              <div className={`icon-mic ${isListening ? 'animate-ping' : ''}`}></div>
+              <div className={`icon-mic ${isListening ? 'animate-bounce' : ''}`}></div>
             </button>
             <input
               type="text"

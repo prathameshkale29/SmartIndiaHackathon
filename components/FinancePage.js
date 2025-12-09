@@ -84,7 +84,7 @@ function FinancePage() {
                                     <span className="text-2xl font-bold text-[var(--primary-color)]">₹{calculateEMI().toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button className="btn-primary w-full">Check Eligibility</button>
+                            <button onClick={() => window.open('https://www.jansamarth.in/check-eligibility', '_blank')} className="btn-primary w-full">Check Eligibility (JanSamarth)</button>
                         </div>
                     </div>
                     <div className="space-y-4">
@@ -93,14 +93,14 @@ function FinancePage() {
                             <p className="text-sm text-[var(--text-secondary)] mb-3">
                                 Get instant credit for agricultural needs. Interest subvention of 3% for prompt repayment.
                             </p>
-                            <button className="text-blue-600 font-medium hover:underline">Apply Now →</button>
+                            <button onClick={() => window.open('https://www.myscheme.gov.in/schemes/kcc', '_blank')} className="text-blue-600 font-medium hover:underline">Apply Now →</button>
                         </div>
                         <div className="card border-l-4 border-l-purple-500">
                             <h3 className="text-lg font-semibold mb-2">Farm Mechanization Loan</h3>
                             <p className="text-sm text-[var(--text-secondary)] mb-3">
                                 Financing for tractors, harvesters, and other farm equipment. 85% reduced collateral.
                             </p>
-                            <button className="text-purple-600 font-medium hover:underline">Apply Now →</button>
+                            <button onClick={() => window.open('https://agrimachinery.nic.in/', '_blank')} className="text-purple-600 font-medium hover:underline">Apply Now →</button>
                         </div>
                     </div>
                 </div>
@@ -180,7 +180,7 @@ function FinancePage() {
                         <p className="text-sm text-[var(--text-secondary)] mb-4">
                             Get up to 50% subsidy on high-yielding seed varieties and inputs for oilseed cultivation.
                         </p>
-                        <button className="btn-primary w-full text-sm">Check Eligibility</button>
+                        <button onClick={() => window.open('https://nmoop.gov.in/', '_blank')} className="btn-primary w-full text-sm">Check Eligibility</button>
                     </div>
                 </div>
             )}

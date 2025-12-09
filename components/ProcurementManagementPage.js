@@ -3,6 +3,7 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
     const [activeTab, setActiveTab] = React.useState(initialTab);
     const [isLoading, setIsLoading] = React.useState(true);
     const [dailyInflows, setDailyInflows] = React.useState([]);
+    const [inventory, setInventory] = React.useState([]);
 
     React.useEffect(() => {
         // Sync internal state if prop changes
@@ -18,6 +19,8 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
         try {
             const data = await window.MockApiService.getProcurementRequests();
             setDailyInflows(data);
+            const invData = await window.MockApiService.getInventory();
+            setInventory(invData);
         } catch (error) {
             console.error("Failed to load procurement data", error);
         } finally {
@@ -52,6 +55,18 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
         loadData();
     };
 
+    const handleSellToProcessor = async (item) => {
+        if (!window.confirm(`List ${item.item} for Processors?`)) return;
+        // In this mock, listing is automatic based on inventory, but we can simulate a specific action
+        // Actually, let's call buyForProcessing from Processor side, OR we can have a "Push" model.
+        // My plan said: "List for Processors".
+        // MockApiService.getProcessorMarketplace reads from Inventory directly.
+        // So just by being in Inventory, it is visible. 
+        // But maybe we want to mark it as "For Sale"?
+        // Let's just show a toast for now that it is available.
+        window.useToast().success(`${item.item} is now visible to Processors`);
+    };
+
 
     // Helper to filter data based on tab
     // Inflow: Pending or Verified recently
@@ -78,7 +93,7 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-4 border-b border-[var(--border-color)] mb-6">
+            <div className="flex flex-wrap gap-4 border-b border-[var(--border-color)] mb-6">
                 <button
                     className={`pb-2 px-4 font-medium transition-colors border-b-2 ${activeTab === 'procurement' ? 'border-[var(--primary-color)] text-[var(--primary-color)]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                     onClick={() => setActiveTab('procurement')}
@@ -90,6 +105,12 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
                     onClick={() => setActiveTab('quality')}
                 >
                     Quality Grading <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">{pendingQuality.length}</span>
+                </button>
+                <button
+                    className={`pb-2 px-4 font-medium transition-colors border-b-2 ${activeTab === 'inventory' ? 'border-[var(--primary-color)] text-[var(--primary-color)]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTab('inventory')}
+                >
+                    Inventory & Sales
                 </button>
             </div>
 
@@ -144,8 +165,8 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
                                                     <td className="p-4 text-sm text-gray-500">{row.date}</td>
                                                     <td className="p-4">
                                                         <span className={`px-2 py-1 text-xs rounded-full ${row.status === 'Verified' ? 'bg-green-100 text-green-700' :
-                                                                row.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                                                                    'bg-amber-100 text-amber-700'
+                                                            row.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                                                                'bg-amber-100 text-amber-700'
                                                             }`}>
                                                             {row.status}
                                                         </span>
@@ -211,6 +232,59 @@ function ProcurementManagementPage({ initialTab = 'procurement' }) {
                                                                 <button onClick={() => handleVerify(row.id)} className="btn-sm bg-green-600 text-white hover:bg-green-700">Approve & Grade</button>
                                                                 <button onClick={() => handleReject(row.id)} className="btn-sm bg-red-100 text-red-600 hover:bg-red-200">Reject</button>
                                                             </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* View 3: Inventory & Sales */}
+                    {activeTab === 'inventory' && (
+                        <div className="space-y-6">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex gap-3 text-blue-800">
+                                <div className="icon-box mt-1"></div>
+                                <div>
+                                    <h4 className="font-bold">FPO Inventory & Sales</h4>
+                                    <p className="text-sm">Manage verified stock and list items for Processors to buy.</p>
+                                </div>
+                            </div>
+
+                            <div className="card overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th className="p-4">Batch ID</th>
+                                                <th className="p-4">Item</th>
+                                                <th className="p-4">Quantity</th>
+                                                <th className="p-4">Location</th>
+                                                <th className="p-4">Status</th>
+                                                <th className="p-4">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                            {inventory.length === 0 ? (
+                                                <tr><td colSpan="6" className="p-8 text-center text-gray-500">Inventory is empty.</td></tr>
+                                            ) : (
+                                                inventory.map((row) => (
+                                                    <tr key={row.id}>
+                                                        <td className="p-4 font-mono text-xs">{row.batch || row.id}</td>
+                                                        <td className="p-4 font-bold">{row.item}</td>
+                                                        <td className="p-4">{row.quantity} {row.unit}</td>
+                                                        <td className="p-4">{row.location}</td>
+                                                        <td className="p-4"><span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Available</span></td>
+                                                        <td className="p-4">
+                                                            <button
+                                                                onClick={() => handleSellToProcessor(row)}
+                                                                className="btn-sm bg-blue-600 text-white hover:bg-blue-700 transition"
+                                                            >
+                                                                List for Processors
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))

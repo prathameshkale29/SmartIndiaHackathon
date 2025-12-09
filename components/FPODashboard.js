@@ -21,13 +21,13 @@ function FPODashboard({ setActivePage, user }) {
                     <div className="icon-users text-9xl"></div>
                 </div>
                 <div className="relative z-10">
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                         <div>
                             <span className="bg-blue-800/50 border border-blue-700/50 text-blue-200 px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">FPO Dashboard</span>
                             <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}</h1>
                             <p className="text-blue-200 max-w-xl">Manage farmer collections, quality checks, and logistics efficiency from a single command center.</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap gap-2 md:gap-3">
                             <button onClick={() => setActivePage('procurement-mgmt')} className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center gap-2">
                                 <div className="icon-clipboard-list"></div> Procurement
                             </button>
